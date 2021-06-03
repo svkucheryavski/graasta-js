@@ -178,7 +178,7 @@
 :global(.mdatools-app .app-controls-area) {
    display: flex;
    flex-direction: column;
-   justify-content: flex-end;
+   justify-content: flex-start;
    align-content: center;
 }
 
