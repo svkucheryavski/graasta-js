@@ -1,0 +1,165 @@
+<script>
+   import {max, rnorm, quantile, mean, min} from 'stat-js';
+   import {default as StatApp} from '../../shared/StatApp.svelte';
+   import AppControlRange from '../../shared/AppControlRange.svelte';
+   import AppControlButton from '../../shared/AppControlButton.svelte';
+   import AppControlArea from '../../shared/AppControlArea.svelte';
+   import Plot from './AppPlot.svelte';
+   import DataTable from './AppDataTable.svelte';
+   import StatTable from './AppStatTable.svelte';
+
+   const sampleSize = 12;
+   const popMean = 110;
+   const popStd = 5;
+   const statLabels = ["min", "Q1", "Q2", "Q3", "max"];
+   const statNum = statLabels.length;
+
+   let minRange = [0, 0];
+   let maxRange = [0, 0];
+
+   const getSample = function(n) {
+      let values = rnorm(n, popMean, popStd).sort((a, b) => a - b);
+      const dv = (max(values) - min(values)) * 0.5;
+
+      minRange = [values[0] - dv, values[1] - (values[1] - values[0]) * 0.10];
+      maxRange = [values[n - 2] + (values[n - 1] - values[n - 2]) * 0.10, values[n - 1] + dv];
+      return({
+         i: Array.from({length: n}, (v, i) => i + 1),
+         x: values,
+         p: Array.from({length: n}, (v, i) => (i + 0.5) / n),
+      });
+   }
+
+   $: sample = getSample(sampleSize);
+   $: errormsg = sampleSize < 3 || sampleSize > 30 ? "Sample size should be between 3 and 30." : "";
+</script>
+
+<StatApp>
+   <div class="app-layout">
+
+      <div class="left-column">
+         <!-- dot with data points and statistics -->
+         <div class="app-plot-area">
+            <Plot values={sample.x} />
+         </div>
+         <!-- data table -->
+         <div class="app-datatable-area">
+            <DataTable {sample} />
+         </div>
+      </div>
+
+      <div class="right-column">
+         <!-- table with statistics -->
+         <div class="app-stattable-area">
+            <StatTable values={sample.x} />
+         </div>
+         <!-- control elements -->
+         <div class="app-controls-area">
+            <AppControlArea {errormsg}>
+               <AppControlButton id="sampleSize" label="Sample:" text="Take new" on:click={() => sample = getSample(sampleSize)} />
+               <AppControlRange id="minValue" label="Change min:" step={0.1} bind:value={sample.x[0]} min={minRange[0]} max={minRange[1]} />
+               <AppControlRange id="maxValue" label="Change max:" step={0.1} bind:value={sample.x[sampleSize - 1]} min={maxRange[0]} max={maxRange[1]} />
+            </AppControlArea>
+         </div>
+      </div>
+   </div>
+
+   <div slot="help">
+      <h2>Quantiles, quartiles, percentiles</h2>
+      <p>
+         This app shows calculation of main non-parametric descriptive statistics: <i>min</i>, <i>max</i>, <i>quartiles</i> and
+         <i>percentils</i>. The plot contains the current sample values as points and the traditional boxplot. The dashed line inside
+         the box shows the mean. The red elements represent boundaries for detection of outliers.
+      </p>
+      <p>
+         Try to change the smallest (<i>min</i>) or the largest (<i>max</i>) values of your current sample using the sliders in order to see what happens to the boxplot if one of the values will be outside the boundaries. You can also pay attention which statistics are changing and which remain stable in this case.
+      </p>
+      <p>
+         The table in the bottom shows the current values (<i>x</i>) ordered from smallest to largest, their rank (<i>i</i>), as well
+         as their percentiles (<i>p</i>). The percentiles are computed using <code>(i - 0.5)/n</code> rule. The table on the right side shows the computed statistics.
+      </p>
+   </div>
+</StatApp>
+
+<style>
+
+.app-layout {
+   width: 100%;
+   height: 100%;
+   position: relative;
+   display: flex;
+}
+
+.left-column {
+   flex: 1 1 65%;
+}
+
+.right-column {
+   flex: 1 1 35%;
+}
+
+.app-plot-area {
+   box-sizing: border-box;
+   height: 80%;
+   width: 100%;
+   padding-right: 10px;
+   padding-bottom: 20px;
+}
+
+.app-datatable-area {
+   box-sizing: border-box;
+   height: 100%;
+   width: 100%;
+   padding-right: 10px;
+   padding-top: 10px;
+}
+
+.app-stattable-area {
+   padding-left: 10px;
+   padding-bottom: 20px;
+}
+
+
+.app-controls-area {
+   display: flex;
+   flex-direction: column;
+   justify-content: flex-start;
+   align-content: center;
+   padding-left: 10px;
+   padding-top: 10px;
+}
+
+:global(.datatable) {
+   width: 100%;
+   color: #404040;
+   text-align: right;
+}
+
+
+.app-datatable-area :global(.datatable > tr:first-of-type) {
+   border-bottom: solid 1px #e0e0e0;
+}
+
+.app-datatable-area :global(.datatable > tr:nth-of-type(2) > .datatable__value) {
+   color: #191970;
+}
+
+
+.app-datatable-area :global(.datatable > tr:nth-of-type(2) > td:nth-of-type(2)),
+.app-datatable-area :global(.datatable > tr:nth-of-type(2) > td:last-of-type) {
+   font-weight: bold;
+   color: blue;
+}
+
+.app-stattable-area :global(.datatable > tr) {
+   border-bottom: solid 1px #e0e0e0;
+}
+
+.app-stattable-area :global(.datatable > tr:first-of-type) {
+   border-top: solid 1px #e0e0e0;
+}
+
+.app-stattable-area :global(.datatable__label ) {
+   text-align: left;
+}
+</style>
