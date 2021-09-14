@@ -34,7 +34,7 @@ export default {
 		sourcemap: true,
 		format: 'iife',
 		name: 'app',
-		file: 'public/build/asta-b102.js'
+		file: 'public/asta-b102.js'
 	},
 	plugins: [
 		svelte({

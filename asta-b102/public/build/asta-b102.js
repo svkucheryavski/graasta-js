@@ -1216,7 +1216,7 @@ var app = (function () {
     	const TICK_NUM = { "small": 5, "medium": 8, "large": 12 };
 
     	// margin between plot series elements and data labels
-    	const LABELS_MARGIN = { "small": 15, "medium": 20, "large": 25 };
+    	const LABELS_MARGIN = { "small": 10, "medium": 15, "large": 20 };
 
     	// line styles for different scales and types
     	const LINE_STYLES = {
@@ -1712,9 +1712,9 @@ var app = (function () {
     			attr_dev(line, "y1", line_y__value = /*y*/ ctx[1][0]);
     			attr_dev(line, "y2", line_y__value_1 = /*y*/ ctx[1][0]);
     			attr_dev(line, "style", /*axisLineStyleStr*/ ctx[7]);
-    			add_location(line, file$a, 63, 3, 2585);
+    			add_location(line, file$a, 63, 3, 2597);
     			attr_dev(g, "class", "mdaplot__axis mdaplot__xaxis");
-    			add_location(g, file$a, 57, 0, 2166);
+    			add_location(g, file$a, 57, 3, 2169);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, g, anchor);
@@ -1812,13 +1812,13 @@ var app = (function () {
     			attr_dev(line0, "y1", line0_y__value = /*y*/ ctx[1][0]);
     			attr_dev(line0, "y2", line0_y__value_1 = /*y*/ ctx[1][1]);
     			attr_dev(line0, "style", /*gridLineStyleStr*/ ctx[8]);
-    			add_location(line0, file$a, 59, 3, 2237);
+    			add_location(line0, file$a, 59, 6, 2243);
     			attr_dev(line1, "x1", line1_x__value = /*tx*/ ctx[26]);
     			attr_dev(line1, "x2", line1_x__value_1 = /*tx*/ ctx[26]);
     			attr_dev(line1, "y1", line1_y__value = /*ticksY*/ ctx[5][0]);
     			attr_dev(line1, "y2", line1_y__value_1 = /*ticksY*/ ctx[5][1]);
     			attr_dev(line1, "style", /*axisLineStyleStr*/ ctx[7]);
-    			add_location(line1, file$a, 60, 3, 2325);
+    			add_location(line1, file$a, 60, 6, 2334);
     			attr_dev(text_1, "x", text_1_x_value = /*tx*/ ctx[26]);
     			attr_dev(text_1, "y", text_1_y_value = /*ticksY*/ ctx[5][1]);
     			attr_dev(text_1, "dx", "0");
@@ -1826,7 +1826,7 @@ var app = (function () {
     			attr_dev(text_1, "class", "mdaplot__axis-labels");
     			attr_dev(text_1, "dominant-baseline", "middle");
     			attr_dev(text_1, "text-anchor", "middle");
-    			add_location(text_1, file$a, 61, 3, 2423);
+    			add_location(text_1, file$a, 61, 6, 2435);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, line0, anchor);
@@ -2233,9 +2233,9 @@ var app = (function () {
     			attr_dev(line, "y1", line_y__value = /*y*/ ctx[3][0]);
     			attr_dev(line, "y2", line_y__value_1 = /*y*/ ctx[3][1]);
     			attr_dev(line, "style", /*axisLineStyleStr*/ ctx[7]);
-    			add_location(line, file$9, 66, 3, 2700);
+    			add_location(line, file$9, 66, 3, 2703);
     			attr_dev(g, "class", "mdaplot__axis mdaplot__yaxis");
-    			add_location(g, file$9, 60, 0, 2237);
+    			add_location(g, file$9, 60, 3, 2240);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, g, anchor);
@@ -2333,13 +2333,13 @@ var app = (function () {
     			attr_dev(line0, "y1", line0_y__value = /*ty*/ ctx[26]);
     			attr_dev(line0, "y2", line0_y__value_1 = /*ty*/ ctx[26]);
     			attr_dev(line0, "style", /*gridLineStyleStr*/ ctx[8]);
-    			add_location(line0, file$9, 62, 6, 2311);
+    			add_location(line0, file$9, 62, 6, 2314);
     			attr_dev(line1, "x1", line1_x__value = /*ticksX*/ ctx[5][0]);
     			attr_dev(line1, "x2", line1_x__value_1 = /*ticksX*/ ctx[5][1]);
     			attr_dev(line1, "y1", line1_y__value = /*ty*/ ctx[26]);
     			attr_dev(line1, "y2", line1_y__value_1 = /*ty*/ ctx[26]);
     			attr_dev(line1, "style", /*axisLineStyleStr*/ ctx[7]);
-    			add_location(line1, file$9, 63, 6, 2402);
+    			add_location(line1, file$9, 63, 6, 2405);
     			attr_dev(text_1, "x", text_1_x_value = /*ticksX*/ ctx[5][0]);
     			attr_dev(text_1, "y", text_1_y_value = /*ty*/ ctx[26]);
     			attr_dev(text_1, "dx", /*dx*/ ctx[2]);
@@ -2349,7 +2349,7 @@ var app = (function () {
     			attr_dev(text_1, "class", "mdaplot__axis-labels");
     			attr_dev(text_1, "dominant-baseline", "middle");
     			attr_dev(text_1, "text-anchor", "end");
-    			add_location(text_1, file$9, 64, 6, 2504);
+    			add_location(text_1, file$9, 64, 6, 2507);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, line0, anchor);
@@ -3178,10 +3178,10 @@ var app = (function () {
 
     	rectangles = new Rectangles({
     			props: {
-    				left: [/*left*/ ctx[0]],
-    				top: [/*top*/ ctx[1]],
-    				width: [/*width*/ ctx[2]],
-    				height: [/*height*/ ctx[3]],
+    				left: /*left*/ ctx[0],
+    				top: /*top*/ ctx[1],
+    				width: /*width*/ ctx[2],
+    				height: /*height*/ ctx[3],
     				borderColor: Colors.DARKGRAY,
     				faceColor: "transparent"
     			},
@@ -3193,7 +3193,7 @@ var app = (function () {
     			g = svg_element("g");
     			create_component(rectangles.$$.fragment);
     			attr_dev(g, "class", "mdaplot__axes-box");
-    			add_location(g, file$7, 28, 0, 733);
+    			add_location(g, file$7, 28, 3, 744);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, g, anchor);
@@ -3202,10 +3202,10 @@ var app = (function () {
     		},
     		p: function update(ctx, dirty) {
     			const rectangles_changes = {};
-    			if (dirty & /*left*/ 1) rectangles_changes.left = [/*left*/ ctx[0]];
-    			if (dirty & /*top*/ 2) rectangles_changes.top = [/*top*/ ctx[1]];
-    			if (dirty & /*width*/ 4) rectangles_changes.width = [/*width*/ ctx[2]];
-    			if (dirty & /*height*/ 8) rectangles_changes.height = [/*height*/ ctx[3]];
+    			if (dirty & /*left*/ 1) rectangles_changes.left = /*left*/ ctx[0];
+    			if (dirty & /*top*/ 2) rectangles_changes.top = /*top*/ ctx[1];
+    			if (dirty & /*width*/ 4) rectangles_changes.width = /*width*/ ctx[2];
+    			if (dirty & /*height*/ 8) rectangles_changes.height = /*height*/ ctx[3];
     			rectangles.$set(rectangles_changes);
     		},
     		i: function intro(local) {
@@ -3374,19 +3374,19 @@ var app = (function () {
     	$$self.$$.update = () => {
     		if ($$self.$$.dirty & /*$xLim*/ 512) {
     			// reactive variables for coordinates of box points in pixels
-    			$$invalidate(0, left = $xLim[0]);
+    			$$invalidate(0, left = [$xLim[0]]);
     		}
 
     		if ($$self.$$.dirty & /*$yLim*/ 1024) {
-    			$$invalidate(1, top = $yLim[1]);
+    			$$invalidate(1, top = [$yLim[1]]);
     		}
 
     		if ($$self.$$.dirty & /*$xLim*/ 512) {
-    			$$invalidate(2, width = $xLim[1] - $xLim[0]);
+    			$$invalidate(2, width = [$xLim[1] - $xLim[0]]);
     		}
 
     		if ($$self.$$.dirty & /*$yLim*/ 1024) {
-    			$$invalidate(3, height = $yLim[1] - $yLim[0]);
+    			$$invalidate(3, height = [$yLim[1] - $yLim[0]]);
     		}
     	};
 
@@ -3873,15 +3873,15 @@ var app = (function () {
 
     function get_each_context$1(ctx, list, i) {
     	const child_ctx = ctx.slice();
-    	child_ctx[21] = list[i];
-    	child_ctx[23] = i;
+    	child_ctx[24] = list[i];
+    	child_ctx[26] = i;
     	return child_ctx;
     }
 
-    // (54:0) {#if x !== undefined && y !== undefined}
+    // (53:0) {#if x !== undefined && y !== undefined}
     function create_if_block$4(ctx) {
     	let each_1_anchor;
-    	let each_value = /*x*/ ctx[3];
+    	let each_value = /*x*/ ctx[1];
     	validate_each_argument(each_value);
     	let each_blocks = [];
 
@@ -3906,7 +3906,7 @@ var app = (function () {
     		},
     		p: function update(ctx, dirty) {
     			if (dirty & /*textStyleStr, x, y, dx, dy, labels*/ 63) {
-    				each_value = /*x*/ ctx[3];
+    				each_value = /*x*/ ctx[1];
     				validate_each_argument(each_value);
     				let i;
 
@@ -3939,57 +3939,55 @@ var app = (function () {
     		block,
     		id: create_if_block$4.name,
     		type: "if",
-    		source: "(54:0) {#if x !== undefined && y !== undefined}",
+    		source: "(53:0) {#if x !== undefined && y !== undefined}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (55:3) {#each x as v, i}
+    // (54:3) {#each x as v, i}
     function create_each_block$1(ctx) {
     	let text_1;
-    	let t_value = /*labels*/ ctx[0][/*i*/ ctx[23]] + "";
+    	let t_value = /*labels*/ ctx[0][/*i*/ ctx[26]] + "";
     	let t;
     	let text_1_x_value;
     	let text_1_y_value;
-    	let text_1_dx_value;
-    	let text_1_dy_value;
 
     	const block = {
     		c: function create() {
     			text_1 = svg_element("text");
     			t = text(t_value);
     			attr_dev(text_1, "style", /*textStyleStr*/ ctx[5]);
-    			attr_dev(text_1, "x", text_1_x_value = /*x*/ ctx[3][/*i*/ ctx[23]]);
-    			attr_dev(text_1, "y", text_1_y_value = /*y*/ ctx[4][/*i*/ ctx[23]]);
-    			attr_dev(text_1, "dx", text_1_dx_value = /*dx*/ ctx[1][/*i*/ ctx[23]]);
-    			attr_dev(text_1, "dy", text_1_dy_value = /*dy*/ ctx[2][/*i*/ ctx[23]]);
+    			attr_dev(text_1, "x", text_1_x_value = /*x*/ ctx[1][/*i*/ ctx[26]]);
+    			attr_dev(text_1, "y", text_1_y_value = /*y*/ ctx[2][/*i*/ ctx[26]]);
+    			attr_dev(text_1, "dx", /*dx*/ ctx[3]);
+    			attr_dev(text_1, "dy", /*dy*/ ctx[4]);
     			attr_dev(text_1, "dominant-baseline", "middle");
     			attr_dev(text_1, "text-anchor", "middle");
-    			add_location(text_1, file$5, 55, 6, 1948);
+    			add_location(text_1, file$5, 54, 6, 1973);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, text_1, anchor);
     			append_dev(text_1, t);
     		},
     		p: function update(ctx, dirty) {
-    			if (dirty & /*labels*/ 1 && t_value !== (t_value = /*labels*/ ctx[0][/*i*/ ctx[23]] + "")) set_data_dev(t, t_value);
+    			if (dirty & /*labels*/ 1 && t_value !== (t_value = /*labels*/ ctx[0][/*i*/ ctx[26]] + "")) set_data_dev(t, t_value);
 
-    			if (dirty & /*x*/ 8 && text_1_x_value !== (text_1_x_value = /*x*/ ctx[3][/*i*/ ctx[23]])) {
+    			if (dirty & /*x*/ 2 && text_1_x_value !== (text_1_x_value = /*x*/ ctx[1][/*i*/ ctx[26]])) {
     				attr_dev(text_1, "x", text_1_x_value);
     			}
 
-    			if (dirty & /*y*/ 16 && text_1_y_value !== (text_1_y_value = /*y*/ ctx[4][/*i*/ ctx[23]])) {
+    			if (dirty & /*y*/ 4 && text_1_y_value !== (text_1_y_value = /*y*/ ctx[2][/*i*/ ctx[26]])) {
     				attr_dev(text_1, "y", text_1_y_value);
     			}
 
-    			if (dirty & /*dx*/ 2 && text_1_dx_value !== (text_1_dx_value = /*dx*/ ctx[1][/*i*/ ctx[23]])) {
-    				attr_dev(text_1, "dx", text_1_dx_value);
+    			if (dirty & /*dx*/ 8) {
+    				attr_dev(text_1, "dx", /*dx*/ ctx[3]);
     			}
 
-    			if (dirty & /*dy*/ 4 && text_1_dy_value !== (text_1_dy_value = /*dy*/ ctx[2][/*i*/ ctx[23]])) {
-    				attr_dev(text_1, "dy", text_1_dy_value);
+    			if (dirty & /*dy*/ 16) {
+    				attr_dev(text_1, "dy", /*dy*/ ctx[4]);
     			}
     		},
     		d: function destroy(detaching) {
@@ -4001,7 +3999,7 @@ var app = (function () {
     		block,
     		id: create_each_block$1.name,
     		type: "each",
-    		source: "(55:3) {#each x as v, i}",
+    		source: "(54:3) {#each x as v, i}",
     		ctx
     	});
 
@@ -4010,7 +4008,7 @@ var app = (function () {
 
     function create_fragment$7(ctx) {
     	let if_block_anchor;
-    	let if_block = /*x*/ ctx[3] !== undefined && /*y*/ ctx[4] !== undefined && create_if_block$4(ctx);
+    	let if_block = /*x*/ ctx[1] !== undefined && /*y*/ ctx[2] !== undefined && create_if_block$4(ctx);
 
     	const block = {
     		c: function create() {
@@ -4025,7 +4023,7 @@ var app = (function () {
     			insert_dev(target, if_block_anchor, anchor);
     		},
     		p: function update(ctx, [dirty]) {
-    			if (/*x*/ ctx[3] !== undefined && /*y*/ ctx[4] !== undefined) {
+    			if (/*x*/ ctx[1] !== undefined && /*y*/ ctx[2] !== undefined) {
     				if (if_block) {
     					if_block.p(ctx, dirty);
     				} else {
@@ -4060,17 +4058,19 @@ var app = (function () {
     function instance$7($$self, $$props, $$invalidate) {
     	let x;
     	let y;
+    	let dx;
+    	let dy;
     	let $xLim;
     	let $axesWidth;
     	let $yLim;
     	let $axesHeight;
+    	let $scale;
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots("TextLabels", slots, []);
     	let { xValues } = $$props;
     	let { yValues } = $$props;
     	let { labels } = $$props;
-    	let { dx = 0 } = $$props;
-    	let { dy = 0 } = $$props;
+    	let { pos = 0 } = $$props;
     	let { faceColor = Colors.PRIMARY_TEXT } = $$props;
     	let { borderColor = "transparent" } = $$props;
     	let { borderWidth = 0 } = $$props;
@@ -4089,23 +4089,25 @@ var app = (function () {
 
     	const xLim = axes.xLim;
     	validate_store(xLim, "xLim");
-    	component_subscribe($$self, xLim, value => $$invalidate(16, $xLim = value));
+    	component_subscribe($$self, xLim, value => $$invalidate(18, $xLim = value));
     	const yLim = axes.yLim;
     	validate_store(yLim, "yLim");
-    	component_subscribe($$self, yLim, value => $$invalidate(18, $yLim = value));
+    	component_subscribe($$self, yLim, value => $$invalidate(20, $yLim = value));
     	const axesWidth = axes.width;
     	validate_store(axesWidth, "axesWidth");
-    	component_subscribe($$self, axesWidth, value => $$invalidate(17, $axesWidth = value));
+    	component_subscribe($$self, axesWidth, value => $$invalidate(19, $axesWidth = value));
     	const axesHeight = axes.height;
     	validate_store(axesHeight, "axesHeight");
-    	component_subscribe($$self, axesHeight, value => $$invalidate(19, $axesHeight = value));
+    	component_subscribe($$self, axesHeight, value => $$invalidate(21, $axesHeight = value));
+    	const scale = axes.scale;
+    	validate_store(scale, "scale");
+    	component_subscribe($$self, scale, value => $$invalidate(22, $scale = value));
 
     	const writable_props = [
     		"xValues",
     		"yValues",
     		"labels",
-    		"dx",
-    		"dy",
+    		"pos",
     		"faceColor",
     		"borderColor",
     		"borderWidth",
@@ -4117,15 +4119,14 @@ var app = (function () {
     	});
 
     	$$self.$$set = $$props => {
-    		if ("xValues" in $$props) $$invalidate(10, xValues = $$props.xValues);
-    		if ("yValues" in $$props) $$invalidate(11, yValues = $$props.yValues);
+    		if ("xValues" in $$props) $$invalidate(11, xValues = $$props.xValues);
+    		if ("yValues" in $$props) $$invalidate(12, yValues = $$props.yValues);
     		if ("labels" in $$props) $$invalidate(0, labels = $$props.labels);
-    		if ("dx" in $$props) $$invalidate(1, dx = $$props.dx);
-    		if ("dy" in $$props) $$invalidate(2, dy = $$props.dy);
-    		if ("faceColor" in $$props) $$invalidate(12, faceColor = $$props.faceColor);
-    		if ("borderColor" in $$props) $$invalidate(13, borderColor = $$props.borderColor);
-    		if ("borderWidth" in $$props) $$invalidate(14, borderWidth = $$props.borderWidth);
-    		if ("textSize" in $$props) $$invalidate(15, textSize = $$props.textSize);
+    		if ("pos" in $$props) $$invalidate(13, pos = $$props.pos);
+    		if ("faceColor" in $$props) $$invalidate(14, faceColor = $$props.faceColor);
+    		if ("borderColor" in $$props) $$invalidate(15, borderColor = $$props.borderColor);
+    		if ("borderWidth" in $$props) $$invalidate(16, borderWidth = $$props.borderWidth);
+    		if ("textSize" in $$props) $$invalidate(17, textSize = $$props.textSize);
     	};
 
     	$$self.$capture_state = () => ({
@@ -4134,8 +4135,7 @@ var app = (function () {
     		xValues,
     		yValues,
     		labels,
-    		dx,
-    		dy,
+    		pos,
     		faceColor,
     		borderColor,
     		borderWidth,
@@ -4146,26 +4146,31 @@ var app = (function () {
     		yLim,
     		axesWidth,
     		axesHeight,
+    		scale,
     		x,
     		$xLim,
     		$axesWidth,
     		y,
     		$yLim,
-    		$axesHeight
+    		$axesHeight,
+    		dx,
+    		$scale,
+    		dy
     	});
 
     	$$self.$inject_state = $$props => {
-    		if ("xValues" in $$props) $$invalidate(10, xValues = $$props.xValues);
-    		if ("yValues" in $$props) $$invalidate(11, yValues = $$props.yValues);
+    		if ("xValues" in $$props) $$invalidate(11, xValues = $$props.xValues);
+    		if ("yValues" in $$props) $$invalidate(12, yValues = $$props.yValues);
     		if ("labels" in $$props) $$invalidate(0, labels = $$props.labels);
-    		if ("dx" in $$props) $$invalidate(1, dx = $$props.dx);
-    		if ("dy" in $$props) $$invalidate(2, dy = $$props.dy);
-    		if ("faceColor" in $$props) $$invalidate(12, faceColor = $$props.faceColor);
-    		if ("borderColor" in $$props) $$invalidate(13, borderColor = $$props.borderColor);
-    		if ("borderWidth" in $$props) $$invalidate(14, borderWidth = $$props.borderWidth);
-    		if ("textSize" in $$props) $$invalidate(15, textSize = $$props.textSize);
-    		if ("x" in $$props) $$invalidate(3, x = $$props.x);
-    		if ("y" in $$props) $$invalidate(4, y = $$props.y);
+    		if ("pos" in $$props) $$invalidate(13, pos = $$props.pos);
+    		if ("faceColor" in $$props) $$invalidate(14, faceColor = $$props.faceColor);
+    		if ("borderColor" in $$props) $$invalidate(15, borderColor = $$props.borderColor);
+    		if ("borderWidth" in $$props) $$invalidate(16, borderWidth = $$props.borderWidth);
+    		if ("textSize" in $$props) $$invalidate(17, textSize = $$props.textSize);
+    		if ("x" in $$props) $$invalidate(1, x = $$props.x);
+    		if ("y" in $$props) $$invalidate(2, y = $$props.y);
+    		if ("dx" in $$props) $$invalidate(3, dx = $$props.dx);
+    		if ("dy" in $$props) $$invalidate(4, dy = $$props.dy);
     	};
 
     	if ($$props && "$$inject" in $$props) {
@@ -4173,13 +4178,11 @@ var app = (function () {
     	}
 
     	$$self.$$.update = () => {
-    		if ($$self.$$.dirty & /*xValues, labels, dx, dy*/ 1031) {
+    		if ($$self.$$.dirty & /*xValues, labels*/ 2049) {
     			// multiply labels values if needed
     			{
     				const n = xValues.length;
     				if (!Array.isArray(labels)) $$invalidate(0, labels = Array(n).fill(labels));
-    				if (!Array.isArray(dx)) $$invalidate(1, dx = Array(n).fill(dx));
-    				if (!Array.isArray(dy)) $$invalidate(2, dy = Array(n).fill(dy));
 
     				// workaround for an issue when xValues and yValues are changed in parent app
     				// but array of labels is still the same as in the
@@ -4192,29 +4195,39 @@ var app = (function () {
     			}
     		}
 
-    		if ($$self.$$.dirty & /*xValues, $xLim, $axesWidth*/ 197632) {
+    		if ($$self.$$.dirty & /*xValues, $xLim, $axesWidth*/ 788480) {
     			// reactive variables for coordinates of data points in pixels
-    			$$invalidate(3, x = axes.scaleX(xValues, $xLim, $axesWidth));
+    			$$invalidate(1, x = axes.scaleX(xValues, $xLim, $axesWidth));
     		}
 
-    		if ($$self.$$.dirty & /*yValues, $yLim, $axesHeight*/ 788480) {
-    			$$invalidate(4, y = axes.scaleY(yValues, $yLim, $axesHeight));
+    		if ($$self.$$.dirty & /*yValues, $yLim, $axesHeight*/ 3149824) {
+    			$$invalidate(2, y = axes.scaleY(yValues, $yLim, $axesHeight));
+    		}
+
+    		if ($$self.$$.dirty & /*pos, $scale*/ 4202496) {
+    			$$invalidate(3, dx = [0, 0, 1, 0, -1][pos] * axes.LABELS_MARGIN[$scale]);
+    		}
+
+    		if ($$self.$$.dirty & /*pos, $scale*/ 4202496) {
+    			$$invalidate(4, dy = [0, 1, 0, -1, 0][pos] * axes.LABELS_MARGIN[$scale]);
     		}
     	};
 
     	return [
     		labels,
-    		dx,
-    		dy,
     		x,
     		y,
+    		dx,
+    		dy,
     		textStyleStr,
     		xLim,
     		yLim,
     		axesWidth,
     		axesHeight,
+    		scale,
     		xValues,
     		yValues,
+    		pos,
     		faceColor,
     		borderColor,
     		borderWidth,
@@ -4222,7 +4235,8 @@ var app = (function () {
     		$xLim,
     		$axesWidth,
     		$yLim,
-    		$axesHeight
+    		$axesHeight,
+    		$scale
     	];
     }
 
@@ -4231,15 +4245,14 @@ var app = (function () {
     		super(options);
 
     		init(this, options, instance$7, create_fragment$7, safe_not_equal, {
-    			xValues: 10,
-    			yValues: 11,
+    			xValues: 11,
+    			yValues: 12,
     			labels: 0,
-    			dx: 1,
-    			dy: 2,
-    			faceColor: 12,
-    			borderColor: 13,
-    			borderWidth: 14,
-    			textSize: 15
+    			pos: 13,
+    			faceColor: 14,
+    			borderColor: 15,
+    			borderWidth: 16,
+    			textSize: 17
     		});
 
     		dispatch_dev("SvelteRegisterComponent", {
@@ -4252,11 +4265,11 @@ var app = (function () {
     		const { ctx } = this.$$;
     		const props = options.props || {};
 
-    		if (/*xValues*/ ctx[10] === undefined && !("xValues" in props)) {
+    		if (/*xValues*/ ctx[11] === undefined && !("xValues" in props)) {
     			console.warn("<TextLabels> was created without expected prop 'xValues'");
     		}
 
-    		if (/*yValues*/ ctx[11] === undefined && !("yValues" in props)) {
+    		if (/*yValues*/ ctx[12] === undefined && !("yValues" in props)) {
     			console.warn("<TextLabels> was created without expected prop 'yValues'");
     		}
 
@@ -4289,19 +4302,11 @@ var app = (function () {
     		throw new Error("<TextLabels>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
 
-    	get dx() {
+    	get pos() {
     		throw new Error("<TextLabels>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
 
-    	set dx(value) {
-    		throw new Error("<TextLabels>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get dy() {
-    		throw new Error("<TextLabels>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set dy(value) {
+    	set pos(value) {
     		throw new Error("<TextLabels>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
 
@@ -4649,7 +4654,7 @@ var app = (function () {
     /* ../../svelte-plots-basic/src/LineSeries.svelte generated by Svelte v3.38.2 */
     const file$3 = "../../svelte-plots-basic/src/LineSeries.svelte";
 
-    // (44:0) {#if p !== undefined}
+    // (43:0) {#if p !== undefined}
     function create_if_block$3(ctx) {
     	let g;
     	let polyline;
@@ -4660,11 +4665,11 @@ var app = (function () {
     			polyline = svg_element("polyline");
     			attr_dev(polyline, "class", "line");
     			attr_dev(polyline, "points", /*p*/ ctx[1]);
-    			add_location(polyline, file$3, 45, 3, 1613);
+    			add_location(polyline, file$3, 44, 3, 1612);
     			attr_dev(g, "class", "series lineseries");
     			attr_dev(g, "style", /*lineStyleStr*/ ctx[2]);
     			attr_dev(g, "title", /*title*/ ctx[0]);
-    			add_location(g, file$3, 44, 3, 1541);
+    			add_location(g, file$3, 43, 3, 1540);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, g, anchor);
@@ -4692,7 +4697,7 @@ var app = (function () {
     		block,
     		id: create_if_block$3.name,
     		type: "if",
-    		source: "(44:0) {#if p !== undefined}",
+    		source: "(43:0) {#if p !== undefined}",
     		ctx
     	});
 
@@ -6106,19 +6111,19 @@ var app = (function () {
     const get_help_slot_changes = dirty => ({});
     const get_help_slot_context = ctx => ({});
 
-    // (42:3) {:else}
+    // (44:3) {:else}
     function create_else_block(ctx) {
     	let div;
     	let current;
-    	const help_slot_template = /*#slots*/ ctx[6].help;
-    	const help_slot = create_slot(help_slot_template, ctx, /*$$scope*/ ctx[5], get_help_slot_context);
+    	const help_slot_template = /*#slots*/ ctx[8].help;
+    	const help_slot = create_slot(help_slot_template, ctx, /*$$scope*/ ctx[7], get_help_slot_context);
 
     	const block = {
     		c: function create() {
     			div = element("div");
     			if (help_slot) help_slot.c();
     			attr_dev(div, "class", "mdatools-app__helptext");
-    			add_location(div, file$1, 42, 3, 952);
+    			add_location(div, file$1, 44, 3, 1058);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -6131,8 +6136,8 @@ var app = (function () {
     		},
     		p: function update(ctx, dirty) {
     			if (help_slot) {
-    				if (help_slot.p && (!current || dirty & /*$$scope*/ 32)) {
-    					update_slot(help_slot, help_slot_template, ctx, /*$$scope*/ ctx[5], dirty, get_help_slot_changes, get_help_slot_context);
+    				if (help_slot.p && (!current || dirty & /*$$scope*/ 128)) {
+    					update_slot(help_slot, help_slot_template, ctx, /*$$scope*/ ctx[7], dirty, get_help_slot_changes, get_help_slot_context);
     				}
     			}
     		},
@@ -6155,26 +6160,26 @@ var app = (function () {
     		block,
     		id: create_else_block.name,
     		type: "else",
-    		source: "(42:3) {:else}",
+    		source: "(44:3) {:else}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (37:3) {#if !showHelp}
+    // (39:3) {#if !showHelp}
     function create_if_block$1(ctx) {
     	let div;
     	let current;
-    	const default_slot_template = /*#slots*/ ctx[6].default;
-    	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[5], null);
+    	const default_slot_template = /*#slots*/ ctx[8].default;
+    	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[7], null);
 
     	const block = {
     		c: function create() {
     			div = element("div");
     			if (default_slot) default_slot.c();
     			attr_dev(div, "class", "mdatools-app__content");
-    			add_location(div, file$1, 37, 3, 874);
+    			add_location(div, file$1, 39, 3, 980);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -6187,8 +6192,8 @@ var app = (function () {
     		},
     		p: function update(ctx, dirty) {
     			if (default_slot) {
-    				if (default_slot.p && (!current || dirty & /*$$scope*/ 32)) {
-    					update_slot(default_slot, default_slot_template, ctx, /*$$scope*/ ctx[5], dirty, null, null);
+    				if (default_slot.p && (!current || dirty & /*$$scope*/ 128)) {
+    					update_slot(default_slot, default_slot_template, ctx, /*$$scope*/ ctx[7], dirty, null, null);
     				}
     			}
     		},
@@ -6211,7 +6216,7 @@ var app = (function () {
     		block,
     		id: create_if_block$1.name,
     		type: "if",
-    		source: "(37:3) {#if !showHelp}",
+    		source: "(39:3) {#if !showHelp}",
     		ctx
     	});
 
@@ -6224,9 +6229,7 @@ var app = (function () {
     	let if_block;
     	let t0;
     	let button;
-    	let t1_value = (/*showHelp*/ ctx[0] ? "×" : "?") + "";
     	let t1;
-    	let button_title_value;
     	let main_class_value;
     	let current;
     	let mounted;
@@ -6248,12 +6251,12 @@ var app = (function () {
     			if_block.c();
     			t0 = space();
     			button = element("button");
-    			t1 = text(t1_value);
+    			t1 = text(/*buttonIcon*/ ctx[4]);
     			attr_dev(button, "class", "mdatools-app__help-button");
-    			attr_dev(button, "title", button_title_value = /*showHelp*/ ctx[0] ? "Back to app" : "Click for help");
-    			add_location(button, file$1, 47, 3, 1044);
+    			attr_dev(button, "title", /*buttonTitle*/ ctx[3]);
+    			add_location(button, file$1, 49, 3, 1150);
     			attr_dev(main, "class", main_class_value = "mdatools-app mdatools-app_" + /*scale*/ ctx[1]);
-    			add_location(main, file$1, 34, 0, 777);
+    			add_location(main, file$1, 36, 0, 883);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -6264,13 +6267,13 @@ var app = (function () {
     			append_dev(main, t0);
     			append_dev(main, button);
     			append_dev(button, t1);
-    			/*main_binding*/ ctx[7](main);
+    			/*main_binding*/ ctx[9](main);
     			current = true;
 
     			if (!mounted) {
     				dispose = [
-    					listen_dev(window, "keypress", /*handleKeyPress*/ ctx[4], false, false, false),
-    					listen_dev(button, "click", prevent_default(/*toggleHelp*/ ctx[3]), false, true, false)
+    					listen_dev(window, "keypress", /*handleKeyPress*/ ctx[6], false, false, false),
+    					listen_dev(button, "click", prevent_default(/*toggleHelp*/ ctx[5]), false, true, false)
     				];
 
     				mounted = true;
@@ -6303,10 +6306,10 @@ var app = (function () {
     				if_block.m(main, t0);
     			}
 
-    			if ((!current || dirty & /*showHelp*/ 1) && t1_value !== (t1_value = (/*showHelp*/ ctx[0] ? "×" : "?") + "")) set_data_dev(t1, t1_value);
+    			if (!current || dirty & /*buttonIcon*/ 16) set_data_dev(t1, /*buttonIcon*/ ctx[4]);
 
-    			if (!current || dirty & /*showHelp*/ 1 && button_title_value !== (button_title_value = /*showHelp*/ ctx[0] ? "Back to app" : "Click for help")) {
-    				attr_dev(button, "title", button_title_value);
+    			if (!current || dirty & /*buttonTitle*/ 8) {
+    				attr_dev(button, "title", /*buttonTitle*/ ctx[3]);
     			}
 
     			if (!current || dirty & /*scale*/ 2 && main_class_value !== (main_class_value = "mdatools-app mdatools-app_" + /*scale*/ ctx[1])) {
@@ -6325,7 +6328,7 @@ var app = (function () {
     		d: function destroy(detaching) {
     			if (detaching) detach_dev(main);
     			if_blocks[current_block_type_index].d();
-    			/*main_binding*/ ctx[7](null);
+    			/*main_binding*/ ctx[9](null);
     			mounted = false;
     			run_all(dispose);
     		}
@@ -6343,6 +6346,8 @@ var app = (function () {
     }
 
     function instance$1($$self, $$props, $$invalidate) {
+    	let buttonTitle;
+    	let buttonIcon;
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots("StatApp", slots, ['default','help']);
     	let showHelp = false;
@@ -6386,7 +6391,7 @@ var app = (function () {
     	}
 
     	$$self.$$set = $$props => {
-    		if ("$$scope" in $$props) $$invalidate(5, $$scope = $$props.$$scope);
+    		if ("$$scope" in $$props) $$invalidate(7, $$scope = $$props.$$scope);
     	};
 
     	$$self.$capture_state = () => ({
@@ -6397,7 +6402,9 @@ var app = (function () {
     		toggleHelp,
     		getScale,
     		ro,
-    		handleKeyPress
+    		handleKeyPress,
+    		buttonTitle,
+    		buttonIcon
     	});
 
     	$$self.$inject_state = $$props => {
@@ -6405,16 +6412,30 @@ var app = (function () {
     		if ("scale" in $$props) $$invalidate(1, scale = $$props.scale);
     		if ("appContainer" in $$props) $$invalidate(2, appContainer = $$props.appContainer);
     		if ("ro" in $$props) ro = $$props.ro;
+    		if ("buttonTitle" in $$props) $$invalidate(3, buttonTitle = $$props.buttonTitle);
+    		if ("buttonIcon" in $$props) $$invalidate(4, buttonIcon = $$props.buttonIcon);
     	};
 
     	if ($$props && "$$inject" in $$props) {
     		$$self.$inject_state($$props.$$inject);
     	}
 
+    	$$self.$$.update = () => {
+    		if ($$self.$$.dirty & /*showHelp*/ 1) {
+    			$$invalidate(3, buttonTitle = showHelp ? "Back to app" : "Click for help");
+    		}
+
+    		if ($$self.$$.dirty & /*showHelp*/ 1) {
+    			$$invalidate(4, buttonIcon = showHelp ? "×" : "?");
+    		}
+    	};
+
     	return [
     		showHelp,
     		scale,
     		appContainer,
+    		buttonTitle,
+    		buttonIcon,
     		toggleHelp,
     		handleKeyPress,
     		$$scope,
