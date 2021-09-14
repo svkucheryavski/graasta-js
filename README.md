@@ -1,14 +1,14 @@
-# Interactive apps for teaching and learning statistics and beyond
+# Interactive apps for teaching and learning statistics and chemometrics
 
-A collection of interactive web applications, which can be used for teaching and learning applied statistics (app name starts with `asta-`), design of experiments (`doe-`) and methods for multivariate data analysis (`mda-`). The initial version was made using R/Shiny but has been replaced with the current version written using [Svelte](https://svelte.dev), so every app is just a single JavaScript file (supplemented with CSS), which can be embedded into any HTML page and be used without backend.
+A collection of interactive web applications, which can be used for teaching and learning applied statistics (app name starts with `asta-`), design of experiments (`doe-`) and methods for multivariate data analysis (`mda-`). The initial version was made using R/Shiny but later has been replaced with the current version written using [Svelte](https://svelte.dev), so every app is just a single JavaScript file (supplemented with CSS), which can be embedded into any HTML page and be used without backend.
 
-You can see the full list of all application as well as try them [here]().
+You can see the full list of all application as well as try them [here](https://graasta.com).
 
 ## How to use
 
 If you want to use any app in your project, do the following (here, for example, it is assumed that you selected app *asta-b1001*, which is the first app in the list):
 
-1. Download `asta-b1001.js` and `asta-b10001.css` from the `/asta-b1001/public/build` folder.
+1. Download `asta-b1001.js` and `asta-b10001.css` from the `/asta-b1001/public/` folder.
 2. Move them to the folders where you keep js and css files (here we assume it is `./js` and `./css`)
 3. Create a new HTML file (or use the one you already have).
 4. Make sure you have a DOM element (e.g. `<div>`) with ID `"mdatools-app-container"` in the HTML file.
@@ -27,9 +27,9 @@ Here are some important notes about the use of the apps in your own projects:
 
 1. The apps are designed to be shown in 16:9 ratio. They will work with any ratio and any size but 16:9 gives the best view.
 
-2. Smallest size the apps can scale down to is 640x360 pixels. Largest size is limited by 2560x1440 pixels. Anything in between works just fine.
+2. Smallest size the apps can scale down to is 640x360 pixels. Largest size is limited by 2560x1440 pixels. Anything in between will work just fine.
 
-3. The apps are tested in last versions of Safari, Chrome and Firefox browsers. They should also work fine in Edge (as it is based on the same engine as Chrome — Chromium). Any other browser which supports modern CSS standards and can run Javascript should also
+3. The apps are tested in latest versions of Safari, Chrome and Firefox browsers. They should also work fine in Edge (as it is based on the same engine as Chrome — Chromium). Any other browser which supports modern CSS standards and can run Javascript should also work.
 
 
 
