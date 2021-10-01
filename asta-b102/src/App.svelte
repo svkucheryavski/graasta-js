@@ -1,8 +1,16 @@
 <script>
    import {max, count, rnorm, runif, split, quantile, min, getOutliers} from 'stat-js';
-   import {Axes, XAxis, YAxis, Box, LineSeries, ScatterSeries} from 'svelte-plots-basic';
-   import {BoxAndWhiskers, Histogram} from 'svelte-plots-stat';
+
+   // common blocks
    import {default as StatApp} from '../../shared/StatApp.svelte';
+   import AppControlArea from '../../shared/AppControlArea.svelte';
+   import AppControlButton from '../../shared/AppControlButton.svelte';
+   import AppControlSelect from '../../shared/AppControlSelect.svelte';
+   import AppControlRange from '../../shared/AppControlRange.svelte';
+
+   // app blocks
+   import HistPlot from "./AppHistPlot.svelte";
+   import PercentilePlot from "./AppPercentilePlot.svelte";
 
    let sampleSize = 6;
    let variableName = "Height";
@@ -25,6 +33,10 @@
 
    const getAgeValues = function(n) {
       return runif(n, 18, 65).map( v => Math.round(v * 10) / 10).sort((a, b) => a - b);
+   }
+
+   const takeNewSample = () => {
+      sample = getSample(population, sampleSize);
    }
 
    const createPopulation = function(title, generator, xLim) {
@@ -78,11 +90,12 @@
    };
 
    const getSample = function(population, size) {
+      size = Math.round(size);
       return({x: population.generator(size), y: Array.from({length: size}, () => population.ps.position), p: Array.from({length: size}, (v, i) => (i + 0.5) / sampleSize)});
    }
 
-   $: pop = populations[variableName];
-   $: sample = getSample(pop, sampleSize);
+   $: population = populations[variableName];
+   $: sample = getSample(population, sampleSize);
    $: errormsg = sampleSize < 3 || sampleSize > 30 ? "Sample size should be between 3 and 30." : "";
 
 </script>
@@ -92,54 +105,21 @@
 
       <!-- plot with histogram -->
       <div class="app-histogram-area">
-         <Axes limX="{pop.hist.xLim}" limY="{pop.hist.yLim}" xLabel="{pop.title}">
-            <Histogram bins={pop.hist.bins} counts="{pop.hist.counts}" faceColor="#f0f0f0" borderColor="#e0e0e0" />
-            <BoxAndWhiskers quartiles={pop.bw.quartiles} range={pop.bw.range} outliers={pop.bw.outliers} boxPosition="{pop.bw.positions[0]}" boxSize={pop.bw.size} borderColor="{populationColor}" horizontal="{true}" />
-
-            {#if sample.x.length >= 3 && sample.x.length <= 30}
-            <ScatterSeries xValues={sample.x} yValues={sample.y} faceColor="white" borderColor="{sampleColor}" borderWidth="{1.5}" />
-            <BoxAndWhiskers values={sample.x} boxPosition="{pop.bw.positions[1]}" boxSize={pop.bw.size} borderColor="{sampleColor}" horizontal="{true}" />
-            {/if}
-            <XAxis slot="xaxis" />
-         </Axes>
+         <HistPlot {sample} {population} {sampleColor} {populationColor} />
       </div>
 
       <!-- plot with population and sample percentiles -->
       <div class="app-percentile-area">
-         <Axes limY="{[-0.05, 1.05]}" limX="{pop.hist.xLim}" xLabel="{pop.title}" yLabel="Percentiles">
-            <LineSeries xValues={pop.ps.xValues} yValues={pop.ps.yValues} lineColor="{populationColor}" />
-
-            {#if sample.x.length >= 3 && sample.x.length <= 30}
-            <LineSeries xValues={sample.x} yValues={sample.p} lineColor="{sampleColor}" />
-            <ScatterSeries xValues={sample.x} yValues={sample.p} faceColor="white" borderColor="{sampleColor}" marker={1} borderWidth="{1.5}" />
-            {/if}
-
-            <XAxis slot="xaxis" showGrid="{true}" />
-            <YAxis slot="yaxis" showGrid="{true}" />
-            <Box slot="box" />
-         </Axes>
+         <PercentilePlot {sample} {population} {sampleColor} {populationColor} />
       </div>
 
       <!-- control elements -->
       <div class="app-controls-area">
-         <fieldset>
-         <div class="app-control">
-            <label for="variableName">Select property:</label>
-            <select name="variableName" bind:value="{variableName}">
-               {#each Object.keys(populations) as property}
-               <option value="{property}">{property}</option>
-               {/each}
-            </select>
-         </div>
-         <div class="app-control">
-            <label class="app-control__label" for="sampleSize">Sample size:</label>
-            <input name="sampleSize" type="number" min="3" max="30" bind:value="{sampleSize}">
-            <button on:click="{() => sample = getSample(pop, sampleSize)}">Take new</button>
-         </div>
-         <div class="app-control-error">
-            {errormsg}
-         </div>
-         </fieldset>
+         <AppControlArea {errormsg}>
+            <AppControlSelect id="variableName" label="Select property" bind:value={variableName} options={Object.keys(populations)} />
+            <AppControlRange id="sampleSize" label="Sample size" bind:value={sampleSize} min={3} max={30} step={1} decNum={0} />
+            <AppControlButton id="newSample" label="Sample" text="Take new" on:click={takeNewSample} />
+         </AppControlArea>
       </div>
 
    </div>
@@ -160,6 +140,11 @@
 <style>
 
 .app-layout {
+   width: 100%;
+   height: 100%;
+   position: relative;
+
+   display: grid;
    grid-template-columns: 3fr 2fr;
    grid-template-rows: 3fr 1fr;
    grid-template-areas:
@@ -182,6 +167,7 @@
 }
 
 .app-controls-area {
+   padding-left: 20px;
    grid-area: controls;
 }
 
