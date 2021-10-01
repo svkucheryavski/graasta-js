@@ -27,7 +27,7 @@ Here are some important notes about the use of the apps in your own projects:
 
 1. The apps are designed to be shown in 16:9 ratio. They will work with any ratio and any size but 16:9 gives the best view.
 
-2. Smallest size the apps can scale down to is 640x360 pixels. Largest size is limited by 2560x1440 pixels. Anything in between will work just fine.
+2. Smallest size the apps can scale down to is 800x450 pixels. Largest size is limited by 2560x1440 pixels. Anything in between will work just fine.
 
 3. The apps are tested in latest versions of Safari, Chrome and Firefox browsers. They should also work fine in Edge (as it is based on the same engine as Chrome — Chromium). Any other browser which supports modern CSS standards and can run Javascript should also work.
 
