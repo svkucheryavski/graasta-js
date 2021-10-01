@@ -1,4 +1,5 @@
 <script>
+   import { createEventDispatcher } from "svelte";
    import AppControl from "./AppControl.svelte";
 
    export let id;
@@ -7,15 +8,26 @@
    export let min;
    export let max;
    export let decNum = 1;
-   export let step = (max - min) / 100;
+   export let step = +((max - min) / 100).toFixed(4);
 
    if (value < min || value > max) {
       throw("The value is outside of the provided range.");
    }
 
+   const dispatch = createEventDispatcher();
+
    let sliderElement;
    let sliderContainer;
    let isDragging = false;
+
+   const computeValue = (p) => {
+      const tmpValue = min + p * (max - min);
+
+      // strange construction below is needed for:
+      // a. make a value fractionated according to step
+      // b. get rid of small decimals added by JS due to loss of precision
+      return(+(Math.round(tmpValue / step) * step).toFixed(4));
+   }
 
    const getRelativePosition = (e) => {
       const sliderRect = sliderElement.getBoundingClientRect();
@@ -36,24 +48,27 @@
       isDragging = false;
       const p = getRelativePosition(e);
       if (p < 0 || p > 1) return;
-      value = min + p * (max - min);
+
+      value = computeValue(p);
    }
 
    const changing = (e) => {
       if (!isDragging) return;
       const p = getRelativePosition(e);
       if (p < 0 || p > 1) return;
-      value = min + p * (max - min);
+
+      value = computeValue(p);
    }
 
    $: width = (value - min) / (max - min) * 100;
-
+   $: dispatch("change", value);
 </script>
 
-<AppControl id={id} label={label} >
+<AppControl id={id} label={label}>
    <div
       class="rangeSliderContainer"
       bind:this={sliderContainer}
+      on:mousewheel={changing}
       on:mousemove={changing}
       on:mouseup={stopChanging}
       on:mousedown={startChanging}>
@@ -70,11 +85,12 @@
       box-sizing: border-box;
       display: inline-block;
       flex: 1 1 auto;
-      background: #c0c0c0;
-      height: 1.2em;
+      background: #e0e0e0;
+      height: 1.5em;
       margin: 0;
       padding: 0;
       width: auto;
+      border-radius: 2px;
 
       user-select: none;
       -webkit-user-select: none;
@@ -86,6 +102,8 @@
       position: relative;
       display: inline-block;
       background: #606060;
+      border-radius: 2px;
+
       margin: 0;
       padding: 0;
       height: 100%;
@@ -96,16 +114,6 @@
 
    }
 
-   .rangeSlider::after {
-      position: absolute;
-      display: inline-block;
-      right: 0;
-      content: "";
-      width: 5px;
-      height: 100%;
-      cursor:col-resize;
-   }
-
    .rangeSliderContainer span {
       display: inline-block;
       position: absolute;
@@ -113,9 +121,9 @@
       top: 0;
       font-size: 0.85em;
       padding: 1px 5px;
-      color: #e0e0e0;
-      mix-blend-mode: lighten;
-
+      color: #606060;
+      mix-blend-mode: difference;
+      line-height: 1.6em;
       user-select: none;
       -webkit-user-select: none;
       -moz-user-select: none;

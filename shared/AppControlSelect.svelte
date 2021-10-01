@@ -1,34 +1,62 @@
 <script>
+   import { fade } from 'svelte/transition';
    import AppControl from "./AppControl.svelte";
 
    export let id;
    export let label;
-   export let value;
-   export let step;
+   export let options;
+   export let value = options[0];
 </script>
 
 <AppControl id={id} label={label} >
-   <select name="" id=""></select>
+
+   <div class="selector">
+      {#each options as option (option)}
+      <div on:click={() => value = option} class="option" class:selected={option==value}>{option}</div>
+      {/each}
+
+   </div>
+   <input name="{id}" bind:value="{value}">
 </AppControl>
 
 <style>
-   :global(.app-control > input, .app-control > select) {
-   font-family:inherit;
-   font-size: inherit;
-   font-size: 0.9em;
-   background: #fff;
-   border: solid 1px #e0e0e0;
-   padding: 0.25em;
-   border-radius: 3px;
-}
+   input {
+      display: none;
+   }
 
-:global(.app-control > select) {
-   -webkit-appearance:none;
-   padding-right: 20px;
-   background-image: url("data:image/svg+xml;utf8,<svg preserveAspectRatio='none' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='%23606060' width='100%' height='100%'><polyline points='50,0, 10,40 90,40'/><polyline points='50,100, 10,60 90,60'/></svg>");
-   background-repeat: no-repeat;
-   background-position: 95% 50%;
-   background-size: 10px 60%;
-}
+   .selector {
+      position: relative;
+      box-sizing: border-box;
+      display: inline-block;
+      flex: 0 0 auto;
+      background: #e0e0e0;
+      height: 1.5em;
+      margin: 0;
+      padding: 0;
+      width: auto;
+      border-radius: 2px;
+
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+
+      display: flex;
+   }
+
+   .option {
+      cursor: default;
+      padding: 0.2em 1em;
+      margin: 0 1px;
+      font-size: 0.85em;
+      line-height: 1.4em;
+      color: #606060;
+      transition: background-color 0.5s ease;
+   }
+
+   .option.selected {
+      border-radius: 3px;
+      background-color: #606060;
+      color: #fefefe;
+   }
 
 </style>

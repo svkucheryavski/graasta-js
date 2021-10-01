@@ -4,7 +4,7 @@
 </script>
 
 <div class="app-control">
-   <label for="{id}">{label}</label>
+   <label for="{id}">{@html label}</label>
    <slot></slot>
 </div>
 
@@ -19,15 +19,16 @@
    }
 
    .app-control > label {
-      flex: 0 0 120px;
-      max-width: 120px;
+      height: 1.5em;
+      flex: 0 0 90px;
+      max-width: 90px;
    }
 
    .app-control > slot {
       width: 100%;
    }
 
-   @media(min-width: 800px) {
+   @media(min-width: 960px) {
       .app-control > label {
          flex: 0 0 150px;
          max-width: 150px;

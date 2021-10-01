@@ -1,10 +1,10 @@
 <script>
-   export let errormsg;
+   export let errormsg = undefined;
 </script>
 
 <fieldset>
    <slot></slot>
-   <div class="app-control-error">{errormsg}</div>
+   {#if errormsg}<div class="app-control-error">{errormsg}</div>{/if}
 </fieldset>
 
 <style>
