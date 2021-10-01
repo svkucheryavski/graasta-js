@@ -8,8 +8,8 @@
    const toggleHelp = () => showHelp = !showHelp;
 
    const getScale = function(width, height) {
-      if (width < 800) return "small";
-      if (width < 1200) return "medium";
+      if (width < 950) return "small";
+      if (width < 1270) return "medium";
       return "large";
    };
 
@@ -64,10 +64,10 @@
    position: relative;
    font-size: 18px;
 
+   min-width: 800px;
    max-width: 2560px;
    max-height: 1800px;
-   min-width: 640px;
-   min-height: 675px;
+   min-height: 720px;
 
    width: 100%;
    height: 100%;
@@ -98,14 +98,14 @@
 .helptext {
    width: 100%;
    height: 100%;
-   padding: 2em;
+   padding: 1em;
    line-height: 1.35em;
    font-size: 1em;
    color: #303030;
 }
 
 .helptext :global(h2) {
-   padding: 1.0em 0 1em 0;
+   padding: 0.5em 0 0.5em 0;
 }
 
 .helptext :global(p) {
@@ -115,22 +115,22 @@
 }
 
 .help-button {
-   width: 30px;
-   height: 30px;
+   width: 20px;
+   height: 20px;
 
    box-sizing: border-box;
    position: absolute;
    right: 0;
    bottom: 0;
-   margin: 0.25em;
+   margin: 0.05em;
    background: transparent;
    border: none;
    cursor: pointer;
    font-weight: bold;
-   font-size: 1.2em;
+   font-size: 1.0em;
    border-radius: 50%;
    color: #a0a0a0;
-   line-height: 30px;
+   line-height: 20px;
 }
 
 
@@ -139,24 +139,24 @@
    color: #f6f6f6;
 }
 
-/* styles for medium app size - between 800 and 1200 */
+/* styles for medium app size - between 900 and 1200 */
 .mdatools-app_medium {
    font-size: 14px;
-   min-height: 450px;
-   max-height: 675px;
+   max-height: 720px;
+   min-height: 540px;
 }
 
 .mdatools-app_small .help-button {
-   width: 25px;
-   height: 25px;
-   line-height: 25px;
+   width: 20px;
+   height: 20px;
+   line-height: 20px;
 }
 
 /* styles for small app size */
 .mdatools-app_small {
-   max-height: 450px;
-   min-height: 360px;
-   font-size: 12px;
+   max-height: 540px;
+   min-height: 450px;
+   font-size: 11px;
 }
 
 .mdatools-app_small :global(.axis-label) {
@@ -166,9 +166,9 @@
 }
 
 .mdatools-app_small .help-button {
-   width: 20px;
-   height: 20px;
-   line-height: 20px;
+   width: 15px;
+   height: 15px;
+   line-height: 15px;
 }
 
 </style>
