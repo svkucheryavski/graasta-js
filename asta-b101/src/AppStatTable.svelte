@@ -20,6 +20,6 @@
       {label: "Q3", values: [Q3]},
       {label: "max", values:[values[sampleSize - 1]] }
    ]}
-   decNum={[1, 1, 1, 1]}
+   decNum={[1, 1, 1, 1, 1, 1, 1]}
    horizontal={true}
 />
