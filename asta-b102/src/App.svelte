@@ -5,7 +5,7 @@
    import {default as StatApp} from '../../shared/StatApp.svelte';
    import AppControlArea from '../../shared/AppControlArea.svelte';
    import AppControlButton from '../../shared/AppControlButton.svelte';
-   import AppControlSelect from '../../shared/AppControlSelect.svelte';
+   import AppControlSwitch from '../../shared/AppControlSwitch.svelte';
    import AppControlRange from '../../shared/AppControlRange.svelte';
 
    // app blocks
@@ -116,7 +116,7 @@
       <!-- control elements -->
       <div class="app-controls-area">
          <AppControlArea {errormsg}>
-            <AppControlSelect id="variableName" label="Select property" bind:value={variableName} options={Object.keys(populations)} />
+            <AppControlSwitch id="variableName" label="Select property" bind:value={variableName} options={Object.keys(populations)} />
             <AppControlRange id="sampleSize" label="Sample size" bind:value={sampleSize} min={3} max={30} step={1} decNum={0} />
             <AppControlButton id="newSample" label="Sample" text="Take new" on:click={takeNewSample} />
          </AppControlArea>
@@ -167,6 +167,7 @@
 }
 
 .app-controls-area {
+   padding-top: 20px;
    padding-left: 20px;
    grid-area: controls;
 }
