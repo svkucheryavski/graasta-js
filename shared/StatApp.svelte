@@ -8,8 +8,8 @@
    const toggleHelp = () => showHelp = !showHelp;
 
    const getScale = function(width, height) {
-      if (width < 950) return "small";
-      if (width < 1270) return "medium";
+      if (width < 959) return "small";
+      if (width < 1279) return "medium";
       return "large";
    };
 
@@ -29,8 +29,9 @@
       ro.observe(appContainer);
    });
 
-   $: buttonTitle = showHelp ? "Back to app" : "Click for help";
-   $: buttonIcon = showHelp ? "×" : "?";
+
+   //$: buttonTitle = showHelp ? "Back to app" : "Click for help";
+   //$: buttonIcon = showHelp ? "×" : "?";
 </script>
 
 <svelte:window on:keypress={handleKeyPress}/>
@@ -47,7 +48,9 @@
    </div>
    {/if}
 
+<!--
    <button class="help-button" title="{buttonTitle}" on:click|preventDefault="{toggleHelp}">{buttonIcon}</button>
+-->
 </main>
 
 <style>
@@ -73,7 +76,7 @@
    height: 100%;
 
    box-sizing: border-box;
-   padding: 2em;
+   padding: 1em;
    margin: 0 auto;
    background: #fdfdfd;
 }
@@ -156,7 +159,7 @@
 .mdatools-app_small {
    max-height: 540px;
    min-height: 450px;
-   font-size: 11px;
+   font-size: 12px;
 }
 
 .mdatools-app_small :global(.axis-label) {
