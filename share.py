@@ -10,7 +10,7 @@ DST_DIR = "../graasta.web.static/public/apps"
 app_blocks = [
    {
       "title": "Descriptive statistics and plots",
-      "apps": ["asta-b101", "asta-b102", "asta-b103"]
+      "apps": ["asta-b101", "asta-b102", "asta-b103", "asta-b104"]
    }
 ]
 
