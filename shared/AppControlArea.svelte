@@ -17,8 +17,8 @@
    fieldset {
       background: #f4f4f4;
       margin: 0;
-      padding: 0;
-      box-shadow: 0px 0px 5px  #30303020;
+      padding: 0.5em;
+      box-shadow: 0px 0px 2px  #30303020;
       border: none;
    }
 </style>

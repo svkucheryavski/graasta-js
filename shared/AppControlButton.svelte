@@ -14,8 +14,9 @@
 
 
 button {
-   font-size: 0.9em;
-   padding: 0.35em 1em;
+   height: 1.5em;
+   font-size: 1em;
+   padding: 0 1em;
    margin: 0;
    color: #606060;
    background: #e0e0e0;
