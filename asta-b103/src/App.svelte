@@ -1,7 +1,7 @@
 <script>
    import {seq, dnorm, dunif, pnorm, punif} from 'stat-js';
    import AppControlArea from '../../shared/AppControlArea.svelte';
-   import AppControlSelect from '../../shared/AppControlSelect.svelte';
+   import AppControlSwitch from '../../shared/AppControlSwitch.svelte';
    import AppControlRange from '../../shared/AppControlRange.svelte';
    import AppControl from '../../shared/AppControl.svelte';
 
@@ -96,7 +96,7 @@
          <PDFPlot x={x} y={d} {varName} {intInd} p={p[intInd[1]] - p[intInd[0]]} limX={limX} limY={distr.limY} />
          <div class="app-control-area">
             <AppControlArea>
-               <AppControlSelect
+               <AppControlSwitch
                   id="distributionName"
                   label="Distribution"
                   options={Object.keys(distrs)}
@@ -129,7 +129,7 @@
                <AppControl id="empty" label="&nbsp;"></AppControl>
                {/if}
                <AppControlRange id="b" label="x<sub>2</sub>" step={0.1} min={limX[0]} max={limX[1]} bind:value={x2} />
-               <AppControlSelect
+               <AppControlSwitch
                   id="mode"
                   label="Mode"
                   options={["Value", "Interval"]}
@@ -148,7 +148,7 @@
                <AppControl id="empty" label="&nbsp;"></AppControl>
                {/if}
                <AppControlRange id="pb" label="p<sub>2</sub>" step={0.001} min={0} max={1} bind:value={p2} decNum={3} />
-               <AppControlSelect
+               <AppControlSwitch
                   id="mode"
                   label="Mode"
                   options={["Value", "Interval"]}

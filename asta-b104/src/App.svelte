@@ -1,5 +1,5 @@
 <script>
-   import {max, ppoints, sd, seq, pnorm, rnorm, skewness, split, quantile, min, getOutliers, mean} from 'stat-js';
+   import {max, ppoints, sd, seq, pnorm, rnorm, skewness, kurtosis, mean, quantile, diff} from 'stat-js';
    import {DataTable} from 'svelte-plots-stat';
    import {Axes, XAxis, YAxis, Box, LineSeries, ScatterSeries} from 'svelte-plots-basic';
 
@@ -7,7 +7,7 @@
    import {default as StatApp} from '../../shared/StatApp.svelte';
    import AppControlArea from '../../shared/AppControlArea.svelte';
    import AppControlButton from '../../shared/AppControlButton.svelte';
-   import AppControlSelect from '../../shared/AppControlSelect.svelte';
+   import AppControlSwitch from '../../shared/AppControlSwitch.svelte';
 
    // app blocks
    // import HistPlot from "./AppHistPlot.svelte";
@@ -36,10 +36,22 @@
       return(rnorm(n, popMean, popStd).sort((a, b) => a - b));
    }
 
+
    $: si = Array.from({length: sampleSize}, (v, i) => i + 1);
    $: sp = ppoints(sampleSize);
    $: sz = sp.map((v, i) => zseq[closestIndex(pseq, v)]);
    $: sx = getSample(sampleSize);
+
+   // theoretical line
+   const lp = [0.25, 0.75];
+   const lz = [-0.6744898,  0.6744898];
+   $: lx = quantile(sx, lp);
+   $: la = diff(lx) / diff(lz);
+   $: lb = mean(lx) - la * mean(lz)
+   $: llx = [-4, 4];
+   $: lly = [-4 * la + lb, 4 * la + lb];
+
+
    $: errormsg = sampleSize < 3 || sampleSize > 30 ? "Sample size should be between 3 and 30." : "";
 </script>
 
@@ -52,7 +64,8 @@
             <XAxis slot="xaxis" showGrid={true}></XAxis>
             <YAxis slot="yaxis" showGrid={true}></YAxis>
             <Box slot="box"></Box>
-            <LineSeries xValues={limX} yValues={limY} lineType={2} lineColor={populationColor} />
+            <LineSeries xValues={limX} yValues={limY} lineType={1} lineWidth={2} lineColor={populationColor} />
+            <LineSeries xValues={llx} yValues={lly} lineType={2} lineColor={"red"} />
             <ScatterSeries xValues={sz} yValues={sx} borderWidth={2} />
          </Axes>
 
@@ -74,9 +87,9 @@
       <div class="app-stat-and-controls-area">
          <DataTable
             variables={[
-               {label: "", values: ["Mean", "St. dev.", "Skewness"]},
-               {label: "Sample", values: [mean(sx), sd(sx), skewness(sx)]},
-               {label: "Population", values: [popMean, popStd, 0]}
+               {label: "", values: ["Mean", "St. dev.", "Skewness", "Kurtosis"]},
+               {label: "Sample", values: [mean(sx), sd(sx), skewness(sx), kurtosis(sx)]},
+               {label: "Population", values: [popMean, popStd, 0, 3.0]}
             ]}
             decNum={[0, 1, 1]}
             horizontal={false}
@@ -84,7 +97,7 @@
 
          <div class="controls-area">
          <AppControlArea {errormsg}>
-            <AppControlSelect id="sampleSize" label="Sample size" bind:value={sampleSize} options={[4, 6, 10, 13]} />
+            <AppControlSwitch id="sampleSize" label="Sample size" bind:value={sampleSize} options={[4, 6, 9, 12]} />
             <AppControlButton id="newSample" label="Sample" text="Take new" on:click={() => sx = getSample(sampleSize)} />
          </AppControlArea>
          </div>
