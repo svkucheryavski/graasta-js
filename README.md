@@ -6,9 +6,9 @@ You can see the full list of all application as well as try them [here](https://
 
 ## How to use
 
-If you want to use any app in your project, do the following (here, for example, it is assumed that you selected app *asta-b1001*, which is the first app in the list):
+If you want to use any app in your project, do the following (here, for example, it is assumed that you selected app *asta-b101*, which is the first app in the list):
 
-1. Download `asta-b1001.js` and `asta-b10001.css` from the `/asta-b1001/public/` folder.
+1. Download `asta-b101.js` and `asta-b101.css` from the `/asta-b101/public/` folder.
 2. Move them to the folders where you keep js and css files (here we assume it is `./js` and `./css`)
 3. Create a new HTML file (or use the one you already have).
 4. Make sure you have a DOM element (e.g. `<div>`) with ID `"mdatools-app-container"` in the HTML file.
@@ -21,7 +21,7 @@ After that just add two lines to the header of the HTML file (between tags `<hea
 <script defer src='/js/asta-b101.js'></script>
 ```
 
-And load the file in a browser. Everything should work.
+And load the file in a browser. Everything should work. You can also download `index.html` from the same folder and look inside for inspiration.
 
 Here are some important notes about the use of the apps in your own projects:
 
