@@ -11,6 +11,10 @@ app_blocks = [
    {
       "title": "Descriptive statistics and plots",
       "apps": ["asta-b101", "asta-b102", "asta-b103", "asta-b104"]
+   },
+   {
+      "title": "Confidence intervals",
+      "apps": ["asta-b201"]
    }
 ]
 
