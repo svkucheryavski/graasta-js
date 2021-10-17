@@ -14,7 +14,7 @@ app_blocks = [
    },
    {
       "title": "Confidence intervals",
-      "apps": ["asta-b201"]
+      "apps": ["asta-b201", "asta-b202"]
    }
 ]
 
