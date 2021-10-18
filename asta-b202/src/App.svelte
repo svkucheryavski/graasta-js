@@ -106,7 +106,6 @@
 
 .app-sample-plot-area {
    grid-area: sampplot;
-   background: black;
 }
 
 .app-sample-plot-area :global(.plot) {
