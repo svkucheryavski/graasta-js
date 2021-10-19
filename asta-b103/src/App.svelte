@@ -1,5 +1,5 @@
 <script>
-   import {seq, dnorm, dunif, pnorm, punif} from 'stat-js';
+   import {seq, dnorm, dunif, pnorm, punif, closestIndex} from 'stat-js';
    import AppControlArea from '../../shared/AppControlArea.svelte';
    import AppControlSwitch from '../../shared/AppControlSwitch.svelte';
    import AppControlRange from '../../shared/AppControlRange.svelte';
@@ -39,11 +39,6 @@
    }
 
    let intInd = [0, Math.round(size/2) + 1];
-
-   const closestIndex = (x, a) => {
-      const c =  x.reduce((prev, curr) => Math.abs(curr - a) < Math.abs(prev - a) ? curr : prev);
-      return x.indexOf(c);
-   }
 
    const changeValues = (x, a, b, mode) => {
 

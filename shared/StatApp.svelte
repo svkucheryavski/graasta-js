@@ -48,9 +48,6 @@
    </div>
    {/if}
 
-<!--
-   <button class="help-button" title="{buttonTitle}" on:click|preventDefault="{toggleHelp}">{buttonIcon}</button>
--->
 </main>
 
 <style>
@@ -117,42 +114,12 @@
    font-size: 1.2em;
 }
 
-.help-button {
-   width: 20px;
-   height: 20px;
-
-   box-sizing: border-box;
-   position: absolute;
-   right: 0;
-   bottom: 0;
-   margin: 0.05em;
-   background: transparent;
-   border: none;
-   cursor: pointer;
-   font-weight: bold;
-   font-size: 1.0em;
-   border-radius: 50%;
-   color: #a0a0a0;
-   line-height: 20px;
-}
-
-
-.help-button:hover {
-   background: #606060;
-   color: #f6f6f6;
-}
 
 /* styles for medium app size - between 900 and 1200 */
 .mdatools-app_medium {
    font-size: 14px;
    max-height: 720px;
    min-height: 540px;
-}
-
-.mdatools-app_small .help-button {
-   width: 20px;
-   height: 20px;
-   line-height: 20px;
 }
 
 /* styles for small app size */
@@ -166,12 +133,6 @@
    text-align: center;
    font-weight: 500;
    font-size: 1.25em;
-}
-
-.mdatools-app_small .help-button {
-   width: 15px;
-   height: 15px;
-   line-height: 15px;
 }
 
 </style>
