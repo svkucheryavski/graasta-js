@@ -4,14 +4,13 @@ import resolve from '@rollup/plugin-node-resolve';
 import livereload from 'rollup-plugin-livereload';
 import { terser } from 'rollup-plugin-terser';
 import css from 'rollup-plugin-css-only';
-
+import * as fs from 'fs';
 const production = !process.env.ROLLUP_WATCH;
 
-// load information about the app
-async function loadInfo() {
-   return(await import(`${process.cwd()}/info.json`));
+const appID = JSON.parse(fs.readFileSync(`${process.cwd()}/info.json`)).id;
+if (appID === "" || appID === undefined) {
+   throw new Error("App ID is not defined.");
 }
-const appInfo = loadInfo()
 
 function serve() {
 	let server;
@@ -40,7 +39,7 @@ export default {
 		sourcemap: true,
 		format: 'iife',
 		name: 'app',
-		file: `public/${appInfo.id}.js`
+		file: `public/${appID}.js`
 	},
 	plugins: [
 		svelte({
@@ -51,7 +50,7 @@ export default {
 		}),
 		// we'll extract any component CSS out into
 		// a separate file - better for performance
-		css({ output: appInfo.id + '.css' }),
+		css({ output: appID + '.css' }),
 
 		// If you have external dependencies installed from
 		// npm, you'll most likely need these plugins. In
