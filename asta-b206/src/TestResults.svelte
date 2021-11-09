@@ -90,7 +90,7 @@
       <TextLabels xValues={[xLegend]} yValues={[max(f) * 1.10]} pos={2} labels={percentBelow005Str} />
       <TextLabels xValues={[xLegend]} yValues={[max(f) * 0.95]} pos={2} labels={H0LegendStr} />
       <TextLabels xValues={[xLegend]} yValues={[max(f) * 0.80]} pos={2} labels={`p-value = ${p.toFixed(3)}`} />
-      <TextLabels xValues={[xLegend]} yValues={[max(f) * 0.65]} pos={2} labels={`sample π&#770; = ${sampProp.toFixed(2)}`} />
+      <TextLabels xValues={[xLegend]} yValues={[max(f) * 0.65]} pos={2} labels={`sample π = ${sampProp.toFixed(2)}`} />
 
       <!-- area for p-value -->
       {#each px as x, i}
