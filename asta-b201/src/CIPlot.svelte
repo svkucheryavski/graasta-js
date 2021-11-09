@@ -61,7 +61,7 @@
 
       <!-- statistics -->
       <TextLabels xValues={[-0.05]} yValues={[max(f) * 1.15]} pos={2} labels={tableNSamplesInside} />
-      <TextLabels xValues={[-0.05]} yValues={[max(f) * 1.00]} pos={2} labels={"CI: " + tableCI} />
+      <TextLabels xValues={[-0.05]} yValues={[max(f) * 1.00]} pos={2} labels={"95% CI: " + tableCI} />
       <TextLabels xValues={[-0.05]} yValues={[max(f) * 0.85]} pos={2} labels={`sample prop. = ${sampProp.toFixed(2)}`} />
 
       <AreaSeries xValues={cix} yValues={cif} lineColor={colors[0] + "40"} fillColor={colors[0] + "40"}/>

@@ -1,7 +1,6 @@
 <script>
    import {sum, seq, sd, max, dnorm, mean} from 'stat-js';
-   import {Axes, XAxis, LineSeries, AreaSeries, Segments} from 'svelte-plots-basic';
-   import {DataTable} from 'svelte-plots-stat';
+   import {Axes, XAxis, LineSeries, AreaSeries, TextLabels, Segments} from 'svelte-plots-basic';
 
    export let popMean;
    export let popSD;
@@ -46,53 +45,21 @@
    $: nSamplesInside = sum(sampStat);
 
    // text values for stat table
-   $: tableSampMean = sampMean.toFixed(2)
    $: tableCI = `[${ci[0].toFixed(2)}, ${ci[1].toFixed(2)}]`;
-   $: tableNSamplesInside = `${nSamplesInside} (${(nSamplesInside/nSamples * 100).toFixed(1)}%)`;
+   $: tableNSamplesInside = `# samples inside CI: ${nSamplesInside}/${nSamples} (${(nSamplesInside/nSamples * 100).toFixed(1)}%)`;
 </script>
 
-<div class="ci-plot">
-   <!-- plot with population based CI and position of current sample proportion -->
-   <Axes limX={[92, 108]} limY={[-0.005, max(f) * 1.1]} xLabel={"Expected sample mean, m"}>
-      <AreaSeries xValues={cix} yValues={cif} lineColor={colors[0] + "40"} fillColor={colors[0] + "40"}/>
-      <LineSeries xValues={x} yValues={f} lineColor={colors[0] + "40"} />
-      <Segments xStart={[sampMean]} xEnd={[sampMean]} yStart={[0]} yEnd={[max(f) * 1.1]} lineColor={colors[1]} />
-      <XAxis slot="xaxis" ></XAxis>
-   </Axes>
-</div>
+<!-- plot with population based CI and position of current sample proportion -->
+<Axes limX={[92, 108]} limY={[-0.005, max(f) * 1.55]} xLabel={"Expected sample mean, m"}>
+   <!-- statistics -->
+   <TextLabels xValues={[92]} yValues={[max(f) * 1.45]} pos={2} labels={tableNSamplesInside} />
+   <TextLabels xValues={[92]} yValues={[max(f) * 1.30]} pos={2} labels={"95% CI: " + tableCI} />
+   <TextLabels xValues={[92]} yValues={[max(f) * 1.15]} pos={2} labels={`sample mean = ${sampMean.toFixed(2)}`} />
+   <TextLabels xValues={[92]} yValues={[max(f) * 1.00]} pos={2} labels={`sample sd = ${sampSD.toFixed(2)}`} />
 
-<div class="stat-table">
-   <!-- plot with statistics -->
-   <DataTable
-      variables={[
-         {label: "Confidence interval (CI)", values: [tableCI]},
-         {label: "Mean of current sample", values: [tableSampMean]},
-         {label: "SD of current sample", values: [sampSD.toFixed(1)]},
-         {label: "# of samples taken", values: [nSamples]},
-         {label: "# of samples inside CI", values: [tableNSamplesInside]},
-      ]}
-      decNum={[0, 0, 0, 0, 0]}
-      horizontal={true}
-   />
-</div>
+   <AreaSeries xValues={cix} yValues={cif} lineColor={colors[0] + "40"} fillColor={colors[0] + "40"}/>
+   <LineSeries xValues={x} yValues={f} lineColor={colors[0] + "40"} />
+   <Segments xStart={[sampMean]} xEnd={[sampMean]} yStart={[0]} yEnd={[max(f)]} lineColor={colors[1]} />
+   <XAxis slot="xaxis" ></XAxis>
+</Axes>
 
-<style>
-   .stat-table {
-      padding: 1em;
-   }
-
-   .stat-table :global(.datatable) {
-      font-size: 0.85em;
-      color: #606060;
-   }
-
-   .stat-table :global(.datatable__label) {
-      font-weight: normal;
-   }
-
-   .stat-table :global(.datatable__value) {
-      padding-left: 1em;
-      font-weight: bold;
-      color: #505050;
-   }
-</style>
