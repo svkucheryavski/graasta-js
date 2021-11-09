@@ -9,10 +9,7 @@
    import AppControlButton from '../../shared/AppControlButton.svelte';
    import AppControlSwitch from '../../shared/AppControlSwitch.svelte';
 
-   // app blocks
-   // import HistPlot from "./AppHistPlot.svelte";
-   // import PercentilePlot from "./AppPercentilePlot.svelte";
-
+   let showPopLine = "off";
    let sampleSize = 6;
    let variableName = "Height";
 
@@ -21,8 +18,8 @@
 
    const popMean = 170;
    const popStd = 10;
-   const limX = [-3, 3];
-   const limY = [popMean - 3 * popStd, popMean + 3 * popStd];
+   const limX = [-3.5, 3.5];
+   const limY = [popMean - 3.5 * popStd, popMean + 3.5 * popStd];
 
    const zseq = seq(-5, 5, 100000);
    const pseq = pnorm(zseq);
@@ -64,12 +61,16 @@
             <XAxis slot="xaxis" showGrid={true}></XAxis>
             <YAxis slot="yaxis" showGrid={true}></YAxis>
             <Box slot="box"></Box>
+            {#if showPopLine === "on"}
             <LineSeries xValues={limX} yValues={limY} lineType={1} lineWidth={2} lineColor={populationColor} />
+            {/if}
             <LineSeries xValues={llx} yValues={lly} lineType={2} lineColor={"red"} />
             <ScatterSeries xValues={sz} yValues={sx} borderWidth={2} />
          </Axes>
+      </div>
 
-         <div class="qqtable-area">
+      <!-- Tables with values and quantiles -->
+      <div class="app-qqtable-area">
          <DataTable
             variables={[
                {label: "i", values: si},
@@ -80,11 +81,10 @@
             decNum={[0, 1, 3, 2]}
             horizontal={true}
          />
-         </div>
       </div>
 
       <!-- control elements -->
-      <div class="app-stat-and-controls-area">
+      <div class="app-stattable-area">
          <DataTable
             variables={[
                {label: "", values: ["Mean", "St. dev.", "Skewness", "Kurtosis"]},
@@ -94,13 +94,14 @@
             decNum={[0, 1, 1]}
             horizontal={false}
          />
+      </div>
 
-         <div class="controls-area">
+      <div class="app-controls-area">
          <AppControlArea {errormsg}>
+            <AppControlSwitch id="popLine" label="Population line" bind:value={showPopLine} options={["on", "off"]} />
             <AppControlSwitch id="sampleSize" label="Sample size" bind:value={sampleSize} options={[4, 6, 9, 12]} />
             <AppControlButton id="newSample" label="Sample" text="Take new" on:click={() => sx = getSample(sampleSize)} />
          </AppControlArea>
-         </div>
       </div>
 
    </div>
@@ -111,20 +112,19 @@
          This app shows how to use quantile-quantile (QQ) plot to check if your values came from normally distributed
          population. In this case the values (height of people, <em>x</em>) are indeed
          randomly taken from a population, where they follow normal distribution with mean = 170 cm and standard
-         deviation = 10 cm. The gray dashed line on the plot corresponds to the population (in conventional QQ-plot
-         it is not shown as we know nothing about the population). The values of the current sample are shown in
+         deviation = 10 cm. The values of the current sample are shown in
          the large table as row <em>x</em> and on the plot as y-axis values.
       </p>
       <p>
          First, for every value <em>x</em> we compute probability <em>p</em>, to get a value even smaller,
          similar to what we did when computed percentiles. In this case we use <code>p = (i - 0.5) / n</code>.
          But if sample size is smaller than 10, the formulla is slightly
-         adjusted: <code>p = (i - 0.375) / (n + 0.25)</code>. For example, if sample size = 6, then the
+         different: <code>p = (i - 0.375) / (n + 0.25)</code>. For example, if sample size = 6, then the
          first value (i = 1) will have the following p: <code>p = (1 - 0.375) / (6 + 0.25) = 0.100</code>.
       </p>
 
       <p>
-         After that for every <em>p</em> we find corresponding standard score, <em>z</em>, using ICDF function for
+         After that, for every <em>p</em> we find corresponding standard score, <em>z</em>, using ICDF function for
          normal distribution. For example, if p = 0.100, the z-score can be found to be equal to -1.28. You can check
          it using app for PDF/CDF/ICDF or in R by running <code>qnorm(0.100)</code>. Finally we make a plot where sample
          values, <em>x</em> are shown as y-axis and the <em>z</em>-scores are shown
@@ -141,19 +141,23 @@
    width: 100%;
    height: 100%;
    position: relative;
-   display: flex;
+   display: grid;
+   grid-template-areas:
+      "plot stattable"
+      "plot controls"
+      "plot ."
+      "qqtable .";
+   grid-template-rows: min-content min-content auto min-content;
+   grid-template-columns: 65% 35%;
 }
 
 .app-qqplot-area {
-   box-sizing: border-box;
-   height: 100%;
-   width: 100%;
-   display: flex;
-   flex-direction: column;
+   grid-area: plot;
    padding-right: 20px;
 }
 
-.qqtable-area {
+.app-qqtable-area {
+   grid-area: qqtable;
    padding-top: 20px;
    width: 100%;
    text-align: center;
@@ -161,32 +165,32 @@
    justify-content: center;
 }
 
-.app-stat-and-controls-area {
-   flex: 1 1 40%;
-   display: flex;
-   flex-direction: column;
+.app-stattable-area {
+   grid-area: stattable;
+   padding-right: 20px;
 }
 
-.controls-area {
+.app-controls-area {
+   grid-area: controls;
    margin-top: 40px;
 }
 
 :global(.datatable) {
-   width: auto;
+   width: 100%;
    color: #404040;
    text-align: right;
 }
 
-.qqtable-area :global(.datatable  td) {
+.app-qqtable-area :global(.datatable  td) {
    font-size: 0.9em;
    padding: 0.25em 0.5em;
 }
 
-.qqtable-area :global(.datatable > tr:first-of-type) {
+.app-qqtable-area :global(.datatable > tr:first-of-type) {
    border-bottom: solid 1px #e0e0e0;
 }
 
-.qqtable-area :global(.datatable > tr:nth-of-type(2) > td) {
+.app-qqtable-area :global(.datatable > tr:nth-of-type(2) > td) {
    font-weight: bold;
    color: blue;
 }
