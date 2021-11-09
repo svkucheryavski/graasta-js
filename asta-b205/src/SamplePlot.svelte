@@ -1,0 +1,13 @@
+<script>
+   import {Axes} from "svelte-plots-basic";
+   import SampleSeries from "./SampleSeries.svelte";
+
+   export let sample = [];
+</script>
+
+{#if sample.length > 0}
+<Axes limX={[0, sample.length + 1]} limY={[-1, 1]} >
+   <SampleSeries {sample} markerSize={sample.length === 4 ? 5 : 4} />
+</Axes>
+{/if}
+
