@@ -1,9 +1,11 @@
 <script>
-   import {max, rnorm, quantile, mean, min} from 'stat-js';
+   import {max, rnorm, sort, min} from 'stat-js';
    import {default as StatApp} from '../../shared/StatApp.svelte';
+
    import AppControlRange from '../../shared/AppControlRange.svelte';
    import AppControlButton from '../../shared/AppControlButton.svelte';
    import AppControlArea from '../../shared/AppControlArea.svelte';
+
    import Plot from './AppPlot.svelte';
    import DataTable from './AppDataTable.svelte';
    import StatTable from './AppStatTable.svelte';
@@ -11,18 +13,22 @@
    const sampleSize = 12;
    const popMean = 110;
    const popStd = 5;
-   const statLabels = ["min", "Q1", "Q2", "Q3", "max"];
-   const statNum = statLabels.length;
 
    let minRange = [0, 0];
    let maxRange = [0, 0];
 
    const getSample = function(n) {
-      let values = rnorm(n, popMean, popStd).sort((a, b) => a - b);
+      // take random normally distributed values and sort them
+      let values = sort(rnorm(n, popMean, popStd));
+
+      // half of the range of the values
       const dv = (max(values) - min(values)) * 0.5;
 
+      // compute range for min and max controllers
       minRange = [values[0] - dv, values[1] - (values[1] - values[0]) * 0.10];
       maxRange = [values[n - 2] + (values[n - 1] - values[n - 2]) * 0.10, values[n - 1] + dv];
+
+      // return object with ranks, values and percentiles
       return({
          i: Array.from({length: n}, (v, i) => i + 1),
          x: values,
@@ -37,30 +43,28 @@
 <StatApp>
    <div class="app-layout">
 
-      <div class="left-column">
-         <!-- dot with data points and statistics -->
-         <div class="app-plot-area">
-            <Plot values={sample.x} />
-         </div>
-         <!-- data table -->
-         <div class="app-datatable-area">
-            <DataTable {sample} />
-         </div>
+      <!-- dot with data points and statistics -->
+      <div class="app-plot-area">
+         <Plot values={sample.x} />
       </div>
 
-      <div class="right-column">
-         <!-- table with statistics -->
-         <div class="app-stattable-area">
-            <StatTable values={sample.x} />
-         </div>
-         <!-- control elements -->
-         <div class="app-controls-area">
-            <AppControlArea {errormsg}>
-               <AppControlButton id="sampleSize" label="Sample:" text="Take new" on:click={() => sample = getSample(sampleSize)} />
-               <AppControlRange id="minValue" label="Change min:" step={0.1} bind:value={sample.x[0]} min={minRange[0]} max={minRange[1]} />
-               <AppControlRange id="maxValue" label="Change max:" step={0.1} bind:value={sample.x[sampleSize - 1]} min={maxRange[0]} max={maxRange[1]} />
-            </AppControlArea>
-         </div>
+      <!-- data table -->
+      <div class="app-datatable-area">
+         <DataTable {sample} />
+      </div>
+
+      <!-- table with statistics -->
+      <div class="app-stattable-area">
+         <StatTable values={sample.x} />
+      </div>
+
+      <!-- control elements -->
+      <div class="app-controls-area">
+         <AppControlArea {errormsg}>
+            <AppControlButton id="sampleSize" label="Sample:" text="Take new" on:click={() => sample = getSample(sampleSize)} />
+            <AppControlRange id="minValue" label="Change min:" step={0.1} bind:value={sample.x[0]} min={minRange[0]} max={minRange[1]} />
+            <AppControlRange id="maxValue" label="Change max:" step={0.1} bind:value={sample.x[sampleSize - 1]} min={maxRange[0]} max={maxRange[1]} />
+         </AppControlArea>
       </div>
    </div>
 
@@ -87,46 +91,39 @@
    width: 100%;
    height: 100%;
    position: relative;
-   display: flex;
+
+   display: grid;
+   grid-template-areas:
+      "plot stattable"
+      "plot controls"
+      "plot ."
+      "datatable .";
+   grid-template-columns: 65% 35%;
+   grid-template-rows: min-content auto auto min-content;
 }
 
-.left-column {
-   flex: 1 1 65%;
-}
-
-.right-column {
-   flex: 1 1 35%;
-}
 
 .app-plot-area {
+   grid-area: plot;
    box-sizing: border-box;
-   height: 80%;
-   width: 100%;
    padding-right: 10px;
    padding-bottom: 20px;
 }
 
 .app-datatable-area {
-   box-sizing: border-box;
-   height: 100%;
-   width: 100%;
+   grid-area: datatable;
    padding-right: 10px;
    padding-top: 10px;
 }
 
 .app-stattable-area {
+   grid-area: stattable;
    padding-left: 10px;
    padding-bottom: 20px;
 }
 
-
 .app-controls-area {
-   display: flex;
-   flex-direction: column;
-   justify-content: flex-start;
-   align-content: center;
-   padding-left: 10px;
-   padding-top: 10px;
+   grid-area: controls;
 }
 
 :global(.datatable) {
@@ -143,7 +140,6 @@
 .app-datatable-area :global(.datatable > tr:nth-of-type(2) > .datatable__value) {
    color: #191970;
 }
-
 
 .app-datatable-area :global(.datatable > tr:nth-of-type(2) > td:nth-of-type(2)),
 .app-datatable-area :global(.datatable > tr:nth-of-type(2) > td:last-of-type) {

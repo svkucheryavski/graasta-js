@@ -10,6 +10,6 @@
       {label: "x", values: sample.x},
       {label: "p", values: sample.p}
    ]}
-   decNum={[0, 1, 2]}
+   decNum={[0, 1, 3]}
    horizontal={true}
 />
