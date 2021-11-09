@@ -1,7 +1,6 @@
 <script>
    import {sum, seq, subset, min, max, dnorm} from 'stat-js';
-   import {Axes, XAxis, LineSeries, AreaSeries, Segments} from 'svelte-plots-basic';
-   import {DataTable} from 'svelte-plots-stat';
+   import {Axes, XAxis, LineSeries, TextLabels, AreaSeries, Segments} from 'svelte-plots-basic';
 
    export let groups;
    export let sample;
@@ -13,16 +12,17 @@
    let sampleSize;
    let sampleSizeOld = sample.length;
 
+
    // when sample size has changed - reset statistics
    $: {
-      sampleSize = sample.length;
-      if (sampleSize != sampleSizeOld) {
+      if (sampleSize !== sampleSizeOld || sd === 0) {
          sampleSizeOld = sampleSize;
          sampStat = [];
       }
    }
 
    // proportion of current sample
+   $: sampleSize = sample.length;
    $: sampProp = 1 - sum(subset(groups, sample).map(v => v - 1)) / sampleSize;
 
    // if population has changed - reset statistics
@@ -51,52 +51,41 @@
    $: nSamplesInside = sum(sampStat);
 
    // text values for stat table
-   $: tableSampProp = sampProp.toFixed(2)
    $: tableCI = `[${ci[0].toFixed(2)}, ${ci[1].toFixed(2)}]`;
-   $: tableNSamplesInside = `${nSamplesInside} (${(nSamplesInside/nSamples * 100).toFixed(1)}%)`;
+   $: tableNSamplesInside = `# samples with π inside: ${nSamplesInside}/${nSamples} (${(nSamplesInside/nSamples * 100).toFixed(1)}%)`;
 </script>
 
 <div class="ci-plot">
+   {#if sd > 0}
    <!-- plot with population based CI and position of current sample proportion -->
-   <Axes limX={[-0.02, 1.02]} limY={[-0.01, max(f) * 1.1]}>
+   <Axes limX={[-0.02, 1.02]} limY={[-0.01, max(f) * 1.25]}>
+
+      <!-- statistics -->
+      <TextLabels xValues={[-0.05]} yValues={[max(f) * 1.15]} pos={2} labels={tableNSamplesInside} />
+      <TextLabels xValues={[-0.05]} yValues={[max(f) * 1.00]} pos={2} labels={"CI: " + tableCI} />
+      <TextLabels xValues={[-0.05]} yValues={[max(f) * 0.85]} pos={2} labels={`sample prop. = ${sampProp.toFixed(2)}`} />
+
+      <!-- sampling distribution and confidence interval -->
       <AreaSeries xValues={cix} yValues={cif} lineColor={colors[0] + "40"} fillColor={colors[0] + "40"}/>
       <LineSeries xValues={x} yValues={f} lineColor={colors[0] + "40"} />
-      <Segments xStart={[popProp]} xEnd={[popProp]} yStart={[0]} yEnd={[max(f) * 1.1]} lineColor={colors[0]} />
+      <Segments xStart={[popProp]} xEnd={[popProp]} yStart={[0]} yEnd={[max(f)]} lineColor={colors[0]} />
+
       <XAxis slot="xaxis" ></XAxis>
    </Axes>
-</div>
-
-<div class="stat-table">
-   <!-- plot with statistics -->
-   <DataTable
-      variables={[
-         {label: "Confidence interval (CI)", values: [tableCI]},
-         {label: "Proportion of current sample", values: [tableSampProp]},
-         {label: "# of samples taken", values: [nSamples]},
-         {label: "# of samples inside CI", values: [tableNSamplesInside]},
-      ]}
-      decNum={[0, 0]}
-      horizontal={true}
-   />
+   {:else}
+   <p class="error">Sample has members only from one class — standard error is zero and we can  not
+      compute confidence interval.
+   </p>
+   {/if}
 </div>
 
 <style>
-   .stat-table {
+
+   .error {
+      font-size: 1.2em;
+      color:red;
+      text-align: center;
       padding: 1em;
    }
 
-   .stat-table :global(.datatable) {
-      font-size: 0.85em;
-      color: #606060;
-   }
-
-   .stat-table :global(.datatable__label) {
-      font-weight: normal;
-   }
-
-   .stat-table :global(.datatable__value) {
-      padding-left: 1em;
-      font-weight: bold;
-      color: #505050;
-   }
 </style>

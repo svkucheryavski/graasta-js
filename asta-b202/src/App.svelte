@@ -14,13 +14,13 @@
    import AppControlRange from '../../shared/AppControlRange.svelte';
 
    // size of population and vector with element indices
-   const popSize = 400;
+   const popSize = 1600;
    const popIndex = seq(1, popSize, popSize);
    const colors = ["#ff0000", "#0000ff"];
 
    // variable parameters
    let popProp = 0.50;
-   let sampSize = 5;
+   let sampSize = 10;
 
    function takeNewSample() {
       sample = subset(shuffle(popIndex), seq(1, sampSize, sampSize));
@@ -54,8 +54,8 @@
       <!-- control elements -->
       <div class="app-controls-area">
          <AppControlArea>
-            <AppControlRange id="popProp" label="Proportion" bind:value={popProp} min={0.1} max={0.9} step={0.01} decNum={2} />
-            <AppControlSwitch id="sampleSize" label="Sample size" bind:value={sampSize} options={[5, 10, 20, 40]} />
+            <AppControlRange id="popProp" label="Proportion" bind:value={popProp} min={0.1} max={0.9} step={0.05} decNum={2} />
+            <AppControlSwitch id="sampleSize" label="Sample size" bind:value={sampSize} options={[10, 20, 40]} />
             <AppControlButton id="newSample" label="Sample" text="Take new" on:click={takeNewSample} />
          </AppControlArea>
       </div>
@@ -74,7 +74,9 @@
       <p>
          The app shows 95% confidence interval computed for current sample as a plot on the right side. So,
          every time you take a new sample, this also results in a new confidence interval. The vertical red line
-         on this plot shows the population proportion, which in real life we do not know.
+         on this plot shows the population proportion, which in real life we do not know. If you take a new
+         sampe many times (say, 200-300) you can see how often the population proportion, π, was inside the
+         interval. If sample size is large enough it should be close to 95% — the confidence level.
       </p>
    </div>
 </StatApp>
@@ -89,8 +91,9 @@
    grid-template-areas:
       "pop sampplot"
       "pop ciplot"
-      "pop controls";
-   grid-template-rows: 150px 1fr 1fr;
+      "pop controls"
+      "pop .";
+   grid-template-rows: 150px 150px auto auto;
    grid-template-columns: 65% 35%;
 }
 
@@ -120,7 +123,12 @@
    grid-area: ciplot;
 }
 
+.app-ci-plot-area :global(.plot) {
+   min-height: 150px;
+}
+
 .app-controls-area {
+   padding-top: 10px;
    grid-area: controls;
 }
 
