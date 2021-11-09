@@ -1,7 +1,6 @@
 <script>
    import {sum, seq, subset, max, dnorm, pnorm} from 'stat-js';
    import {Axes, XAxis, LineSeries, AreaSeries, TextLabels, Segments} from 'svelte-plots-basic';
-   import {DataTable} from 'svelte-plots-stat';
 
    export let groups;   //
    export let sample;
@@ -77,36 +76,36 @@
    }
 
    $: xLegend = popProp >= 0.35 ? -0.05 : 0.30;
-   $: H0LegendStr = `H0: π(<tspan style=\"color:red\">o</tspan>) ${signs[tail]} ${popProp.toFixed(2)}`;
-   $: percentBelow005Str = `# with p < 0.05 = ${nSamplesBelow005}/${nSamples} (${(100 * nSamplesBelow005/nSamples).toFixed(1)}%)`;
+   $: H0LegendStr = `H0: π(<tspan fill=red>o</tspan>) ${signs[tail]} ${popProp.toFixed(2)}`;
+   $: percentBelow005Str = `# samples with p < 0.05 = ${nSamplesBelow005}/${nSamples} (${(100 * nSamplesBelow005/nSamples).toFixed(1)}%)`;
 </script>
 
-<div class="test-plot">
-   {#if sd > 0}
-   <!-- plot with sampling distribution, current sample proportion and area corresponding to p-value -->
-   <Axes limX={[-0.02, 1.02]} limY={[-0.01, max(f) * 1.2]}>
+{#if sd > 0}
+<!-- plot with sampling distribution, current sample proportion and area corresponding to p-value -->
+<Axes limX={[-0.02, 1.02]} limY={[-0.01, max(f) * 1.65]}>
 
-      <!-- statistics -->
-      <TextLabels xValues={[xLegend]} yValues={[max(f) * 1.10]} pos={2} labels={percentBelow005Str} />
-      <TextLabels xValues={[xLegend]} yValues={[max(f) * 0.95]} pos={2} labels={H0LegendStr} />
-      <TextLabels xValues={[xLegend]} yValues={[max(f) * 0.80]} pos={2} labels={`p-value = ${p.toFixed(3)}`} />
-      <TextLabels xValues={[xLegend]} yValues={[max(f) * 0.65]} pos={2} labels={`sample π = ${sampProp.toFixed(2)}`} />
+   <!-- statistics -->
+   <TextLabels textSize={1.25} xValues={[10]} yValues={[max(f) * 1.55]} pos={2} labels={
+      "<tspan x=2em dx=0 dy=0.00em>" + percentBelow005Str + "</tspan>" +
+      "<tspan x=2em dx=0 dy=1.25em>" + H0LegendStr + "</tspan>" +
+      "<tspan x=2em dx=0 dy=1.25em>p-value: " + p.toFixed(3) + "</tspan>" +
+      "<tspan x=2em dx=0 dy=1.25em>sample π: " + sampProp.toFixed(2) + "</tspan>"
+   } />
 
-      <!-- area for p-value -->
-      {#each px as x, i}
-      <AreaSeries xValues={x} yValues={pf[i]} lineColor={colors[0] + "40"} fillColor={colors[0] + "40"}/>
-      {/each}
+   <!-- area for p-value -->
+   {#each px as x, i}
+   <AreaSeries xValues={x} yValues={pf[i]} lineColor={colors[0] + "40"} fillColor={colors[0] + "40"}/>
+   {/each}
 
-      <!-- sampling distribution -->
-      <LineSeries xValues={x} yValues={f} lineColor={colors[0] + "40"} />
-      <Segments xStart={[sampProp]} xEnd={[sampProp]} yStart={[0]} yEnd={[max(f)]} lineColor={colors[0]} />
+   <!-- sampling distribution -->
+   <LineSeries xValues={x} yValues={f} lineColor={colors[0] + "40"} />
+   <Segments xStart={[sampProp]} xEnd={[sampProp]} yStart={[0]} yEnd={[max(f)]} lineColor={colors[0]} />
 
-      <XAxis slot="xaxis" ></XAxis>
-   </Axes>
-   {:else}
-   <p class="error">Sample has members only from one class — standard error is zero and no way to make test</p>
-   {/if}
-</div>
+   <XAxis slot="xaxis" ></XAxis>
+</Axes>
+{:else}
+<p class="error">Sample has members only from one class — standard error is zero and no way to make test</p>
+{/if}
 
 <style>
    .error {
