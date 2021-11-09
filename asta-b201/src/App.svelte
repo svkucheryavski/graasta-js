@@ -14,13 +14,13 @@
    import AppControlRange from '../../shared/AppControlRange.svelte';
 
    // size of population and vector with element indices
-   const popSize = 400;
+   const popSize = 1600;
    const popIndex = seq(1, popSize, popSize);
    const colors = ["#ff0000", "#0000ff"];
 
    // variable parameters
    let popProp = 0.50;
-   let sampSize = 5;
+   let sampSize = 10;
 
    function takeNewSample() {
       sample = subset(shuffle(popIndex), seq(1, sampSize, sampSize));
@@ -54,8 +54,8 @@
       <!-- control elements -->
       <div class="app-controls-area">
          <AppControlArea>
-            <AppControlRange id="popProp" label="Proportion" bind:value={popProp} min={0.1} max={0.9} step={0.01} decNum={2} />
-            <AppControlSwitch id="sampleSize" label="Sample size" bind:value={sampSize} options={[5, 10, 20, 40]} />
+            <AppControlRange id="popProp" label="Proportion" bind:value={popProp} min={0.1} max={0.9} step={0.05} decNum={2} />
+            <AppControlSwitch id="sampleSize" label="Sample size" bind:value={sampSize} options={[10, 20, 40]} />
             <AppControlButton id="newSample" label="Sample" text="Take new" on:click={takeNewSample} />
          </AppControlArea>
       </div>
@@ -65,7 +65,7 @@
    <div slot="help">
       <h2>Population based confidence interval for proportion</h2>
       <p>
-         This app allows you to play with proportion of a random sample. Here we have a population with N = 400
+         This app allows you to play with proportion of a random sample. Here we have a population with N = 1600
          individuals. Some of them are red, some are blue. You can change the proportion of the red
          individuals as you want (by default it is 50%). The population is shown as large plot on the left.
       </p>
@@ -79,7 +79,7 @@
          The interval for selected population proportion and current sample size computed for 95% confidence level is
          shown as a red area under a distribution curve on the right. The vertical line on that plot is a proportion of
          your current sample. Try to take many samples and see how often the proportion of the sample will be inside
-         the interval (table under the plot shows this information). If you repeat this many (hundreds) times, about
+         the interval (text on the plot shows this information). If you repeat this many (hundreds) times, about
          95% of the samples should have proportion within the interval. <strong>However this works only if number of
          individuals in each group is at least 5.</strong> So if proportion is 10% you need to have sample size n = 50 to meat
          this requirement.
@@ -97,8 +97,10 @@
    grid-template-areas:
       "pop sampplot"
       "pop ciplot"
-      "pop controls";
-   grid-template-rows: 150px 1fr 1fr;
+      "pop controls"
+      "pop .";
+
+   grid-template-rows: 150px 150px auto auto;
    grid-template-columns: 65% 35%;
 }
 
@@ -120,13 +122,14 @@
    min-height: 150px;
 }
 
-.app-sample-plot-area {
-   height: 150px;
-}
-
 .app-ci-plot-area {
    grid-area: ciplot;
 }
+
+.app-ci-plot-area :global(.plot) {
+   min-height: 150px;
+}
+
 
 .app-controls-area {
    grid-area: controls;
