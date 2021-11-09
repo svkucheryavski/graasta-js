@@ -47,15 +47,21 @@
    // text values for stat table
    $: tableCI = `[${ci[0].toFixed(2)}, ${ci[1].toFixed(2)}]`;
    $: tableNSamplesInside = `# samples inside CI: ${nSamplesInside}/${nSamples} (${(nSamplesInside/nSamples * 100).toFixed(1)}%)`;
+
+   // text size for legend with statistics
+   const ts = 1.25;
 </script>
 
 <!-- plot with population based CI and position of current sample proportion -->
-<Axes limX={[92, 108]} limY={[-0.005, max(f) * 1.55]} xLabel={"Expected sample mean, m"}>
+<Axes limX={[92, 108]} limY={[-0.005, max(f) * 1.70]} xLabel={"Expected sample mean, m"}>
+
    <!-- statistics -->
-   <TextLabels xValues={[92]} yValues={[max(f) * 1.45]} pos={2} labels={tableNSamplesInside} />
-   <TextLabels xValues={[92]} yValues={[max(f) * 1.30]} pos={2} labels={"95% CI: " + tableCI} />
-   <TextLabels xValues={[92]} yValues={[max(f) * 1.15]} pos={2} labels={`sample mean = ${sampMean.toFixed(2)}`} />
-   <TextLabels xValues={[92]} yValues={[max(f) * 1.00]} pos={2} labels={`sample sd = ${sampSD.toFixed(2)}`} />
+   <TextLabels textSize={ts} xValues={[0]} yValues={[max(f) * 1.60]} pos={2} labels={
+      "<tspan x=2em dx=0 dy=0.00em>" + tableNSamplesInside + "</tspan>" +
+      "<tspan x=2em dx=0 dy=1.25em>" + "95% CI: " + tableCI + "</tspan>" +
+      "<tspan x=2em dx=0 dy=1.25em>" + "sample mean: " + sampMean.toFixed(1) + "</tspan>" +
+      "<tspan x=2em dx=0 dy=1.25em>" + "sample sd: " + sampSD.toFixed(2) + "</tspan>"
+   } />
 
    <AreaSeries xValues={cix} yValues={cif} lineColor={colors[0] + "40"} fillColor={colors[0] + "40"}/>
    <LineSeries xValues={x} yValues={f} lineColor={colors[0] + "40"} />

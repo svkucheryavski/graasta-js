@@ -91,7 +91,7 @@
       "pop ciplot"
       "pop controls"
       "pop .";
-   grid-template-rows: max(200px, 30%) 1fr min-content;
+   grid-template-rows: max(250px, 30%) 1fr min-content;
    grid-template-columns: 65% 35%;
 }
 

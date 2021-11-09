@@ -53,31 +53,34 @@
    // text values for stat table
    $: tableCI = `[${ci[0].toFixed(2)}, ${ci[1].toFixed(2)}]`;
    $: tableNSamplesInside = `# samples with π inside: ${nSamplesInside}/${nSamples} (${(nSamplesInside/nSamples * 100).toFixed(1)}%)`;
+
+   // text size for legend with statistics
+   const ts = 1.25;
 </script>
 
-<div class="ci-plot">
-   {#if sd > 0}
-   <!-- plot with population based CI and position of current sample proportion -->
-   <Axes limX={[-0.02, 1.02]} limY={[-0.01, max(f) * 1.25]}>
+{#if sd > 0}
+<!-- plot with population based CI and position of current sample proportion -->
+<Axes limX={[-0.02, 1.02]} limY={[-0.01, max(f) * 1.65]}>
 
-      <!-- statistics -->
-      <TextLabels xValues={[-0.05]} yValues={[max(f) * 1.15]} pos={2} labels={tableNSamplesInside} />
-      <TextLabels xValues={[-0.05]} yValues={[max(f) * 1.00]} pos={2} labels={"95% CI: " + tableCI} />
-      <TextLabels xValues={[-0.05]} yValues={[max(f) * 0.85]} pos={2} labels={`sample prop. = ${sampProp.toFixed(2)}`} />
+   <!-- statistics -->
+   <TextLabels textSize={ts} xValues={[0]} yValues={[max(f) * 1.55]} pos={2} labels={
+      "<tspan x=2em dx=0 dy=0.00em>" + tableNSamplesInside + "</tspan>" +
+      "<tspan x=2em dx=0 dy=1.25em>" + "95% CI: " + tableCI + "</tspan>" +
+      "<tspan x=2em dx=0 dy=1.25em>" + "sample prop.: " + sampProp.toFixed(2) + "</tspan>"
+   } />
 
-      <!-- sampling distribution and confidence interval -->
-      <AreaSeries xValues={cix} yValues={cif} lineColor={colors[0] + "40"} fillColor={colors[0] + "40"}/>
-      <LineSeries xValues={x} yValues={f} lineColor={colors[0] + "40"} />
-      <Segments xStart={[popProp]} xEnd={[popProp]} yStart={[0]} yEnd={[max(f)]} lineColor={colors[0]} />
+   <!-- sampling distribution and confidence interval -->
+   <AreaSeries xValues={cix} yValues={cif} lineColor={colors[0] + "40"} fillColor={colors[0] + "40"}/>
+   <LineSeries xValues={x} yValues={f} lineColor={colors[0] + "40"} />
+   <Segments xStart={[popProp]} xEnd={[popProp]} yStart={[0]} yEnd={[max(f)]} lineColor={colors[0]} />
 
-      <XAxis slot="xaxis" ></XAxis>
-   </Axes>
-   {:else}
-   <p class="error">Sample has members only from one class — standard error is zero and we can  not
-      compute confidence interval.
-   </p>
-   {/if}
-</div>
+   <XAxis slot="xaxis" ></XAxis>
+</Axes>
+{:else}
+<p class="error">Sample has members only from one class — standard error is zero and we can  not
+   compute confidence interval.
+</p>
+{/if}
 
 <style>
 
