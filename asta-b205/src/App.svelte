@@ -15,6 +15,7 @@
 
    // signs for differen H0 tails
    const signs = {"both": "=", "left": "≥", "right": "≤"};
+   const colors = ["#ff2400", "#66023c", "#b7420e"];
 
    // variable parameters
    let sampSize = 4;
@@ -35,8 +36,11 @@
    // strings for statistics table
    $: h0Str = `π(o) ${signs[tail]} 0.5`;
    $: sampPropStr = (sum(sample) / sample.length).toFixed(3);
-   $: pValStr = N.length == 3 ? `(<span style="color:red">${N[1]}</span> + <span style="color:green">${N[0]}</span>) /
-      (<span style="color:red">${N[1]}</span> + <span style="color:green">${N[0]}</span> + <span style="color:blue">${N[2]}</span>)
+   $: pValStr = N.length == 3 ? `
+      (<span style="color:${colors[0]}">${N[1]}</span> + <span style="color:${colors[1]}">${N[0]}</span>) /
+      (<span style="color:${colors[0]}">${N[1]}</span> +
+         <span style="color:${colors[1]}">${N[0]}</span> +
+         <span style="color:${colors[2]}">${N[2]}</span>)
       = ${(sum(subset(N, [1, 2]))/sum(N)).toFixed(3)}` : "";
 </script>
 
@@ -45,7 +49,7 @@
 
       <!-- plot for possible outcomes (population) -->
       <div class="app-outcomes-plot-area">
-         <OutcomesPlot {sample} {tail} bind:value={N} />
+         <OutcomesPlot {sample} {tail} {colors} bind:value={N} />
       </div>
 
       <!-- plot with current sample  -->

@@ -7,7 +7,7 @@
 
 {#if sample.length > 0}
 <Axes limX={[0, sample.length + 1]} limY={[-1, 1]} >
-   <SampleSeries {sample} markerSize={sample.length === 4 ? 5 : 4} />
+   <SampleSeries {sample} markerSize={sample.length === 4 ? 4 : 3} />
 </Axes>
 {/if}
 

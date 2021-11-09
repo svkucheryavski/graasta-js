@@ -5,6 +5,8 @@
    export let yPos = 0;
    export let sample = [];
    export let markerSize = 5;
+   export let lineColor = "#606060";
+   export let bgColor = "#f0f0f0";
 
    // sample size and coordinates for its elements
    $: n = sample.length;
@@ -24,10 +26,10 @@
 </script>
 
 {#if nT > 0}
-   <ScatterSeries xValues={xT} yValues={yT} {markerSize} faceColor="#f0f0f0" borderColor="#606060" />
+   <ScatterSeries xValues={xT} yValues={yT} {markerSize} faceColor={bgColor} borderColor={lineColor} />
 {/if}
 
 {#if nH > 0}
-   <ScatterSeries xValues={xH} yValues={yH} {markerSize} faceColor="#606060" borderColor="#606060" />
+   <ScatterSeries xValues={xH} yValues={yH} {markerSize} faceColor={lineColor} borderColor={lineColor} />
 {/if}
 

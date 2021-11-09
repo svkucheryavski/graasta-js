@@ -6,6 +6,7 @@
    export let sample;
    export let tail;
    export let value;
+   export let colors;
 
    // sample size, number of heads and tails
    $: n = sample.length;
@@ -46,7 +47,7 @@
       value = [N1, N2, N3];
    }
 
-   $: limY = n == 4 ? [-1.5, N + 1] : [-2.5, N + 0.5]
+   $: limY = n == 4 ? [-1.5, N + 1] : [-4.5, N + 0.5]
    $: mYPos = n == 4 ? [-1] : [-2];
    $: mSize = n == 4 ? 2 : 1;
 </script>
@@ -56,20 +57,20 @@
       {#each outcomes2 as outcome, i}
       <SampleSeries sample={outcome} yPos={i} markerSize={mSize} />
       {/each}
-      <TextLabels textSize={1.2} xValues={[n/2 + 0.5]} yValues={mYPos} faceColor="#ff2222" labels={"more extreme: " + N2} />
+      <TextLabels textSize={1.3} xValues={[n/2 + 0.5]} yValues={mYPos} faceColor={colors[0]} labels={"more extreme: " + N2} />
    </Axes>
 
    <Axes limX={[0, n + 1]} limY={limY}>
       {#each outcomes1 as outcome, i}
       <SampleSeries sample={outcome} yPos={i} markerSize={mSize} />
       {/each}
-      <TextLabels textSize={1.2} xValues={[n/2 + 0.5]} yValues={mYPos} faceColor="#22aa22" labels={"equally extreme: " + N1} />
+      <TextLabels textSize={1.3} xValues={[n/2 + 0.5]} yValues={mYPos} faceColor={colors[1]} labels={"equally extreme: " + N1} />
    </Axes>
 
    <Axes limX={[0, n + 1]} limY={limY}>
       {#each outcomes3 as outcome, i}
       <SampleSeries sample={outcome} yPos={i} markerSize={mSize} />
       {/each}
-      <TextLabels textSize={1.2} xValues={[n/2 + 0.5]} yValues={mYPos} faceColor="#2222ff" labels={"less extreme: " + N3} />
+      <TextLabels textSize={1.3} xValues={[n/2 + 0.5]} yValues={mYPos} faceColor={colors[2]} labels={"less extreme: " + N3} />
    </Axes>
 
