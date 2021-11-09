@@ -127,7 +127,8 @@
    <div slot="help">
       <h2>Samples and populations</h2>
       <p>This app helps you to investigate how different a sample can be when it is being randomly taken from corresponding population.</p>
-      <p>You can investigate this difference for several parameters, each has own distribution. Thus, <em>Age</em> is distributed
+      <p>You can investigate this difference for one of the three parameters: Height, Age and IQ of a population of people. Each parameter
+         has own distribution. Thus, <em>Age</em> is distributed
          uniformly, <em>IQ</em> is distributed normally and <em>Height</em> has distribution with two peaks (modes). You can also see how
          sample size influences the difference.
       </p>

@@ -1,5 +1,6 @@
 <script>
    import {seq, dnorm, dunif, pnorm, punif, closestIndex} from 'stat-js';
+
    import AppControlArea from '../../shared/AppControlArea.svelte';
    import AppControlSwitch from '../../shared/AppControlSwitch.svelte';
    import AppControlRange from '../../shared/AppControlRange.svelte';
@@ -40,7 +41,7 @@
 
    let intInd = [0, Math.round(size/2) + 1];
 
-   const changeValues = (x, a, b, mode) => {
+   function changeValues(x, a, b, mode) {
 
       if (mode === "Value") {
          intInd = [0, closestIndex(x, b)];
@@ -55,7 +56,7 @@
       p2 = p[intInd[1]];
    }
 
-   const changeProbabilities = (p, pa, pb, mode) => {
+   function changeProbabilities (p, pa, pb, mode) {
 
       if (mode === "Value") {
          intInd = [0, closestIndex(p, pb)];
@@ -119,11 +120,11 @@
          <div class="app-control-area">
             <AppControlArea>
                {#if mode === "Interval"}
-               <AppControlRange id="a" label="x<sub>1</sub>" step={0.1} min={limX[0]} max={limX[1]} bind:value={x1} />
+               <AppControlRange id="a" label="x<sub>1</sub>" step={0.5} min={limX[0]} max={limX[1]} bind:value={x1} />
                {:else}
                <AppControl id="empty" label="&nbsp;"></AppControl>
                {/if}
-               <AppControlRange id="b" label="x<sub>2</sub>" step={0.1} min={limX[0]} max={limX[1]} bind:value={x2} />
+               <AppControlRange id="b" label="x<sub>2</sub>" step={0.5} min={limX[0]} max={limX[1]} bind:value={x2} />
                <AppControlSwitch
                   id="mode"
                   label="Mode"
@@ -138,11 +139,11 @@
          <div class="app-control-area">
             <AppControlArea>
                {#if mode === "Interval"}
-               <AppControlRange id="pa" label="p<sub>1</sub>" step={0.001} min={0} max={1} bind:value={p1} decNum={3} />
+               <AppControlRange id="pa" label="p<sub>1</sub>" step={0.005} min={0} max={1} bind:value={p1} decNum={3} />
                {:else}
                <AppControl id="empty" label="&nbsp;"></AppControl>
                {/if}
-               <AppControlRange id="pb" label="p<sub>2</sub>" step={0.001} min={0} max={1} bind:value={p2} decNum={3} />
+               <AppControlRange id="pb" label="p<sub>2</sub>" step={0.005} min={0} max={1} bind:value={p2} decNum={3} />
                <AppControlSwitch
                   id="mode"
                   label="Mode"
