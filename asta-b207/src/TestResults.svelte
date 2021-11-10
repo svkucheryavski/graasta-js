@@ -1,0 +1,106 @@
+<script>
+   import {cumsum, round, seq, sd, max, dt, mean, closestIndex} from 'stat-js';
+   import {Axes, XAxis, LineSeries, AreaSeries, TextLabels, Segments} from 'svelte-plots-basic';
+
+   export let popMean;
+   export let popSD;
+   export let sample;
+   export let colors;
+   export let tail;
+
+   // sign symbols for hypothesis tails
+   const signs = {"both": "=", "left": "≥", "right": "≤"};
+
+   // variables for collecting cumulative statistics
+   let oldTail = tail;
+   let oldPopMean = popMean;
+   let oldPopSD = popSD;
+   let oldSampSize = sample.length;
+   let nSamples = 0;
+   let nSamplesBelow005 = 0;
+
+   // statistics for current sample
+   $: sampSize = sample.length;
+   $: sampMean = round(mean(sample), 2);
+   $: sampSD = round(sd(sample), 2);
+   $: SE = sampSD / Math.sqrt(sampSize);
+   $: tValue = -Math.abs((sampMean - popMean) / SE);
+
+   // PDF curve for sampling distribution
+   $: x = seq(popMean - 10 * SE, popMean + 10 * SE, 300);
+   $: f = dt(x.map(v => (v - popMean) /SE), sampSize - 1);
+
+   // here we approximate CDF for t-distribution
+   const t1 = seq(-30, -5, 20000);
+   const t2 = seq(-5, 0, 20000);
+   $: p1 = cumsum(dt(t1, sampSize - 1)).map(v => v * (t1[1] - t1[0]));
+   $: p2 = cumsum(dt(t2, sampSize - 1)).map(v => v * (t2[1] - t2[0]));
+
+   // this p-value is always for left half of the PDF and has to be adjusted
+   $: pValue = tValue < -5 ? p1[closestIndex(t1, tValue)] : p2[closestIndex(t2, tValue)] + p1[19999];
+
+   // Correct p-value and p-value area
+   let px, pf, p;
+   $: {
+      // compute p-value and coordinates of corresponding area on the plot
+      if (tail === "left") {
+         px = [seq(popMean - 10 * SE, sampMean, 300)];
+         p = sampMean > popMean ? 1 - pValue : pValue;
+      } else if (tail === "right") {
+         px = [seq(sampMean, popMean + 10 * SE, 300)];
+         p = sampMean > popMean ? pValue : 1 - pValue;
+      } else {
+         const dm = Math.abs(sampMean - popMean)
+         px = [seq(popMean - 6 * SE, popMean - dm, 150), seq(popMean + dm, popMean + 6 * SE, 150)];
+         p = 2 * pValue;
+      }
+
+      // compute density values for the area points
+      pf = px.map(x => dt(x.map(m => (m - popMean) / SE), sampSize - 1));
+   }
+
+   // cumulative statistics
+   $: {
+
+      // reset statistics if sample size, population proportion or a test tail has been changed
+      if (oldSampSize !== sample.length || oldPopMean !== popMean || oldPopSD !== popSD || oldTail !== tail) {
+         oldSampSize = sample.length;
+         oldPopMean = popMean;
+         oldPopSD = popSD;
+         oldTail = tail;
+         nSamples = 0;
+         nSamplesBelow005 = 0;
+      }
+
+      // count number of samples taken for the same test conditions and how many have p-value < 0.05
+      nSamples = nSamples + 1;
+      nSamplesBelow005 = nSamplesBelow005 + (p < 0.05);
+   }
+
+   $: H0LegendStr = `H0: µ ${signs[tail]} ${popMean.toFixed(1)}`;
+   $: percentBelow005Str = `# samples with p < 0.05 = ${nSamplesBelow005}/${nSamples} (${(100 * nSamplesBelow005/nSamples).toFixed(1)}%)`;
+
+</script>
+
+<!-- plot with population based CI and position of current sample proportion -->
+<Axes limX={[90, 110]} limY={[-0.005, max(f) * 1.70]} xLabel={"Expected sample mean, m"}>
+
+   <TextLabels textSize={1.25} xValues={[0]} yValues={[max(f) * 1.55]} pos={2} labels={
+      "<tspan x=1.2em dx=0 dy=0.00em>" + percentBelow005Str + "</tspan>" +
+      "<tspan x=1.2em dx=0 dy=1.25em>" + H0LegendStr + "</tspan>" +
+      "<tspan x=1.2em dx=0 dy=1.25em>p-value: " + p.toFixed(3) + "</tspan>" +
+      "<tspan x=1.2em dx=0 dy=1.25em>sample mean: " + sampMean.toFixed(2) + "</tspan>" +
+      "<tspan x=1.2em dx=0 dy=1.25em>sample sd: " + sampSD.toFixed(2) + "</tspan>"
+   } />
+
+
+   <!-- area for p-value -->
+   {#each px as x, i}
+   <AreaSeries xValues={x} yValues={pf[i]} lineColor={colors[0] + "40"} fillColor={colors[0] + "40"}/>
+   {/each}
+
+   <LineSeries xValues={x} yValues={f} lineColor={colors[0] + "40"} />
+   <Segments xStart={[sampMean]} xEnd={[sampMean]} yStart={[0]} yEnd={[max(f)]} lineColor={colors[1]} />
+   <XAxis slot="xaxis" ></XAxis>
+</Axes>
+
