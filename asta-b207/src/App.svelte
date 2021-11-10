@@ -56,28 +56,29 @@
    </div>
 
    <div slot="help">
-      <h2>Population based confidence interval for mean</h2>
+      <h2>One-sample t-test</h2>
       <p>
-         This app is similar to <code>asta-b201</code> but is made to give you an idea about uncertainty of sample mean.
-         Here we have a normally distributed population — concentration of Chloride in different parts of a water source.
-         The concentration has a fixed mean, <em>µ</em> = 100 mg/L, and a standard deviation, <em>σ</em>, which you can
-         vary from 1 to 5 mg/L. The population distribution is shown using gray colors on the left plot. Blue points on
-         that plot show values of a current sample, randomly taken from the population. The vertical lines show the
-         corresponding means.
+         This app helps to understand how does the one sample t-test work. Here we have a normally distributed
+         population — concentration of Chloride in different parts of a water source. The null hypothesis in this case
+         is made about the population mean, µ, and, depending on a tail, you have the following options — "both": H0: µ = 100 mg/L,
+         "left": µ ≥ 100 mg/L, and "right": µ ≤ 100 mg/L.
+         The population in this app has µ exactly equal to 100 mg/L, so all three hypothesis are true in this case.
+         You have a possibility to change the standard deviation of the population, which by default is set to 3 mg/L
+         but you will see, that it does not influence the outcome of the test.
       </p>
       <p>
-         If we know mean of population, <em>µ</em>, and sample size, we can compute an interval of expected mean values
-         of the future samples, <em>m</em>. So, when you take a new random sample of that size from the population, its
-         mean value will likely to be inside the interval. This interval is called <em>confidence interval for mean</em>
-         and since we compute it based on population parameter, it is <em>population based</em>.
+         Then you can take a random sample from this population and see how far the mean of the sample
+         is from the mean of the population. The app computes a chance to get a sample as extreme as given or even
+         more extreme assuming that H0 is correct — the <strong>p-value</strong>. Usually p-value is used to assess how
+         extreme your particlar sample is for being taken from population where H0 is true. If p-value is small,
+         it is considered as unlikely event and H0 is rejected.
       </p>
       <p>
-         Right plot shows distribution of possible mean values of samples to be randomly taken from the current population
-         (and for current sample size). Confidence interval, computed for 95% confidence level is shown as a gray area
-         under the distribution curve. The blue vertical line on that plot is a mean of
-         your current sample. Try to take many samples and see how often the mean of a sample will be inside
-         the interval (table under the plot shows this information). If you repeat this many (hundreds) times, about
-         95% of the samples should have mean within the interval.
+         Often researchers use 5% (0.05) as a threshold for that. It is called <em>significance limit</em>. You will see
+         that if you take many samples (100 or more), you will find out that approximately 5% of the samples will have
+         p-value below 0.05 although the H0 is true. And this happens regardless the sample size. So this threshold is
+         simply a chance to make a wrong decision by rejection the correct H0. So, if you use 0.05 you have 5% chance to
+         make a wrong decision and e.g. "see" an effect, which does not exist.
       </p>
    </div>
 </StatApp>
