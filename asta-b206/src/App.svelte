@@ -103,7 +103,7 @@
       "pop controls"
       "pop .";
 
-   grid-template-rows: 120px max(30%, 170px) auto min-content;
+   grid-template-rows: 120px max(30%, 180px) auto min-content;
    grid-template-columns: 65% 35%;
 }
 
@@ -130,7 +130,7 @@
 }
 
 .app-test-plot-area :global(.plot) {
-   min-height: 170px;
+   min-height: 180px;
 }
 
 .app-controls-area {

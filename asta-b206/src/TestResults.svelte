@@ -85,11 +85,11 @@
 <Axes limX={[-0.02, 1.02]} limY={[-0.01, max(f) * 1.65]}>
 
    <!-- statistics -->
-   <TextLabels textSize={1.25} xValues={[10]} yValues={[max(f) * 1.55]} pos={2} labels={
-      "<tspan x=2em dx=0 dy=0.00em>" + percentBelow005Str + "</tspan>" +
-      "<tspan x=2em dx=0 dy=1.25em>" + H0LegendStr + "</tspan>" +
-      "<tspan x=2em dx=0 dy=1.25em>p-value: " + p.toFixed(3) + "</tspan>" +
-      "<tspan x=2em dx=0 dy=1.25em>sample π: " + sampProp.toFixed(2) + "</tspan>"
+   <TextLabels textSize={1.25} xValues={[0]} yValues={[max(f) * 1.55]} pos={2} labels={
+      "<tspan x=1.2em dx=0 dy=0.00em>" + percentBelow005Str + "</tspan>" +
+      "<tspan x=1.2em dx=0 dy=1.25em>" + H0LegendStr + "</tspan>" +
+      "<tspan x=1.2em dx=0 dy=1.25em>p-value: " + p.toFixed(3) + "</tspan>" +
+      "<tspan x=1.2em dx=0 dy=1.25em>sample prop.: " + sampProp.toFixed(2) + "</tspan>"
    } />
 
    <!-- area for p-value -->

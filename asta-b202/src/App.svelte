@@ -93,7 +93,7 @@
       "pop ciplot"
       "pop controls"
       "pop .";
-   grid-template-rows: 150px max(30%, 175px) auto min-content;
+   grid-template-rows: 130px max(30%, 195px) auto min-content;
    grid-template-columns: 65% 35%;
 }
 
@@ -112,19 +112,16 @@
 }
 
 .app-sample-plot-area :global(.plot) {
-   min-height: 150px;
+   min-height: 130px;
 }
 
-.app-sample-plot-area {
-   height: 150px;
-}
 
 .app-ci-plot-area {
    grid-area: ciplot;
 }
 
 .app-ci-plot-area :global(.plot) {
-   min-height: 150px;
+   min-height: 195px;
 }
 
 .app-controls-area {
