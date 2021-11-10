@@ -15,6 +15,10 @@ app_blocks = [
    {
       "title": "Confidence intervals",
       "apps": ["asta-b201", "asta-b202", "asta-b203", "asta-b204"]
+   },
+   {
+      "title": "Hypothesis testing",
+      "apps": ["asta-b205", "asta-b206"]
    }
 ]
 
