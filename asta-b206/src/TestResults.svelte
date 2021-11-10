@@ -1,6 +1,6 @@
 <script>
    import {sum, seq, round, subset, max, dnorm, pnorm} from 'stat-js';
-   import {Axes, XAxis, LineSeries, AreaSeries, TextLabels, Segments} from 'svelte-plots-basic';
+   import {Axes, XAxis, LineSeries, AreaSeries, TextLegend, Segments} from 'svelte-plots-basic';
 
    export let groups;   //
    export let sample;
@@ -70,7 +70,6 @@
       nSamplesBelow005 = nSamplesBelow005 + (p < 0.05);
    }
 
-   $: xLegend = popProp >= 0.35 ? -0.05 : 0.30;
    $: H0LegendStr = `H0: π(<tspan fill=red>o</tspan>) ${signs[tail]} ${popProp.toFixed(2)}`;
    $: percentBelow005Str = `# samples with p < 0.05 = ${nSamplesBelow005}/${nSamples} (${(100 * nSamplesBelow005/nSamples).toFixed(1)}%)`;
 </script>
@@ -80,12 +79,12 @@
 <Axes limX={[-0.02, 1.02]} limY={[-0.01, max(f) * 1.65]}>
 
    <!-- statistics -->
-   <TextLabels textSize={1.25} xValues={[0]} yValues={[max(f) * 1.55]} pos={2} labels={
-      "<tspan x=1.2em dx=0 dy=0.00em>" + percentBelow005Str + "</tspan>" +
-      "<tspan x=1.2em dx=0 dy=1.25em>" + H0LegendStr + "</tspan>" +
-      "<tspan x=1.2em dx=0 dy=1.25em>p-value: " + p.toFixed(3) + "</tspan>" +
-      "<tspan x=1.2em dx=0 dy=1.25em>sample prop.: " + sampProp.toFixed(2) + "</tspan>"
-   } />
+   <TextLegend textSize={1.25} x={90} y={max(f) * 1.55} pos={2} dx="2em" elements = {[
+         percentBelow005Str,
+         H0LegendStr,
+         "p-value: " + p.toFixed(3),
+         "sample prop.: " + sampProp.toFixed(2)
+   ]} />
 
    <!-- area for p-value -->
    {#each px as x, i}

@@ -1,6 +1,6 @@
 <script>
    import {cumsum, round, seq, sd, max, dt, mean, closestIndex} from 'stat-js';
-   import {Axes, XAxis, LineSeries, AreaSeries, TextLabels, Segments} from 'svelte-plots-basic';
+   import {Axes, XAxis, LineSeries, AreaSeries, TextLegend, Segments} from 'svelte-plots-basic';
 
    export let popMean;
    export let popSD;
@@ -85,22 +85,24 @@
 <!-- plot with population based CI and position of current sample proportion -->
 <Axes limX={[90, 110]} limY={[-0.005, max(f) * 1.70]} xLabel={"Expected sample mean, m"}>
 
-   <TextLabels textSize={1.25} xValues={[0]} yValues={[max(f) * 1.55]} pos={2} labels={
-      "<tspan x=1.2em dx=0 dy=0.00em>" + percentBelow005Str + "</tspan>" +
-      "<tspan x=1.2em dx=0 dy=1.25em>" + H0LegendStr + "</tspan>" +
-      "<tspan x=1.2em dx=0 dy=1.25em>p-value: " + p.toFixed(3) + "</tspan>" +
-      "<tspan x=1.2em dx=0 dy=1.25em>sample mean: " + sampMean.toFixed(2) + "</tspan>" +
-      "<tspan x=1.2em dx=0 dy=1.25em>sample sd: " + sampSD.toFixed(2) + "</tspan>"
-   } />
-
+   <!-- statistics -->
+   <TextLegend textSize={1.25} x={90} y={max(f) * 1.55} pos={2} dx="2em" elements = {[
+         percentBelow005Str,
+         H0LegendStr,
+         "p-value: " + p.toFixed(3),
+         "sample mean: " + sampMean.toFixed(2),
+         "sample sd: " + sampSD.toFixed(2)
+   ]} />
 
    <!-- area for p-value -->
    {#each px as x, i}
    <AreaSeries xValues={x} yValues={pf[i]} lineColor={colors[0] + "40"} fillColor={colors[0] + "40"}/>
    {/each}
 
+   <!-- PDF for sampling distribution -->
    <LineSeries xValues={x} yValues={f} lineColor={colors[0] + "40"} />
    <Segments xStart={[sampMean]} xEnd={[sampMean]} yStart={[0]} yEnd={[max(f)]} lineColor={colors[1]} />
+
    <XAxis slot="xaxis" ></XAxis>
 </Axes>
 

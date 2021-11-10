@@ -1,6 +1,6 @@
 <script>
    import {sum, seq, sd, max, dt, mean, subset, closestIndex} from 'stat-js';
-   import {Axes, XAxis, LineSeries, AreaSeries, TextLabels, Segments} from 'svelte-plots-basic';
+   import {Axes, XAxis, LineSeries, AreaSeries, TextLegend, Segments} from 'svelte-plots-basic';
 
    export let popMean;
    export let popSD;
@@ -54,19 +54,18 @@
    $: tableCI = `[${ci[0].toFixed(2)}, ${ci[1].toFixed(2)}]`;
    $: tableNSamplesInside = `# samples with µ inside CI: ${nSamplesInside}/${nSamples} (${(nSamplesInside/nSamples * 100).toFixed(1)}%)`;
 
-   // text size for legend with statistics
-   const ts = 1.25;
 </script>
 
 <!-- plot with population based CI and position of current sample proportion -->
 <Axes limX={[92, 108]} limY={[-0.005, max(f) * 1.70]} xLabel={"Estimated population mean, µ"}>
+
    <!-- statistics -->
-   <TextLabels textSize={ts} xValues={[0]} yValues={[max(f) * 1.60]} pos={2} labels={
-      "<tspan x=2em dx=0 dy=0.00em>" + tableNSamplesInside + "</tspan>" +
-      "<tspan x=2em dx=0 dy=1.25em>" + "95% CI: " + tableCI + "</tspan>" +
-      "<tspan x=2em dx=0 dy=1.25em>" + "sample mean: " + sampMean.toFixed(1) + "</tspan>" +
-      "<tspan x=2em dx=0 dy=1.25em>" + "sample sd: " + sampSD.toFixed(2) + "</tspan>"
-   } />
+   <TextLegend textSize={1.15} x={90} y={max(f) * 1.55} pos={2} dx="1.25em" elements = {[
+         tableNSamplesInside,
+         "95% CI: " + tableCI,
+         "sample mean: " + sampMean.toFixed(1),
+         "sample sd: " + sampSD.toFixed(2)
+   ]} />
 
    <AreaSeries xValues={cix} yValues={cif} lineColor={colors[1] + "20"} fillColor={colors[1] + "20"}/>
    <LineSeries xValues={x} yValues={f} lineColor={colors[1] + "20"} />
