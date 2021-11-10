@@ -18,7 +18,7 @@ app_blocks = [
    },
    {
       "title": "Hypothesis testing",
-      "apps": ["asta-b205", "asta-b206"]
+      "apps": ["asta-b205", "asta-b206", "asta-b207"]
    }
 ]
 
