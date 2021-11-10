@@ -1,5 +1,5 @@
 <script>
-   import {sum, seq, subset, max, dnorm, pnorm} from 'stat-js';
+   import {sum, seq, round, subset, max, dnorm, pnorm} from 'stat-js';
    import {Axes, XAxis, LineSeries, AreaSeries, TextLabels, Segments} from 'svelte-plots-basic';
 
    export let groups;   //
@@ -20,11 +20,6 @@
    let oldSampSize = -1;
    let nSamples = 0;
    let nSamplesBelow005 = 0;
-
-   // function to round values down to given number of decimals
-   function round(x, n = 0) {
-      return Number.parseFloat(x.toFixed(n));
-   }
 
    // proportion of current sample
    $: sampProp = round(1 - sum(subset(groups, sample).map(v => v - 1)) / sample.length, 2);
