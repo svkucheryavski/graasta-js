@@ -1,4 +1,4 @@
-from shutil import copyfile, move, rmtree
+from shutil import copyfile, move, rmtree, make_archive
 import subprocess
 import json
 import os
@@ -18,7 +18,11 @@ app_blocks = [
    },
    {
       "title": "Hypothesis testing",
-      "apps": ["asta-b205", "asta-b206", "asta-b207"]
+      "apps": ["asta-b205", "asta-b206", "asta-b207", "asta-b208"]
+   },
+   {
+      "title": "Comparing means",
+      "apps": ["asta-b209"]
    }
 ]
 
@@ -43,6 +47,9 @@ for block in app_blocks:
         copyfile(app + "/public/" + app + ".js", SRC_DIR + app + "/" + app + ".js")
         copyfile(app + "/public/" + app + ".js.map", SRC_DIR + app + "/" + app + ".js.map")
         copyfile(app + "/public/" + "index.html", SRC_DIR + app + "/index.html")
+
+        # make archive
+        make_archive(SRC_DIR + app, 'zip', SRC_DIR + app)
 
         # add app info into json
         app_info = json.load(open(app + "/info.json"))
