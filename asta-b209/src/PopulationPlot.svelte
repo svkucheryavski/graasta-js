@@ -1,0 +1,60 @@
+<script>
+   import {seq, rep, mean, dnorm} from 'stat-js';
+   import {Axes, XAxis, YAxis, LineSeries,ScatterSeries, AreaSeries, Segments} from 'svelte-plots-basic';
+
+   export let globalMean;
+   export let effectExpected;
+   export let noiseExpected ;
+   export let samples;
+   export let colors = ["#0000ff", "#ff0000"];
+
+   const effectLineColor = "#202020";
+
+   $: sampSize = samples[0].length;
+
+   // parameters of sampel and population 1
+   $: mu1 = globalMean - effectExpected / 2;
+   $: x1 = seq(mu1 - 3.5 * noiseExpected, mu1 + 3.5 * noiseExpected, 100);
+   $: f1 = dnorm(x1, mu1, noiseExpected);
+   $: y1 = f1.map(v => v * 15);
+   $: m1 = mean(samples[0]);
+
+   // parameters of sample and population 2
+   $: mu2 = globalMean + effectExpected / 2;
+   $: x2 = seq(mu2 - 3.5 * noiseExpected, mu2 + 3.5 * noiseExpected, 100);
+   $: f2 = dnorm(x2, mu2, noiseExpected);
+   $: y2 = f2.map(v => 3 - v * 15);
+   $: m2 = mean(samples[1]);
+</script>
+
+<Axes limX={[-0.2, 3.2]} limY={[20, 180]} xLabel="Temperature, ºC" yLabel="Yield, mg">
+   <XAxis slot="xaxis" showGrid={true} ticks={[0, 3]} tickLabels={["120", "160"]}></XAxis>
+   <YAxis slot="yaxis" showGrid={true}></YAxis>
+
+    <!-- PDF  for population 1 -->
+   <LineSeries xValues={y1} yValues={x1} lineColor="{colors[0]}90"></LineSeries>
+   <AreaSeries xValues={y1} yValues={x1} fillColor="{colors[0]}10" lineColor="transparent"/>
+
+    <!-- line for mu1 -->
+   <Segments xStart={[0]} xEnd={[1.49]} yStart={[mu1]} yEnd={[mu1]} lineType={2} lineColor="{colors[0]}a0" />
+   <ScatterSeries xValues={[1.49]} yValues={[mu1]} faceColor="{colors[0]}a0" borderColor="transparent" />
+
+    <!-- sample points for population 1 -->
+   <ScatterSeries xValues={rep(-0, sampSize)} yValues={samples[0]} borderColor={colors[0]} borderWidth={2} markerSize={1.3} faceColor="transparent" />
+
+    <!-- PDF  for population 2 -->
+   <LineSeries xValues={y2} yValues={x2} lineColor="{colors[1]}90"></LineSeries>
+   <AreaSeries xValues={y2} yValues={x2} fillColor="{colors[1]}10" lineColor="transparent"/>
+
+    <!-- line for mu2 -->
+   <Segments xStart={[1.51]} xEnd={[3]} yStart={[mu2]} yEnd={[mu2]} lineType={2} lineColor="{colors[1]}a0" />
+   <ScatterSeries xValues={[1.51]} yValues={[mu2]} faceColor="{colors[1]}a0" borderColor="transparent" />
+
+    <!-- sample points for population 2 -->
+   <ScatterSeries xValues={rep(3, sampSize)} yValues={samples[1]} borderColor={colors[1]} borderWidth={2} markerSize={1.3} faceColor="transparent" />
+
+    <!-- line fo observed effect -->
+   <Segments xStart={[0]} xEnd={[3]} yStart={[m1]} yEnd={[m2]} lineWidth={2} lineColor="{effectLineColor}" />
+   <ScatterSeries xValues={[0]} yValues={[m1]} borderColor={effectLineColor} markerSize={1} faceColor={effectLineColor} />
+   <ScatterSeries xValues={[3]} yValues={[m2]} borderColor={effectLineColor} markerSize={1} faceColor={effectLineColor} />
+</Axes>
