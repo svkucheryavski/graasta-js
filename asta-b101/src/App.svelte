@@ -61,9 +61,9 @@
       <!-- control elements -->
       <div class="app-controls-area">
          <AppControlArea {errormsg}>
-            <AppControlButton id="sampleSize" label="Sample:" text="Take new" on:click={() => sample = getSample(sampleSize)} />
             <AppControlRange id="minValue" label="Change min:" step={0.1} bind:value={sample.x[0]} min={minRange[0]} max={minRange[1]} />
             <AppControlRange id="maxValue" label="Change max:" step={0.1} bind:value={sample.x[sampleSize - 1]} min={maxRange[0]} max={maxRange[1]} />
+            <AppControlButton id="getSample" label="Sample:" text="Take new" on:click={() => sample = getSample(sampleSize)} />
          </AppControlArea>
       </div>
    </div>
