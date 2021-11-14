@@ -1,3 +1,7 @@
+"""
+This script builds the selected apps and copy
+"""
+
 from shutil import copyfile, move, rmtree, make_archive
 import subprocess
 import json
@@ -45,7 +49,6 @@ for block in app_blocks:
         os.makedirs(os.path.join(SRC_DIR, app), exist_ok = True)
         copyfile(app + "/public/" + app + ".css", SRC_DIR + app + "/" + app + ".css")
         copyfile(app + "/public/" + app + ".js", SRC_DIR + app + "/" + app + ".js")
-        copyfile(app + "/public/" + app + ".js.map", SRC_DIR + app + "/" + app + ".js.map")
         copyfile(app + "/public/" + "index.html", SRC_DIR + app + "/index.html")
 
         # make archive
