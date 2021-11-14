@@ -1,5 +1,5 @@
 <script>
-   import {cumsum, round, seq, sd, max, dt, mean, closestIndex} from 'stat-js';
+   import {pt, round, seq, sd, max, dt, mean} from 'stat-js';
    import {Axes, XAxis, LineSeries, AreaSeries, TextLegend, Segments} from 'svelte-plots-basic';
 
    export let popMean;
@@ -36,14 +36,8 @@
    $: xr = seq(popMean - 10 * popSE, popMean + 10 * popSE, 300);
    $: fr = dt(xr.map(v => (v - popMean) / popSE), sampSize - 1);
 
-   // here we approximate CDF for t-distribution
-   const t1 = seq(-30, -5, 20000);
-   const t2 = seq(-5, 0, 20000);
-   $: p1 = cumsum(dt(t1, sampSize - 1)).map(v => v * (t1[1] - t1[0]));
-   $: p2 = cumsum(dt(t2, sampSize - 1)).map(v => v * (t2[1] - t2[0]));
-
    // this p-value is always for left half of the PDF and has to be adjusted
-   $: pValue = tValue < -5 ? p1[closestIndex(t1, tValue)] : p2[closestIndex(t2, tValue)] + p1[19999];
+   $: pValue = pt(tValue, sampSize - 1)
 
    // Correct p-value and p-value area
    let px, pf, p;

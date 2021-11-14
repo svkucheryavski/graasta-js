@@ -1,5 +1,5 @@
 <script>
-   import {seq, sd, dt, mean, closestIndex, cumsum, max} from 'stat-js';
+   import {seq, sd, dt, mean, pt, max} from 'stat-js';
    import {Axes, XAxis, TextLegend, LineSeries, AreaSeries, Segments} from 'svelte-plots-basic';
 
    export let samples;
@@ -25,14 +25,8 @@
    $: x = seq(- 10 * SE, 10 * SE, 300);
    $: f = dt(x.map(v => v /SE), 2 * sampSize - 2);
 
-   // here we approximate CDF for t-distribution (only left tail) by integrating PDF values
-   const t1 = seq(-30, -5, 20000);
-   const t2 = seq(-5, 0, 20000);
-   $: p1 = cumsum(dt(t1, 2 * sampSize - 2)).map(v => v * (t1[1] - t1[0]));
-   $: p2 = cumsum(dt(t2, 2 * sampSize - 2)).map(v => v * (t2[1] - t2[0]));
-
    // compute p-value and x/y coordinates for corresponding area under PDF
-   $: p = tValue > 5 ? 2 * p1[closestIndex(t1, -tValue)] : 2 * (p2[closestIndex(t2, -tValue)] + p1[19999]);
+   $: p = 2 * pt(-tValue, 2 * sampSize - 2);
    $: px = tValue > 10 ? [] : [seq(-10 * SE, -Math.abs(effectObserved), 150), seq(Math.abs(effectObserved), 10 * SE, 150)];
    $: pf = px.map(x => dt(x.map(m => m / SE), 2 * sampSize - 2));
 
