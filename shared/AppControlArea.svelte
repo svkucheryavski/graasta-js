@@ -2,7 +2,7 @@
    export let errormsg = undefined;
 </script>
 
-<fieldset>
+<fieldset class="app-control-area">
    <slot></slot>
    {#if errormsg}<div class="app-control-error">{errormsg}</div>{/if}
 </fieldset>
