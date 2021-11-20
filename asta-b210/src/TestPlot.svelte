@@ -7,7 +7,7 @@
    export let sysSample;
    export let errSample;
 
-   const colors = ["#2233f0", "#2233a0"];
+   const colors = ["#606060", "#404040"];
 
    // variables for collecting cumulative statistics
    let oldEffectExpected = effectExpected;
