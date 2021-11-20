@@ -11,6 +11,11 @@
 
    // sign symbols for hypothesis tails
    const signs = {"both": "=", "left": "≥", "right": "≤"};
+   const tCrit = {
+      "both": {"5": 2.776445, "10": 2.262157, "20": 2.093024, "40": 2.022691},
+      "left": {"5": 2.131847, "10": 1.833113, "20": 1.729133, "40": 1.684875},
+      "right": {"5": 2.131847, "10": 1.833113, "20": 1.729133, "40": 1.684875}
+   }
 
    // variables for collecting cumulative statistics
    let oldTail = tail;
@@ -26,7 +31,8 @@
    $: sampSD = round(sd(sample), 2);
    $: SE = sampSD / Math.sqrt(sampSize);
    $: popSE = popSD / Math.sqrt(sampSize);
-   $: tValue = -Math.abs((sampMean - popH0Mean) / SE);
+   $: tValue = (sampMean - popH0Mean) / SE;
+
 
    // PDF curve for sampling distribution (H0)
    $: x = seq(popH0Mean - 10 * SE, popH0Mean + 10 * SE, 300);
@@ -36,42 +42,16 @@
    $: xr = seq(popMean - 10 * popSE, popMean + 10 * popSE, 300);
    $: fr = dt(xr.map(v => (v - popMean) / popSE), sampSize - 1);
 
-   // this p-value is always for left half of the PDF and has to be adjusted
-   $: pValue = pt(tValue, sampSize - 1)
+   // Area for power of test
+   $: critMean = tail === "right" ? popH0Mean + tCrit[tail][sampSize] * popSE : popH0Mean - tCrit[tail][sampSize] * popSE;
+   $: power = tail === "right" ? 1 - pt((critMean - popMean) / popSE, sampSize - 1) : pt((critMean - popMean) / popSE, sampSize - 1);
 
-   // Correct p-value and p-value area
-   let px, pf, p;
+   // PDF curve for p-value
+   $: px = tail === "right" ? seq(sampMean, popMean + 10 * SE, 100) : seq(popMean - 10 * SE, sampMean, 100);
+   $: pf = dt(px.map(m => (m - popH0Mean) / SE), sampSize - 1);
 
-   // Function which computes x-values for the area under PDF which corresponds to the p-value
-   function getPX(tail, popMean, sampMean, SE, tCrit = 10, n = 300) {
-      const tValue = (sampMean - popH0Mean) / SE
-
-      if (tail === "left") {
-         return tValue < -tCrit ? [] : [seq(popMean - tCrit * SE, sampMean, n)];
-      }
-
-      if (tail === "right") {
-         return tValue > tCrit ? [] : [seq(sampMean, popMean + tCrit * SE, n)];
-      }
-
-      const dm = Math.abs(sampMean - popMean)
-      return Math.abs(tValue) > tCrit ? [] : [seq(popMean - tCrit * SE, popMean - dm, n/2), seq(popMean + dm, popMean + tCrit * SE, n/2)];
-   }
-
-   $: {
-      // compute p-value
-      if (tail === "left") {
-         p = sampMean > popH0Mean ? 1 - pValue : pValue;
-      } else if (tail === "right") {
-         p = sampMean > popH0Mean ? pValue : 1 - pValue;
-      } else {
-         p = 2 * pValue;
-      }
-
-      // compute coordinates of corresponding area on the plot
-      px = getPX(tail, popH0Mean, sampMean, SE);
-      pf = px.length < 1 ? [] : px.map(x => dt(x.map(m => (m - popH0Mean) / SE), sampSize - 1));
-   }
+   // The p-value
+   $: p = tail === "right" ? 1 - pt(tValue, sampSize - 1) : pt(tValue, sampSize - 1);
 
    // cumulative statistics
    $: {
@@ -99,23 +79,22 @@
 <Axes limX={[85, 115]} limY={[-0.005, max(f) * 1.70]} xLabel={"Expected sample mean, m"}>
 
    <!-- statistics -->
-   <TextLegend textSize={1.15} x={85} y={max(f) * 1.55} pos={2} dx="1.2em" elements = {[
+   <TextLegend textSize={1.15} x={85} y={max(f) * 1.55} pos={2} dx="1.30em" elements = {[
          percentBelow005Str,
-         H0LegendStr,
-         "p-value: " + p.toFixed(3),
          "sample mean: " + sampMean.toFixed(2),
-         "sample sd: " + sampSD.toFixed(2)
+         "sample sd: " + sampSD.toFixed(2),
+         "p-value: " + p.toFixed(3),
+         H0LegendStr,
+         "<tspan font-weight=bold>power: " + power.toFixed(3) + "</tspan>"
    ]} />
 
-   <!-- area for p-value -->
-   {#each px as x, i}
-   <AreaSeries xValues={x} yValues={pf[i]} lineColor={colors[0] + "40"} fillColor={colors[0] + "40"}/>
-   {/each}
+   <!-- Area for p-value -->
+   <AreaSeries xValues={px} yValues={pf} lineColor={colors[0] + "40"} fillColor={colors[0] + "40"}/>
 
    <!-- PDF for sampling distribution -->
-   <LineSeries xValues={x} yValues={f} lineColor={colors[0] + "50"} />
-   <LineSeries xValues={xr} yValues={fr} lineColor={colors[1] + "50"} />
-   <Segments xStart={[sampMean]} xEnd={[sampMean]} yStart={[0]} yEnd={[max(f)]} lineColor={colors[1]} />
+   <LineSeries xValues={x} yValues={f} lineColor={colors[0] + "f0"} />
+   <LineSeries xValues={xr} yValues={fr} lineColor={colors[1] + "f0"} />
+   <Segments xStart={[sampMean]} xEnd={[sampMean]} yStart={[0]} yEnd={[max(f)]} lineType={3} lineColor={colors[1] + "a0"} />
 
    <XAxis slot="xaxis" ></XAxis>
 </Axes>
