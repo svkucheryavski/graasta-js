@@ -1,7 +1,8 @@
 <script>
    import {rep} from 'stat-js';
-   import {Axes, XAxis, YAxis, Segments, TextLabels, ScatterSeries} from 'svelte-plots-basic';
-   import {BoxAndWhiskers} from 'svelte-plots-stat';
+   import {Axes, YAxis, Segments, ScatterSeries} from 'svelte-plots-basic';
+
+   import BoxAndWhiskers from '../../shared/BoxAndWhiskers.svelte';
 
    export let popMeans;
    export let popSigma;

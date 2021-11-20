@@ -1,6 +1,6 @@
 <script>
    import {quantile, mean} from 'stat-js';
-   import {DataTable} from 'svelte-plots-stat';
+   import DataTable from "../../shared/DataTable.svelte";
 
    export let values;
 

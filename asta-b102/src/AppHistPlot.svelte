@@ -1,6 +1,8 @@
 <script>
    import {Axes, XAxis, ScatterSeries} from 'svelte-plots-basic';
-   import {BoxAndWhiskers, Histogram} from 'svelte-plots-stat';
+
+   import BoxAndWhiskers from "../../shared/BoxAndWhiskers.svelte";
+   import Histogram from "../../shared/Histogram.svelte";
 
    export let sample;
    export let population;

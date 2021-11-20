@@ -1,17 +1,17 @@
 <script>
    // blocks from external packages
    import {runif, sum, subset} from 'stat-js';
-   import {DataTable} from "svelte-plots-stat";
-
-   // children blocks
-   import OutcomesPlot from './OutcomesPlot.svelte';
-   import SamplePlot from './SamplePlot.svelte';
 
    // common blocks
    import {default as StatApp} from '../../shared/StatApp.svelte';
    import AppControlArea from '../../shared/AppControlArea.svelte';
    import AppControlButton from '../../shared/AppControlButton.svelte';
    import AppControlSwitch from '../../shared/AppControlSwitch.svelte';
+   import DataTable from "../../shared/DataTable.svelte";
+
+   // children blocks
+   import OutcomesPlot from './OutcomesPlot.svelte';
+   import SamplePlot from './SamplePlot.svelte';
 
    // signs for differen H0 tails
    const signs = {"both": "=", "left": "≥", "right": "≤"};

@@ -1,5 +1,5 @@
 <script>
-   import {DataTable} from 'svelte-plots-stat';
+   import DataTable from "../../shared/DataTable.svelte";
    export let sample;
 
 </script>

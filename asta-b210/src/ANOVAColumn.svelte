@@ -1,7 +1,7 @@
 <script>
    import { sum } from "stat-js";
-   import { DataTable } from "svelte-plots-stat";
 
+   import DataTable  from "../../shared/DataTable.svelte";
    import ANOVATable from "./ANOVATable.svelte";
    import ANOVAPlot from "./ANOVAPlot.svelte";
 

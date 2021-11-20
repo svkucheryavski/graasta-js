@@ -1,7 +1,8 @@
 <script>
    import {max, quantile, mean, min} from 'stat-js';
    import {Axes, XAxis, Segments, TextLabels, ScatterSeries} from 'svelte-plots-basic';
-   import {BoxAndWhiskers} from 'svelte-plots-stat';
+
+   import BoxAndWhiskers from "../../shared/BoxAndWhiskers.svelte";
 
    export let values;
 

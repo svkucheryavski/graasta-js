@@ -1,6 +1,5 @@
 <script>
    import {max, ppoints, sd, seq, pnorm, rnorm, skewness, kurtosis, mean, quantile, diff} from 'stat-js';
-   import {DataTable} from 'svelte-plots-stat';
    import {Axes, XAxis, YAxis, Box, LineSeries, ScatterSeries} from 'svelte-plots-basic';
 
    // common blocks
@@ -8,6 +7,7 @@
    import AppControlArea from '../../shared/AppControlArea.svelte';
    import AppControlButton from '../../shared/AppControlButton.svelte';
    import AppControlSwitch from '../../shared/AppControlSwitch.svelte';
+   import DataTable from '../../shared/DataTable.svelte';
 
    let showPopLine = "off";
    let sampleSize = 6;
