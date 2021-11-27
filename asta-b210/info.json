@@ -1,5 +1,5 @@
 {
    "id": "asta-b210",
-   "title": "One-way ANOVA",
-   "info": "How Analysis of Variance works for one factor."
+   "title": "Multiple comparison and Bonferroni correction",
+   "info": "What if we apply t-test to more than 2 groups."
 }

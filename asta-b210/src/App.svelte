@@ -1,5 +1,5 @@
 <script>
-   import {rep, mean, rnorm} from 'stat-js';
+   import {subset, seq, dnorm, rnorm} from 'stat-js';
 
    // common blocks
    import {default as StatApp} from '../../shared/StatApp.svelte';
@@ -7,151 +7,107 @@
    import AppControlButton from '../../shared/AppControlButton.svelte';
    import AppControlRange from '../../shared/AppControlRange.svelte';
 
+
    // children blocks
-   import ANOVATable from "./ANOVATable.svelte";
-   import ANOVAColumn from './ANOVAColumn.svelte';
-   import TestPlot from './TestPlot.svelte';
+   import TestColumnPlot from "./TestColumnPlot.svelte";
+   import TestColumnTable from "./TestColumnTable.svelte";
+   import TestColumn from './TestColumn.svelte';
+   import AppControlSwitch from '../../shared/AppControlSwitch.svelte';
 
    // constant parameters
    const globalMean = 100;
    const sampSize = 5;
-   const nGroups = 3;
    const labels = ["A", "B", "C"];
 
-   // degrees of freedom
-   const DoFTotal = sampSize * nGroups - 1;
-   const DoFSys = nGroups - 1;
-   const DoFErr = DoFTotal - DoFSys;
-
-   // needed to make first sample predefined
-   let firstSample = true;
-
-   // population parameters, which can vary
-   let muA = -10;
-   let muB = 0;
-   let muC = 10;
+   // parameters, which can vary
+   let correction = "off";
    let noiseExpected = 10;
+   let alpha = 0.05
+   let samples;
+   let p = [];
 
-   // current sample and its parts
-   let sample, grandMean, unbiasedSample, sysSample, errSample;
-
-   function takeNewSample() {
-
-      if (firstSample) {
-         sample = [
-            [ 80,  85,  90,  95, 100],
-            [ 90,  95, 100, 105, 110],
-            [100, 105, 110, 115, 120],
-         ];
-         firstSample = false;
-      } else {
-         sample = [
-            rnorm(sampSize, globalMean + muA, noiseExpected),
-            rnorm(sampSize, globalMean + muB, noiseExpected),
-            rnorm(sampSize, globalMean + muC, noiseExpected),
-         ];
-      }
-
-      const sampleMeans = sample.map(v => mean(v));
-      grandMean = mean(sampleMeans);
-      unbiasedSample = sample.map(v => v.map(x => x - grandMean));
-
-      const unbiasedSampleMeans = unbiasedSample.map(v => mean(v));
-      sysSample = unbiasedSampleMeans.map(v => rep(v, sampSize));
-      errSample = unbiasedSample.map((v, i) => v.map(x => x - unbiasedSampleMeans[i]));
+   function takeNewSample(reset = false) {
+      if (reset) p = [];
+      samples = [
+         rnorm(sampSize, globalMean, noiseExpected),
+         rnorm(sampSize, globalMean, noiseExpected),
+         rnorm(sampSize, globalMean, noiseExpected),
+      ];
    }
 
-   // combine population means to a vector for easy handling
-   $: effectExpected = [muA, muB, muC];
-
    // take a new sample when population parameters have been changed
-   $: muA || muB || muC || noiseExpected ? takeNewSample()  : null;
+   $: noiseExpected | correction ? takeNewSample(true)  : null;
+   $: alpha = correction === "on" ? 0.05/3 : 0.05;
 </script>
 
 <StatApp>
    <div class="app-layout">
 
       <div class="app-original-data-area">
-         <!-- original values table and the sign -->
-         <ANOVATable {labels} values={sample} />
-         <div class="sign">
-            <span>&minus;&nbsp;{grandMean.toFixed(1)}</span>
-         </div>
 
-         <!-- F-distribution plot -->
-         <TestPlot {effectExpected} {noiseExpected} {errSample} {sysSample} />
+         <!-- original values table  -->
+         <TestColumnTable labels={labels} samples={samples} />
+
+         <!-- boxplot for samples and populations -->
+         <TestColumnPlot
+            {samples}
+            popMeans={[globalMean, globalMean, globalMean]}
+            alpha={alpha}
+            popSigma={noiseExpected}
+            pValues={p}
+            boxColor="#f0f0f0"
+            color="#a0a0a0"
+         />
 
          <!-- Control elements -->
          <AppControlArea>
-            <AppControlRange
-               id="effectA" label="µ – µ<sub>A</sub>"
-               bind:value={muA} min={-10} max={10} step={1} decNum={0}
-            />
-            <AppControlRange
-               id="effectB" label="µ – µ<sub>B</sub>"
-               bind:value={muB} min={-10} max={10} step={1} decNum={0}
-            />
-            <AppControlRange
-               id="effectC" label="µ – µ<sub>C</sub>"
-               bind:value={muC} min={-10} max={10} step={1} decNum={0}
-            />
-            <AppControlRange
-               id="noise" label="Noise (σ)"
-               bind:value={noiseExpected} min={5} max={15} step={1} decNum={0}
-            />
+            <AppControlRange id="noise" label="Noise (σ)" bind:value={noiseExpected} min={5} max={15} step={1} decNum={0}/>
+            <AppControlSwitch id="correction" label="Correction" bind:value={correction} options={["on", "off"]} />
             <AppControlButton id="newSample" label="Sample" text="Take new" on:click={takeNewSample} />
          </AppControlArea>
       </div>
 
-      <div class="app-unbiased-data-area">
-         <ANOVAColumn {effectExpected} {noiseExpected} {labels}
-            sign="=" DoF = {DoFTotal} samples={unbiasedSample}
-            colors={["#202020", "#d0d0d0"]}
-         />
+      <div class="app-test-data-area">
+         <TestColumn labels={subset(labels, [1, 2])} {alpha} bind:p={p[0]} samples={subset(samples, [1, 2])} />
       </div>
 
-      <div class="app-systematic-data-area">
-         <ANOVAColumn {effectExpected} {noiseExpected} {labels}
-            sign="=" DoF={DoFSys} samples={sysSample}
-            colors={["#106020", "#d0e0d0"]}
-         />
+      <div class="app-test-data-area">
+         <TestColumn labels={subset(labels, [1, 3])} {alpha} bind:p={p[1]} samples={subset(samples, [1, 3])} />
       </div>
 
-
-      <div class="app-error-data-area">
-         <ANOVAColumn {effectExpected} {noiseExpected} {labels}
-            sign="+" DoF = {DoFErr} samples={errSample}
-            colors={["#602010", "#e0d8d0"]}
-         />
+      <div class="app-test-data-area">
+         <TestColumn labels={subset(labels, [2, 3])} {alpha} bind:p={p[2]} samples={subset(samples, [2, 3])} />
       </div>
    </div>
 
    <div slot="help">
-      <h2>One way ANOVA</h2>
+      <h2>Multiple t-test and Bonferroni correction</h2>
       <p>
-         This app shows how one-way ANOVA tests means of three samples — the outcomes of a chemical reaction running
-         using three different catalysis: <em>A</em>, <em>B</em> and <em>C</em>. We "run" the reaction with each
-         catalyst 5 times, which gives 15 values — yield of each run in mg. The obtained yield values are shown in
-         the top left table. The last row shows the average yield for each catalyst. You can adjust the
-         expected effect for each catalyst and noise using slider controls.
+         This app shows how to compare three samples taken from three populations. The three populations
+         are all outcomes (yield measured in mg/L) of a chemical process
+         running with a catalyst A, catalyst B and catalyst C. Here H0: µA = µB = µC = 100 mg/L. This means that
+         regardless which catalyst we use, the average yield of the reaction is 100 mg/L, so changing
+         catalyst has no effect on the yield. But when we run the reaction only 5 times for each catalyst, like shown
+         in the app, the mean of these 5 runs will not be the same as the expected mean of the populations.
+         And most of the time you will observe a difference among the sample means. Our goal is to use a t-test to
+         test the H0 and make decision.
       </p>
       <p>
-         Then app computes a global mean for all original values and subtract it from the values thus creating a
-         table with unbiased values, which are shown in the gray column. Table in the top of the column contains
-         the unbiased values and their means. Under the table there are statistics: degrees of freedom (DoF), sum of squared values (SSQ)
-         and variance or mean squares (MS = SSQ/DoF). Plot below shows boxplots for populations and
-         points for the values.
+         However, t-test can be applied for comparing mean of two samples, while here we have three. One of the
+         possibility will be to run t-test three times — one for each pair. This is what is called a <em>multiple
+         compare</em> — you compare samples using several tests to check a single hypothesis. But the more tests
+         you do the higher chance that you will reject correct H0. Try to
+         run the test many times and you will see that although app works at significance limit 0.05 (so we expect
+         that the H0 will be incorrectly rejected in 5% of cases), the real percent of rejections will be higher,
+         about 10%.
       </p>
       <p>
-         After that we split the unbiased values into a sum of <em>systematic</em> part, shown in the green column, and
-         the <em>residuals</em>, shown in the red column. In the systematic part we assume there is no noise,
-         so all outcomes for given factor level (e.g. column A) have the same value — the corresponding mean. Residuals
-         are computed as a difference between the unbiased values and the systematic part. App computes DoF, SSQ
-         and MS for each part and the F-value — which is a ratio of MS for systematic part and residuals. The F-value
-         follows F-distribution shown under the original data table. We use this distribution
-         to compute corresponding p-value and make decision about the H0.
+         You can overcome this problem by using Bonferroni correction, which decreases the significance
+         limit in each individual tests, so the overall significance will be 0.05 (or any other pre-defined value).
+         You can see the effect of correction by turning it on in the app and repeating the sampling many times again.
+         In this case the significance level for individual tests will be set to 0.05/3 ≈ 0.017 and the number of
+         incorrectly rejected H0 will be around 5%.
       </p>
-
    </div>
 </StatApp>
 
@@ -172,7 +128,7 @@
 
 /* main column */
 .app-original-data-area{
-   flex: 0 1 34%;
+   flex: 0 1 30%;
 
    display: grid;
    grid-template-areas:
@@ -182,21 +138,6 @@
       ". .";
    grid-template-rows: min-content 1fr min-content auto;
    grid-template-columns: 1fr min-content;
-}
-
-:global(.sign) {
-   grid-area: sign;
-   text-align: center;
-   padding: 0 0.5em;
-   font-size: 1.5em;
-   font-weight: bold;
-
-   color: black;
-   height: 100%;
-   display: flex;
-   flex-direction: column;
-   justify-content:center;
-   align-items: center;
 }
 
 .app-original-data-area  > :global(.plot) {
@@ -216,53 +157,10 @@
 
 
 /* column with unbiased data */
-
-.app-unbiased-data-area{
-   flex: 0 1 22%;
-}
-
-.app-unbiased-data-area :global(.datatable),
-.app-unbiased-data-area :global(.plot){
-   background: #f6f6f6;
-}
-
-.app-unbiased-data-area > :global(.anova-column > .datatable  tr:last-of-type > .datatable__value) {
-   font-weight: bold;
-   color: #666666;
-}
-
-
-/* column with systematic data */
-
-.app-systematic-data-area {
-   flex: 0 1 22%;
-}
-
-.app-systematic-data-area :global(.datatable),
-.app-systematic-data-area :global(.plot){
-   background: #f0f6f0;
-}
-
-.app-systematic-data-area > :global(.anova-column > .datatable  tr:last-of-type > .datatable__value) {
-   font-weight: bold;
-   color: #66aa88;
-}
-
-
-/* column with error data */
-
-.app-error-data-area {
-   flex: 0 1 22%;
-}
-
-.app-error-data-area :global(.datatable),
-.app-error-data-area :global(.plot){
-   background: #f8f4f0;
-}
-
-.app-error-data-area > :global(.anova-column > .datatable  tr:last-of-type > .datatable__value) {
-   font-weight: bold;
-   color: #aa6644;
+.app-test-data-area{
+   flex: 0 1 23%;
+   box-sizing: border-box;
+   padding-left: 10px;
 }
 
 </style>
