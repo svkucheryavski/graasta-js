@@ -30,8 +30,9 @@ import { getContext } from 'svelte';
    $: Q3 = quartiles.length === 3 ? quartiles[2] : quantile(values, 0.75);
    $: IQR = Q3 - Q1;
    $: out = values.length === 0 ? outliers : getOutliers(values, Q1, Q3);
-   $: mn = range.length === 2 ? range[0] : min(out.length > 0 ? values.filter(v => !out.some(o => o == v)) : values);
-   $: mx = range.length === 2 ? range[1] : max(out.length > 0 ? values.filter(v => !out.some(o => o == v)) : values);
+   $: outFreeValues = out.length > 0 ? values.filter(v => !out.some(o => o == v)) : values;
+   $: mn = range.length === 2 ? range[0] : min(outFreeValues);
+   $: mx = range.length === 2 ? range[1] : max(outFreeValues);
 
    $: {
       if (horizontal === true) {
@@ -39,8 +40,8 @@ import { getContext } from 'svelte';
          bt = boxPosition + boxSize/2;
          bw = IQR;
          bh = boxSize;
-         xs = [mn, Q3, Q2];
-         xe = [Q1, mx, Q2];
+         xs = [mn < Q1 ? mn : Q1, Q3, Q2];
+         xe = [Q1, mx > Q3 ? mx : Q3, Q2];
          ys = [boxPosition, boxPosition, bt];
          ye = [boxPosition, boxPosition, bt - bh];
          px = out;
@@ -58,8 +59,8 @@ import { getContext } from 'svelte';
          bt = Q3;
          bw = boxSize;
          bh = IQR;
-         ys = [mn, Q3, Q2];
-         ye = [Q1, mx, Q2];
+         ys = [mn < Q1 ? mn : Q1, Q3, Q2];
+         ye = [Q1, mx > Q3 ? Q3 : mx, Q2];
          xs = [boxPosition, boxPosition, bl];
          xe = [boxPosition, boxPosition, bl + bw];
          py = out;
