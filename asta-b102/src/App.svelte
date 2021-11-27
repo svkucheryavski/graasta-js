@@ -1,14 +1,16 @@
 <script>
    import {max, count, rnorm, runif, split, quantile, min, getOutliers} from 'stat-js';
 
-   // common blocks
+   // shared components
    import {default as StatApp} from '../../shared/StatApp.svelte';
-   import AppControlArea from '../../shared/AppControlArea.svelte';
-   import AppControlButton from '../../shared/AppControlButton.svelte';
-   import AppControlSwitch from '../../shared/AppControlSwitch.svelte';
-   import AppControlRange from '../../shared/AppControlRange.svelte';
 
-   // app blocks
+   // shared components - controls
+   import AppControlArea from '../../shared/controls/AppControlArea.svelte';
+   import AppControlButton from '../../shared/controls/AppControlButton.svelte';
+   import AppControlSwitch from '../../shared/controls/AppControlSwitch.svelte';
+   import AppControlRange from '../../shared/controls/AppControlRange.svelte';
+
+   // local components
    import HistPlot from "./AppHistPlot.svelte";
    import PercentilePlot from "./AppPercentilePlot.svelte";
 
@@ -126,13 +128,21 @@
 
    <div slot="help">
       <h2>Samples and populations</h2>
-      <p>This app helps you to investigate how different a sample can be when it is being randomly taken from corresponding population.</p>
-      <p>You can investigate this difference for one of the three parameters: Height, Age and IQ of a population of people. Each parameter
-         has own distribution. Thus, <em>Age</em> is distributed
-         uniformly, <em>IQ</em> is distributed normally and <em>Height</em> has distribution with two peaks (modes). You can also see how
-         sample size influences the difference.
+      <p>
+         This app helps you to investigate how different a sample can be when it is being randomly taken from corresponding
+         population.
       </p>
-      <p>Plot series made for a population (histogram and boxplot on the left part and percentile plot on the right) are shown using gray colors. The size of the population is <em>N</em> = 50&nbsp;000. The plot series for current sample are shown in blue. A new sample is taken when you change any of the controls — select the population parameter or the sample size as well as when you force to take a new sample by clicking the specific button.
+      <p>
+         You can investigate this difference for one of the three parameters: Height, Age and IQ of a population of people.
+         Each parameter has own distribution. Thus, <em>Age</em> is distributed uniformly, <em>IQ</em> is distributed normally
+         and <em>Height</em> has distribution with two peaks (bimodal). You can also see how sample size influences the difference.
+      </p>
+
+      <p>
+         Plot series made for a population (histogram and boxplot on the left part and percentile plot on the right) are shown
+         using gray colors. The size of the population is <em>N</em> = 50&nbsp;000. The plot series for current sample are
+         shown in blue. A new sample is taken when you change any of the controls — select the population parameter or the
+         sample size as well as when you force to take a new sample by clicking the specific button.
       </p>
 
    </div>
