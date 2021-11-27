@@ -2,9 +2,9 @@
    import {max, rnorm, sort, min} from 'stat-js';
    import {default as StatApp} from '../../shared/StatApp.svelte';
 
-   import AppControlRange from '../../shared/AppControlRange.svelte';
-   import AppControlButton from '../../shared/AppControlButton.svelte';
-   import AppControlArea from '../../shared/AppControlArea.svelte';
+   import AppControlRange from '../../shared/controls/AppControlRange.svelte';
+   import AppControlButton from '../../shared/controls/AppControlButton.svelte';
+   import AppControlArea from '../../shared/controls/AppControlArea.svelte';
 
    import Plot from './AppPlot.svelte';
    import DataTable from './AppDataTable.svelte';
@@ -72,15 +72,15 @@
       <h2>Quantiles, quartiles, percentiles</h2>
       <p>
          This app shows calculation of main non-parametric descriptive statistics: <i>min</i>, <i>max</i>, <i>quartiles</i> and
-         <i>percentils</i>. The plot contains the current sample values as points and the traditional boxplot. The dashed line inside
-         the box shows the mean. The red elements represent boundaries for detection of outliers.
+         <i>percentils</i>. The plot contains current sample values as points and the traditional box and whiskers plot. The dashed line inside
+         the box shows the mean. The red elements represent boundaries for detection of outliers (based on ±1.5IQR rule).
       </p>
       <p>
          Try to change the smallest (<i>min</i>) or the largest (<i>max</i>) values of your current sample using the sliders in order to see what happens to the boxplot if one of the values will be outside the boundaries. You can also pay attention which statistics are changing and which remain stable in this case.
       </p>
       <p>
          The table in the bottom shows the current values (<i>x</i>) ordered from smallest to largest, their rank (<i>i</i>), as well
-         as their percentiles (<i>p</i>). The percentiles are computed using <code>(i - 0.5)/n</code> rule. The table on the right side shows the computed statistics.
+         as their percentiles (<i>p</i>) also known as <em>sample quantiles</em>. The percentiles are computed using <code>(i - 0.5)/n</code> rule. The table on the right side shows the computed statistics.
       </p>
    </div>
 </StatApp>
