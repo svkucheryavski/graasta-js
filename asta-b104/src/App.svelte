@@ -1,17 +1,20 @@
 <script>
-   import {max, ppoints, sd, seq, pnorm, rnorm, skewness, kurtosis, mean, quantile, diff} from 'stat-js';
+   import {ppoints, sd, seq, pnorm, rnorm, skewness, kurtosis, mean, quantile, diff} from 'stat-js';
    import {Axes, XAxis, YAxis, Box, LineSeries, ScatterSeries} from 'svelte-plots-basic';
 
-   // common blocks
+   // shared components
    import {default as StatApp} from '../../shared/StatApp.svelte';
-   import AppControlArea from '../../shared/AppControlArea.svelte';
-   import AppControlButton from '../../shared/AppControlButton.svelte';
-   import AppControlSwitch from '../../shared/AppControlSwitch.svelte';
-   import DataTable from '../../shared/DataTable.svelte';
+
+   // shared components - contrls
+   import AppControlArea from '../../shared/controls/AppControlArea.svelte';
+   import AppControlButton from '../../shared/controls/AppControlButton.svelte';
+   import AppControlSwitch from '../../shared/controls/AppControlSwitch.svelte';
+
+   // shared tables
+   import DataTable from '../../shared/tables/DataTable.svelte';
 
    let showPopLine = "off";
    let sampleSize = 6;
-   let variableName = "Height";
 
    const sampleColor = "blue";
    const populationColor = "#a0a0a0";
@@ -42,14 +45,12 @@
    // theoretical line
    const lp = [0.25, 0.75];
    const lz = [-0.6744898,  0.6744898];
+
    $: lx = quantile(sx, lp);
    $: la = diff(lx) / diff(lz);
    $: lb = mean(lx) - la * mean(lz)
    $: llx = [-4, 4];
    $: lly = [-4 * la + lb, 4 * la + lb];
-
-
-   $: errormsg = sampleSize < 3 || sampleSize > 30 ? "Sample size should be between 3 and 30." : "";
 </script>
 
 <StatApp>
@@ -65,7 +66,7 @@
             <LineSeries xValues={limX} yValues={limY} lineType={1} lineWidth={2} lineColor={populationColor} />
             {/if}
             <LineSeries xValues={llx} yValues={lly} lineType={2} lineColor={"red"} />
-            <ScatterSeries xValues={sz} yValues={sx} borderWidth={2} />
+            <ScatterSeries xValues={sz} yValues={sx} borderWidth={2} borderColor={sampleColor}/>
          </Axes>
       </div>
 
@@ -97,7 +98,7 @@
       </div>
 
       <div class="app-controls-area">
-         <AppControlArea {errormsg}>
+         <AppControlArea>
             <AppControlSwitch id="popLine" label="Population line" bind:value={showPopLine} options={["on", "off"]} />
             <AppControlSwitch id="sampleSize" label="Sample size" bind:value={sampleSize} options={[4, 6, 9, 12]} />
             <AppControlButton id="newSample" label="Sample" text="Take new" on:click={() => sx = getSample(sampleSize)} />
