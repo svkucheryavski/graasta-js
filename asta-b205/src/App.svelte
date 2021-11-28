@@ -1,15 +1,18 @@
 <script>
-   // blocks from external packages
    import {runif, sum, subset} from 'stat-js';
 
-   // common blocks
+   // shared components
    import {default as StatApp} from '../../shared/StatApp.svelte';
-   import AppControlArea from '../../shared/AppControlArea.svelte';
-   import AppControlButton from '../../shared/AppControlButton.svelte';
-   import AppControlSwitch from '../../shared/AppControlSwitch.svelte';
-   import DataTable from "../../shared/DataTable.svelte";
 
-   // children blocks
+   // shared components - controls
+   import AppControlArea from '../../shared/controls/AppControlArea.svelte';
+   import AppControlButton from '../../shared/controls/AppControlButton.svelte';
+   import AppControlSwitch from '../../shared/controls/AppControlSwitch.svelte';
+
+   // shared components - tables
+   import DataTable from "../../shared/tables/DataTable.svelte";
+
+   // local components
    import OutcomesPlot from './OutcomesPlot.svelte';
    import SamplePlot from './SamplePlot.svelte';
 
