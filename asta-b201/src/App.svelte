@@ -1,17 +1,19 @@
 <script>
    import {seq, subset, rep, shuffle} from 'stat-js';
 
-   // children blocks
+   // shared components
+   import {default as StatApp} from '../../shared/StatApp.svelte';
+
+   // shared components - controls
+   import AppControlArea from '../../shared/controls/AppControlArea.svelte';
+   import AppControlButton from '../../shared/controls/AppControlButton.svelte';
+   import AppControlSwitch from '../../shared/controls/AppControlSwitch.svelte';
+   import AppControlRange from '../../shared/controls/AppControlRange.svelte';
+
+   // local components
    import PopulationPlot from './PopulationPlot.svelte';
    import SamplePlot from './SamplePlot.svelte';
    import CIPlot from './CIPlot.svelte';
-
-   // common blocks
-   import {default as StatApp} from '../../shared/StatApp.svelte';
-   import AppControlArea from '../../shared/AppControlArea.svelte';
-   import AppControlButton from '../../shared/AppControlButton.svelte';
-   import AppControlSwitch from '../../shared/AppControlSwitch.svelte';
-   import AppControlRange from '../../shared/AppControlRange.svelte';
 
    // size of population and vector with element indices
    const popSize = 1600;
