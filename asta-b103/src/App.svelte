@@ -1,15 +1,16 @@
 <script>
    import {seq, dnorm, dunif, pnorm, punif, closestIndex} from 'stat-js';
 
-   import AppControlArea from '../../shared/AppControlArea.svelte';
-   import AppControlSwitch from '../../shared/AppControlSwitch.svelte';
-   import AppControlRange from '../../shared/AppControlRange.svelte';
-   import AppControl from '../../shared/AppControl.svelte';
-
-   // common blocks
+   // shared components
    import {default as StatApp} from '../../shared/StatApp.svelte';
 
-   // local apps
+   // shared components - controls
+   import AppControlArea from '../../shared/controls/AppControlArea.svelte';
+   import AppControlSwitch from '../../shared/controls/AppControlSwitch.svelte';
+   import AppControlRange from '../../shared/controls/AppControlRange.svelte';
+   import AppControl from '../../shared/controls/AppControl.svelte';
+
+   // local components
    import PDFPlot from './PDFPlot.svelte';
    import CDFPlot from './CDFPlot.svelte';
    import ICDFPlot from './ICDFPlot.svelte';
@@ -116,7 +117,7 @@
          </div>
       </div>
       <div class="app-layout-column cdf-area">
-         <CDFPlot x={x} y={p} {varName} {mode} {intInd} limX={limX} limY={[-0.01, 1.1]} />
+         <CDFPlot x={x} y={p} {varName} {mode} {intInd} limX={limX} limY={[-0.05, 1.05]} />
          <div class="app-control-area">
             <AppControlArea>
                {#if mode === "Interval"}
@@ -135,7 +136,7 @@
          </div>
       </div>
       <div class="app-layout-column icdf-area">
-         <ICDFPlot x={x} y={p} {varName} {mode} {intInd} limX={limX} limY={[-0.01, 1.1]} />
+         <ICDFPlot x={x} y={p} {varName} {mode} {intInd} limX={limX} limY={[-0.05, 1.05]} />
          <div class="app-control-area">
             <AppControlArea>
                {#if mode === "Interval"}

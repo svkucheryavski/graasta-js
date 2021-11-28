@@ -28,4 +28,3 @@
    <AreaSeries lineWidth={2} xValues={xi} yValues={yi} opacity={0.25}/>
    <TextLabels xValues={[mean(xs)]} yValues={[0]} labels={[p.toFixed(3)]} faceColor={Colors.PRIMARY} pos={3} />
 </Axes>
-

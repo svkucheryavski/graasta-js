@@ -29,7 +29,7 @@
    <LineSeries lineWidth={2} xValues={xi} yValues={yi} />
 
    <ScatterSeries xValues={[xs[1]]} yValues={[ys[1]]}  faceColor={Colors.PRIMARY} />
-   <TextLabels xValues={[limX[0] + 15]} yValues={[ys[1]]} labels={ys[1].toFixed(3)} pos={3} faceColor={Colors.PRIMARY} />
+   <TextLabels xValues={[limX[0] + 15]} yValues={[ys[1]]} labels={ys[1].toFixed(4)} pos={3} faceColor={Colors.PRIMARY} />
 
    {#if mode === "Interval"}
    <Segments xStart={[xs[0]]} yStart={[limY[0]]} xEnd={[xs[0]]} yEnd={[ys[0]]} />
