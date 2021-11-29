@@ -14,6 +14,8 @@
    export let limX = mrange(x, 0.1);
    export let limY = [0, max(f) * 1.2];
    export let xLabel = "";
+   export let yLabel = null;
+   export let title = null;
 
    let axLeft = [], axRight = [], afLeft = [], afRight = [];
    let cxInd, cx, cf;
@@ -39,7 +41,8 @@
 </script>
 
 <!-- plot with population based CI and position of current sample proportion -->
-<Axes {limX} {limY} {xLabel}>
+<Axes {limX} {limY} {xLabel} {yLabel} {title}>
+   <slot name="box"></slot>
 
    <!-- legend with statistics -->
    <slot name="legend"></slot>
@@ -63,6 +66,7 @@
    {/if}
 
    <slot></slot>
+   <slot name="yaxis"></slot>
    <XAxis slot="xaxis" ></XAxis>
 </Axes>
 

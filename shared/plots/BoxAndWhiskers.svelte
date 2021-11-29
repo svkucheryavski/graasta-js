@@ -82,10 +82,11 @@ import { getContext } from 'svelte';
    top={[bt]}
    width={[bw]}
    height="{[bh]}"
+   {lineWidth}
    {faceColor}
    {borderColor}
 />
-<Segments xStart="{xs}" xEnd="{xe}" yStart="{ys}" yEnd="{ye}" {lineWidth} lineColor={borderColor} />
+<Segments xStart="{xs}" xEnd={xe} yStart={ys} yEnd={ye} {lineWidth} lineColor={borderColor} />
 {#if out.length > 0}
-<TextLabels xValues="{px}" yValues="{py}" labels="●" {faceColor} {borderColor} borderWidth="{1}" />
+<TextLabels xValues="{px}" yValues="{py}" labels="●" {faceColor} {borderColor} borderWidth={lineWidth} />
 {/if}
