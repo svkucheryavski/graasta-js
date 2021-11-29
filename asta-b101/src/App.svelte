@@ -1,11 +1,15 @@
 <script>
    import {max, rnorm, sort, min} from 'stat-js';
+
+   // shared components
    import {default as StatApp} from '../../shared/StatApp.svelte';
 
+   // shared components - controls
    import AppControlRange from '../../shared/controls/AppControlRange.svelte';
    import AppControlButton from '../../shared/controls/AppControlButton.svelte';
    import AppControlArea from '../../shared/controls/AppControlArea.svelte';
 
+   // local components - controls
    import Plot from './AppPlot.svelte';
    import DataTable from './AppDataTable.svelte';
    import StatTable from './AppStatTable.svelte';
@@ -137,14 +141,19 @@
    border-bottom: solid 1px #e0e0e0;
 }
 
+.app-datatable-area :global(.datatable > tr > .datatable__value) {
+   font-size: 1em;
+   color: #606060;
+}
+
 .app-datatable-area :global(.datatable > tr:nth-of-type(2) > .datatable__value) {
-   color: #191970;
+   color: #336688;
 }
 
 .app-datatable-area :global(.datatable > tr:nth-of-type(2) > td:nth-of-type(2)),
 .app-datatable-area :global(.datatable > tr:nth-of-type(2) > td:last-of-type) {
    font-weight: bold;
-   color: blue;
+   color: #336688;
 }
 
 .app-stattable-area :global(.datatable > tr) {
