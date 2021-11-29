@@ -28,21 +28,16 @@
    onMount(() => {
       ro.observe(appContainer);
    });
-
-
-   //$: buttonTitle = showHelp ? "Back to app" : "Click for help";
-   //$: buttonIcon = showHelp ? "×" : "?";
 </script>
 
 <svelte:window on:keypress={handleKeyPress}/>
 <main class="mdatools-app mdatools-app_{scale}" bind:this={appContainer}>
 
-   {#if !showHelp}
    <div class="content">
    <slot></slot>
    </div>
 
-   {:else}
+   {#if showHelp}
    <div class="helptext">
       <slot name="help"></slot>
    </div>
@@ -96,9 +91,20 @@
 /* help text and button */
 
 .helptext {
+   position: absolute;
+   top: 0;
+   width: 0;
+   left: 0;
+   bottom: 0;
+
+   z-index: 999;
+   background: white;
+   box-sizing: border-box;
+
    width: 100%;
    height: 100%;
    padding: 1em;
+   margin: 0;
    line-height: 1.35em;
    font-size: 1em;
    color: #303030;
