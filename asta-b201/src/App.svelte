@@ -3,6 +3,7 @@
 
    // shared components
    import {default as StatApp} from '../../shared/StatApp.svelte';
+   import { colors } from "../../shared/graasta";
 
    // shared components - controls
    import AppControlArea from '../../shared/controls/AppControlArea.svelte';
@@ -10,15 +11,14 @@
    import AppControlSwitch from '../../shared/controls/AppControlSwitch.svelte';
    import AppControlRange from '../../shared/controls/AppControlRange.svelte';
 
-   // local components
-   import PopulationPlot from './PopulationPlot.svelte';
-   import SamplePlot from './SamplePlot.svelte';
-   import CIPlot from './CIPlot.svelte';
+   // shared components - plots
+   import PopulationPlot from '../../shared/plots/ProportionPopulationPlot.svelte';
+   import SamplePlot from '../../shared/plots/ProportionSamplePlot.svelte';
+   import CIPlot from '../../shared/plots/ProportionCIPlot.svelte';
 
    // size of population and vector with element indices
    const popSize = 1600;
    const popIndex = seq(1, popSize, popSize);
-   const colors = ["#ff0000", "#0000ff"];
 
    // variable parameters
    let popProp = 0.50;
@@ -40,17 +40,17 @@
 
       <!-- plot for population individuals  -->
       <div class="app-population-plot-area">
-         <PopulationPlot {groups} {sample} {colors} />
+         <PopulationPlot {groups} {sample} populationColors={colors.plots.POPULATIONS} sampleColors={colors.plots.SAMPLES}/>
       </div>
 
       <!-- plot for sample individuals -->
       <div class="app-sample-plot-area">
-         <SamplePlot {groups} {sample} {colors} />
+         <SamplePlot {groups} {sample} colors={colors.plots.SAMPLES} />
       </div>
 
       <!-- confidence intervals and statistic table -->
       <div class="app-ci-plot-area">
-         <CIPlot {groups} {sample} {colors} />
+         <CIPlot {groups} {sample} />
       </div>
 
       <!-- control elements -->
@@ -102,7 +102,7 @@
       "pop controls"
       "pop .";
 
-   grid-template-rows: 130px max(30%, 195px) auto min-content;
+   grid-template-rows: 130px max(35%, 185px) auto min-content;
    grid-template-columns: 65% 35%;
 }
 
@@ -129,11 +129,12 @@
 }
 
 .app-ci-plot-area :global(.plot) {
-   min-height: 195px;
+   min-height: 185px;
 }
 
 
 .app-controls-area {
+   padding-top: 20px;
    grid-area: controls;
 }
 
