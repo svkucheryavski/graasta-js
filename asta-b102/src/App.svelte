@@ -1,14 +1,14 @@
 <script>
-   import {max, count, rnorm, runif, split, quantile, min, getOutliers} from 'stat-js';
+   import {max, count, rnorm, runif, split, quantile, min, getOutliers} from "stat-js";
 
    // shared components
-   import {default as StatApp} from '../../shared/StatApp.svelte';
+   import {default as StatApp} from "../../shared/StatApp.svelte";
 
    // shared components - controls
-   import AppControlArea from '../../shared/controls/AppControlArea.svelte';
-   import AppControlButton from '../../shared/controls/AppControlButton.svelte';
-   import AppControlSwitch from '../../shared/controls/AppControlSwitch.svelte';
-   import AppControlRange from '../../shared/controls/AppControlRange.svelte';
+   import AppControlArea from "../../shared/controls/AppControlArea.svelte";
+   import AppControlButton from "../../shared/controls/AppControlButton.svelte";
+   import AppControlSwitch from "../../shared/controls/AppControlSwitch.svelte";
+   import AppControlRange from "../../shared/controls/AppControlRange.svelte";
 
    // local components
    import HistPlot from "./AppHistPlot.svelte";
@@ -19,8 +19,6 @@
 
    const nBins = 30;
    const populationSize = 50000;
-   const sampleColor = "blue";
-   const populationColor = "#a0a0a0";
 
    // function for generation of values
    const getHeightValues = function(n) {
@@ -107,12 +105,12 @@
 
       <!-- plot with histogram -->
       <div class="app-histogram-area">
-         <HistPlot {sample} {population} {sampleColor} {populationColor} />
+         <HistPlot {sample} {population} />
       </div>
 
       <!-- plot with population and sample percentiles -->
       <div class="app-percentile-area">
-         <PercentilePlot {sample} {population} {sampleColor} {populationColor} />
+         <PercentilePlot {sample} {population} />
       </div>
 
       <!-- control elements -->

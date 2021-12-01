@@ -1,19 +1,17 @@
 <script>
    import {Axes, XAxis, YAxis, Box, LineSeries, ScatterSeries} from 'svelte-plots-basic';
+   import {colors} from "../../shared/graasta";
 
    export let sample;
    export let population;
-   export let sampleColor;
-   export let populationColor;
 </script>
 
 <Axes limY="{[-0.05, 1.05]}" limX="{population.hist.xLim}" xLabel="{population.title}" yLabel="Percentiles">
-   <LineSeries xValues={population.ps.xValues} yValues={population.ps.yValues} lineColor="{populationColor}" />
+   <LineSeries xValues={population.ps.xValues} yValues={population.ps.yValues} lineColor={colors.plots.POPULATIONS[0]} />
 
-   {#if sample.x.length >= 3 && sample.x.length <= 30}
-   <LineSeries xValues={sample.x} yValues={sample.p} lineColor="{sampleColor}" />
-   <ScatterSeries xValues={sample.x} yValues={sample.p} faceColor="white" borderColor="{sampleColor}" marker={1} borderWidth="{1.5}" />
-   {/if}
+   <LineSeries xValues={sample.x} yValues={sample.p} lineColor={colors.plots.SAMPLES[0]} lineWidth={1.5} />
+   <ScatterSeries xValues={sample.x} yValues={sample.p} faceColor="white" borderColor={colors.plots.SAMPLES[0]}
+      marker={1} markerSize={1.1} borderWidth={2} />
 
    <XAxis slot="xaxis" showGrid="{true}" />
    <YAxis slot="yaxis" showGrid="{true}" />
