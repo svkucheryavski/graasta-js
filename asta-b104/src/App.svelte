@@ -1,23 +1,24 @@
 <script>
-   import {ppoints, sd, seq, pnorm, rnorm, skewness, kurtosis, mean, quantile, diff} from 'stat-js';
-   import {Axes, XAxis, YAxis, Box, LineSeries, ScatterSeries} from 'svelte-plots-basic';
+   import {ppoints, sd, seq, pnorm, rnorm, skewness, kurtosis, mean, quantile, diff} from "stat-js";
+   import {Axes, XAxis, YAxis, Box, LineSeries, ScatterSeries} from "svelte-plots-basic";
 
    // shared components
-   import {default as StatApp} from '../../shared/StatApp.svelte';
+   import {default as StatApp} from "../../shared/StatApp.svelte";
+   import { colors } from "../../shared/graasta";
 
    // shared components - contrls
-   import AppControlArea from '../../shared/controls/AppControlArea.svelte';
-   import AppControlButton from '../../shared/controls/AppControlButton.svelte';
-   import AppControlSwitch from '../../shared/controls/AppControlSwitch.svelte';
+   import AppControlArea from "../../shared/controls/AppControlArea.svelte";
+   import AppControlButton from "../../shared/controls/AppControlButton.svelte";
+   import AppControlSwitch from "../../shared/controls/AppControlSwitch.svelte";
 
    // shared tables
-   import DataTable from '../../shared/tables/DataTable.svelte';
+   import DataTable from "../../shared/tables/DataTable.svelte";
 
    let showPopLine = "off";
    let sampleSize = 6;
 
-   const sampleColor = "blue";
-   const populationColor = "#a0a0a0";
+   const sampleColor = colors.plots.SAMPLES[0];
+   const populationColor = colors.plots.POPULATIONS[0];
 
    const popMean = 170;
    const popStd = 10;
@@ -35,7 +36,6 @@
    const getSample = function(n) {
       return(rnorm(n, popMean, popStd).sort((a, b) => a - b));
    }
-
 
    $: si = Array.from({length: sampleSize}, (v, i) => i + 1);
    $: sp = ppoints(sampleSize);
@@ -65,8 +65,8 @@
             {#if showPopLine === "on"}
             <LineSeries xValues={limX} yValues={limY} lineType={1} lineWidth={2} lineColor={populationColor} />
             {/if}
-            <LineSeries xValues={llx} yValues={lly} lineType={2} lineColor={"red"} />
-            <ScatterSeries xValues={sz} yValues={sx} borderWidth={2} borderColor={sampleColor}/>
+            <LineSeries xValues={llx} yValues={lly} lineType={2} lineColor={sampleColor} />
+            <ScatterSeries xValues={sz} yValues={sx} borderWidth={2} markerSize={1.25} borderColor={sampleColor}/>
          </Axes>
       </div>
 
@@ -193,7 +193,7 @@
 
 .app-qqtable-area :global(.datatable > tr:nth-of-type(2) > td) {
    font-weight: bold;
-   color: blue;
+   color: #336688;
 }
 
 </style>

@@ -2942,12 +2942,12 @@ var app = (function () {
 
     function get_each_context$4(ctx, list, i) {
     	const child_ctx = ctx.slice();
-    	child_ctx[22] = list[i];
-    	child_ctx[24] = i;
+    	child_ctx[23] = list[i];
+    	child_ctx[25] = i;
     	return child_ctx;
     }
 
-    // (50:0) {#if rx !== undefined && ry !== undefined}
+    // (51:0) {#if rx !== undefined && ry !== undefined}
     function create_if_block$8(ctx) {
     	let each_1_anchor;
     	let each_value = /*left*/ ctx[0];
@@ -3008,14 +3008,14 @@ var app = (function () {
     		block,
     		id: create_if_block$8.name,
     		type: "if",
-    		source: "(50:0) {#if rx !== undefined && ry !== undefined}",
+    		source: "(51:0) {#if rx !== undefined && ry !== undefined}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (51:3) {#each left as v, i}
+    // (52:3) {#each left as v, i}
     function create_each_block$4(ctx) {
     	let rect;
     	let rect_x_value;
@@ -3026,30 +3026,30 @@ var app = (function () {
     	const block = {
     		c: function create() {
     			rect = svg_element("rect");
-    			attr_dev(rect, "x", rect_x_value = /*rx*/ ctx[1][/*i*/ ctx[24]]);
-    			attr_dev(rect, "y", rect_y_value = /*ry*/ ctx[2][/*i*/ ctx[24]]);
-    			attr_dev(rect, "width", rect_width_value = /*rw*/ ctx[3][/*i*/ ctx[24]]);
-    			attr_dev(rect, "height", rect_height_value = /*rh*/ ctx[4][/*i*/ ctx[24]]);
+    			attr_dev(rect, "x", rect_x_value = /*rx*/ ctx[1][/*i*/ ctx[25]]);
+    			attr_dev(rect, "y", rect_y_value = /*ry*/ ctx[2][/*i*/ ctx[25]]);
+    			attr_dev(rect, "width", rect_width_value = /*rw*/ ctx[3][/*i*/ ctx[25]]);
+    			attr_dev(rect, "height", rect_height_value = /*rh*/ ctx[4][/*i*/ ctx[25]]);
     			attr_dev(rect, "style", /*barsStyleStr*/ ctx[5]);
-    			add_location(rect, file$c, 51, 6, 1929);
+    			add_location(rect, file$c, 52, 6, 1969);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, rect, anchor);
     		},
     		p: function update(ctx, dirty) {
-    			if (dirty & /*rx*/ 2 && rect_x_value !== (rect_x_value = /*rx*/ ctx[1][/*i*/ ctx[24]])) {
+    			if (dirty & /*rx*/ 2 && rect_x_value !== (rect_x_value = /*rx*/ ctx[1][/*i*/ ctx[25]])) {
     				attr_dev(rect, "x", rect_x_value);
     			}
 
-    			if (dirty & /*ry*/ 4 && rect_y_value !== (rect_y_value = /*ry*/ ctx[2][/*i*/ ctx[24]])) {
+    			if (dirty & /*ry*/ 4 && rect_y_value !== (rect_y_value = /*ry*/ ctx[2][/*i*/ ctx[25]])) {
     				attr_dev(rect, "y", rect_y_value);
     			}
 
-    			if (dirty & /*rw*/ 8 && rect_width_value !== (rect_width_value = /*rw*/ ctx[3][/*i*/ ctx[24]])) {
+    			if (dirty & /*rw*/ 8 && rect_width_value !== (rect_width_value = /*rw*/ ctx[3][/*i*/ ctx[25]])) {
     				attr_dev(rect, "width", rect_width_value);
     			}
 
-    			if (dirty & /*rh*/ 16 && rect_height_value !== (rect_height_value = /*rh*/ ctx[4][/*i*/ ctx[24]])) {
+    			if (dirty & /*rh*/ 16 && rect_height_value !== (rect_height_value = /*rh*/ ctx[4][/*i*/ ctx[25]])) {
     				attr_dev(rect, "height", rect_height_value);
     			}
     		},
@@ -3062,7 +3062,7 @@ var app = (function () {
     		block,
     		id: create_each_block$4.name,
     		type: "each",
-    		source: "(51:3) {#each left as v, i}",
+    		source: "(52:3) {#each left as v, i}",
     		ctx
     	});
 
@@ -3136,9 +3136,10 @@ var app = (function () {
     	let { labels = undefined } = $$props;
     	let { faceColor = Colors.PRIMARY } = $$props;
     	let { borderColor = faceColor } = $$props;
+    	let { lineWidth = 1 } = $$props;
 
     	// styles for bars and labels
-    	const barsStyleStr = `fill:${faceColor};stroke:${borderColor};stroke-width: 1px;`;
+    	const barsStyleStr = `fill:${faceColor};stroke:${borderColor};stroke-width: ${lineWidth}px;`;
 
     	// multiply width and height values if needed
     	if (!Array.isArray(left) || !Array.isArray(top) || left.length < 1 || left.length != top.length) {
@@ -3165,17 +3166,27 @@ var app = (function () {
 
     	const xLim = axes.xLim;
     	validate_store(xLim, "xLim");
-    	component_subscribe($$self, xLim, value => $$invalidate(16, $xLim = value));
+    	component_subscribe($$self, xLim, value => $$invalidate(17, $xLim = value));
     	const yLim = axes.yLim;
     	validate_store(yLim, "yLim");
-    	component_subscribe($$self, yLim, value => $$invalidate(18, $yLim = value));
+    	component_subscribe($$self, yLim, value => $$invalidate(19, $yLim = value));
     	const axesWidth = axes.width;
     	validate_store(axesWidth, "axesWidth");
-    	component_subscribe($$self, axesWidth, value => $$invalidate(17, $axesWidth = value));
+    	component_subscribe($$self, axesWidth, value => $$invalidate(18, $axesWidth = value));
     	const axesHeight = axes.height;
     	validate_store(axesHeight, "axesHeight");
-    	component_subscribe($$self, axesHeight, value => $$invalidate(19, $axesHeight = value));
-    	const writable_props = ["left", "top", "width", "height", "labels", "faceColor", "borderColor"];
+    	component_subscribe($$self, axesHeight, value => $$invalidate(20, $axesHeight = value));
+
+    	const writable_props = [
+    		"left",
+    		"top",
+    		"width",
+    		"height",
+    		"labels",
+    		"faceColor",
+    		"borderColor",
+    		"lineWidth"
+    	];
 
     	Object.keys($$props).forEach(key => {
     		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== "$$") console.warn(`<Rectangles> was created with unknown prop '${key}'`);
@@ -3189,6 +3200,7 @@ var app = (function () {
     		if ("labels" in $$props) $$invalidate(13, labels = $$props.labels);
     		if ("faceColor" in $$props) $$invalidate(14, faceColor = $$props.faceColor);
     		if ("borderColor" in $$props) $$invalidate(15, borderColor = $$props.borderColor);
+    		if ("lineWidth" in $$props) $$invalidate(16, lineWidth = $$props.lineWidth);
     	};
 
     	$$self.$capture_state = () => ({
@@ -3201,6 +3213,7 @@ var app = (function () {
     		labels,
     		faceColor,
     		borderColor,
+    		lineWidth,
     		barsStyleStr,
     		n,
     		axes,
@@ -3226,6 +3239,7 @@ var app = (function () {
     		if ("labels" in $$props) $$invalidate(13, labels = $$props.labels);
     		if ("faceColor" in $$props) $$invalidate(14, faceColor = $$props.faceColor);
     		if ("borderColor" in $$props) $$invalidate(15, borderColor = $$props.borderColor);
+    		if ("lineWidth" in $$props) $$invalidate(16, lineWidth = $$props.lineWidth);
     		if ("rx" in $$props) $$invalidate(1, rx = $$props.rx);
     		if ("ry" in $$props) $$invalidate(2, ry = $$props.ry);
     		if ("rw" in $$props) $$invalidate(3, rw = $$props.rw);
@@ -3237,20 +3251,20 @@ var app = (function () {
     	}
 
     	$$self.$$.update = () => {
-    		if ($$self.$$.dirty & /*left, $xLim, $axesWidth*/ 196609) {
+    		if ($$self.$$.dirty & /*left, $xLim, $axesWidth*/ 393217) {
     			// reactive variables for coordinates of data points in pixels
     			$$invalidate(1, rx = axes.scaleX(left, $xLim, $axesWidth));
     		}
 
-    		if ($$self.$$.dirty & /*top, $yLim, $axesHeight*/ 790528) {
+    		if ($$self.$$.dirty & /*top, $yLim, $axesHeight*/ 1576960) {
     			$$invalidate(2, ry = axes.scaleY(top, $yLim, $axesHeight));
     		}
 
-    		if ($$self.$$.dirty & /*width, $xLim, $axesWidth*/ 197632) {
+    		if ($$self.$$.dirty & /*width, $xLim, $axesWidth*/ 394240) {
     			$$invalidate(3, rw = axes.scaleX(width, $xLim, $axesWidth, true));
     		}
 
-    		if ($$self.$$.dirty & /*height, $yLim, $axesHeight*/ 788480) {
+    		if ($$self.$$.dirty & /*height, $yLim, $axesHeight*/ 1574912) {
     			$$invalidate(4, rh = axes.scaleY(height, $yLim, $axesHeight, true));
     		}
     	};
@@ -3272,6 +3286,7 @@ var app = (function () {
     		labels,
     		faceColor,
     		borderColor,
+    		lineWidth,
     		$xLim,
     		$axesWidth,
     		$yLim,
@@ -3290,7 +3305,8 @@ var app = (function () {
     			height: 11,
     			labels: 13,
     			faceColor: 14,
-    			borderColor: 15
+    			borderColor: 15,
+    			lineWidth: 16
     		});
 
     		dispatch_dev("SvelteRegisterComponent", {
@@ -3373,6 +3389,14 @@ var app = (function () {
     	}
 
     	set borderColor(value) {
+    		throw new Error("<Rectangles>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get lineWidth() {
+    		throw new Error("<Rectangles>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set lineWidth(value) {
     		throw new Error("<Rectangles>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
     }
@@ -4778,8 +4802,8 @@ var app = (function () {
     const get_help_slot_changes = dirty => ({});
     const get_help_slot_context = ctx => ({});
 
-    // (41:3) {:else}
-    function create_else_block$2(ctx) {
+    // (40:3) {#if showHelp}
+    function create_if_block$4(ctx) {
     	let div;
     	let current;
     	const help_slot_template = /*#slots*/ ctx[5].help;
@@ -4789,8 +4813,8 @@ var app = (function () {
     		c: function create() {
     			div = element("div");
     			if (help_slot) help_slot.c();
-    			attr_dev(div, "class", "helptext svelte-d5wxow");
-    			add_location(div, file$7, 41, 3, 905);
+    			attr_dev(div, "class", "helptext svelte-coelov");
+    			add_location(div, file$7, 40, 3, 893);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -4825,65 +4849,9 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_else_block$2.name,
-    		type: "else",
-    		source: "(41:3) {:else}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (36:3) {#if !showHelp}
-    function create_if_block$4(ctx) {
-    	let div;
-    	let current;
-    	const default_slot_template = /*#slots*/ ctx[5].default;
-    	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[4], null);
-
-    	const block = {
-    		c: function create() {
-    			div = element("div");
-    			if (default_slot) default_slot.c();
-    			attr_dev(div, "class", "content svelte-d5wxow");
-    			add_location(div, file$7, 36, 3, 841);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, div, anchor);
-
-    			if (default_slot) {
-    				default_slot.m(div, null);
-    			}
-
-    			current = true;
-    		},
-    		p: function update(ctx, dirty) {
-    			if (default_slot) {
-    				if (default_slot.p && (!current || dirty & /*$$scope*/ 16)) {
-    					update_slot(default_slot, default_slot_template, ctx, /*$$scope*/ ctx[4], dirty, null, null);
-    				}
-    			}
-    		},
-    		i: function intro(local) {
-    			if (current) return;
-    			transition_in(default_slot, local);
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			transition_out(default_slot, local);
-    			current = false;
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(div);
-    			if (default_slot) default_slot.d(detaching);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
     		id: create_if_block$4.name,
     		type: "if",
-    		source: "(36:3) {#if !showHelp}",
+    		source: "(40:3) {#if showHelp}",
     		ctx
     	});
 
@@ -4892,28 +4860,26 @@ var app = (function () {
 
     function create_fragment$7(ctx) {
     	let main;
-    	let current_block_type_index;
-    	let if_block;
+    	let div;
+    	let t;
     	let main_class_value;
     	let current;
     	let mounted;
     	let dispose;
-    	const if_block_creators = [create_if_block$4, create_else_block$2];
-    	const if_blocks = [];
-
-    	function select_block_type(ctx, dirty) {
-    		if (!/*showHelp*/ ctx[0]) return 0;
-    		return 1;
-    	}
-
-    	current_block_type_index = select_block_type(ctx);
-    	if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
+    	const default_slot_template = /*#slots*/ ctx[5].default;
+    	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[4], null);
+    	let if_block = /*showHelp*/ ctx[0] && create_if_block$4(ctx);
 
     	const block = {
     		c: function create() {
     			main = element("main");
-    			if_block.c();
-    			attr_dev(main, "class", main_class_value = "mdatools-app mdatools-app_" + /*scale*/ ctx[1] + " svelte-d5wxow");
+    			div = element("div");
+    			if (default_slot) default_slot.c();
+    			t = space();
+    			if (if_block) if_block.c();
+    			attr_dev(div, "class", "content svelte-coelov");
+    			add_location(div, file$7, 35, 3, 822);
+    			attr_dev(main, "class", main_class_value = "mdatools-app mdatools-app_" + /*scale*/ ctx[1] + " svelte-coelov");
     			add_location(main, file$7, 33, 0, 744);
     		},
     		l: function claim(nodes) {
@@ -4921,7 +4887,14 @@ var app = (function () {
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, main, anchor);
-    			if_blocks[current_block_type_index].m(main, null);
+    			append_dev(main, div);
+
+    			if (default_slot) {
+    				default_slot.m(div, null);
+    			}
+
+    			append_dev(main, t);
+    			if (if_block) if_block.m(main, null);
     			/*main_binding*/ ctx[6](main);
     			current = true;
 
@@ -4931,48 +4904,54 @@ var app = (function () {
     			}
     		},
     		p: function update(ctx, [dirty]) {
-    			let previous_block_index = current_block_type_index;
-    			current_block_type_index = select_block_type(ctx);
+    			if (default_slot) {
+    				if (default_slot.p && (!current || dirty & /*$$scope*/ 16)) {
+    					update_slot(default_slot, default_slot_template, ctx, /*$$scope*/ ctx[4], dirty, null, null);
+    				}
+    			}
 
-    			if (current_block_type_index === previous_block_index) {
-    				if_blocks[current_block_type_index].p(ctx, dirty);
-    			} else {
+    			if (/*showHelp*/ ctx[0]) {
+    				if (if_block) {
+    					if_block.p(ctx, dirty);
+
+    					if (dirty & /*showHelp*/ 1) {
+    						transition_in(if_block, 1);
+    					}
+    				} else {
+    					if_block = create_if_block$4(ctx);
+    					if_block.c();
+    					transition_in(if_block, 1);
+    					if_block.m(main, null);
+    				}
+    			} else if (if_block) {
     				group_outros();
 
-    				transition_out(if_blocks[previous_block_index], 1, 1, () => {
-    					if_blocks[previous_block_index] = null;
+    				transition_out(if_block, 1, 1, () => {
+    					if_block = null;
     				});
 
     				check_outros();
-    				if_block = if_blocks[current_block_type_index];
-
-    				if (!if_block) {
-    					if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
-    					if_block.c();
-    				} else {
-    					if_block.p(ctx, dirty);
-    				}
-
-    				transition_in(if_block, 1);
-    				if_block.m(main, null);
     			}
 
-    			if (!current || dirty & /*scale*/ 2 && main_class_value !== (main_class_value = "mdatools-app mdatools-app_" + /*scale*/ ctx[1] + " svelte-d5wxow")) {
+    			if (!current || dirty & /*scale*/ 2 && main_class_value !== (main_class_value = "mdatools-app mdatools-app_" + /*scale*/ ctx[1] + " svelte-coelov")) {
     				attr_dev(main, "class", main_class_value);
     			}
     		},
     		i: function intro(local) {
     			if (current) return;
+    			transition_in(default_slot, local);
     			transition_in(if_block);
     			current = true;
     		},
     		o: function outro(local) {
+    			transition_out(default_slot, local);
     			transition_out(if_block);
     			current = false;
     		},
     		d: function destroy(detaching) {
     			if (detaching) detach_dev(main);
-    			if_blocks[current_block_type_index].d();
+    			if (default_slot) default_slot.d(detaching);
+    			if (if_block) if_block.d();
     			/*main_binding*/ ctx[6](null);
     			mounted = false;
     			dispose();
@@ -5075,6 +5054,19 @@ var app = (function () {
     		});
     	}
     }
+
+    let colors = {
+       plots: {
+          // population colors
+          POPULATIONS_PALE: ["#33668820", "#ff990020"],
+          POPULATIONS: ["#33668850", "#ff990050"],
+          SAMPLES: ["#336688", "#ff9900"],
+
+          // statistics on plot legend
+          STAT_NAME: "#808080",
+          STAT_VALUE: "#202020"
+       }
+    };
 
     /* ../shared/controls/AppControlArea.svelte generated by Svelte v3.38.2 */
 
@@ -7012,11 +7004,11 @@ var app = (function () {
 
     	lineseries = new LineSeries({
     			props: {
-    				xValues: /*limX*/ ctx[8],
-    				yValues: /*limY*/ ctx[9],
+    				xValues: /*limX*/ ctx[10],
+    				yValues: /*limY*/ ctx[11],
     				lineType: 1,
     				lineWidth: 2,
-    				lineColor: populationColor
+    				lineColor: /*populationColor*/ ctx[9]
     			},
     			$$inline: true
     		});
@@ -7069,7 +7061,7 @@ var app = (function () {
     				xValues: /*llx*/ ctx[6],
     				yValues: /*lly*/ ctx[7],
     				lineType: 2,
-    				lineColor: "red"
+    				lineColor: /*sampleColor*/ ctx[8]
     			},
     			$$inline: true
     		});
@@ -7079,7 +7071,8 @@ var app = (function () {
     				xValues: /*sz*/ ctx[5],
     				yValues: /*sx*/ ctx[2],
     				borderWidth: 2,
-    				borderColor: sampleColor
+    				markerSize: 1.25,
+    				borderColor: /*sampleColor*/ ctx[8]
     			},
     			$$inline: true
     		});
@@ -7306,7 +7299,7 @@ var app = (function () {
     	let current;
 
     	function appcontrolswitch0_value_binding(value) {
-    		/*appcontrolswitch0_value_binding*/ ctx[14](value);
+    		/*appcontrolswitch0_value_binding*/ ctx[16](value);
     	}
 
     	let appcontrolswitch0_props = {
@@ -7327,7 +7320,7 @@ var app = (function () {
     	binding_callbacks.push(() => bind(appcontrolswitch0, "value", appcontrolswitch0_value_binding));
 
     	function appcontrolswitch1_value_binding(value) {
-    		/*appcontrolswitch1_value_binding*/ ctx[15](value);
+    		/*appcontrolswitch1_value_binding*/ ctx[17](value);
     	}
 
     	let appcontrolswitch1_props = {
@@ -7356,7 +7349,7 @@ var app = (function () {
     			$$inline: true
     		});
 
-    	appcontrolbutton.$on("click", /*click_handler*/ ctx[16]);
+    	appcontrolbutton.$on("click", /*click_handler*/ ctx[18]);
 
     	const block = {
     		c: function create() {
@@ -7445,8 +7438,8 @@ var app = (function () {
 
     	axes = new Axes({
     			props: {
-    				limX: /*limX*/ ctx[8],
-    				limY: /*limY*/ ctx[9],
+    				limX: /*limX*/ ctx[10],
+    				limY: /*limY*/ ctx[11],
     				yLabel: "Height, cm",
     				xLabel: "Standard score, z",
     				$$slots: {
@@ -7523,16 +7516,16 @@ var app = (function () {
     			t2 = space();
     			div3 = element("div");
     			create_component(appcontrolarea.$$.fragment);
-    			attr_dev(div0, "class", "app-qqplot-area svelte-1hxh3t3");
-    			add_location(div0, file, 59, 6, 1797);
-    			attr_dev(div1, "class", "app-qqtable-area svelte-1hxh3t3");
-    			add_location(div1, file, 73, 6, 2490);
-    			attr_dev(div2, "class", "app-stattable-area svelte-1hxh3t3");
-    			add_location(div2, file, 87, 6, 2872);
-    			attr_dev(div3, "class", "app-controls-area svelte-1hxh3t3");
-    			add_location(div3, file, 99, 6, 3303);
-    			attr_dev(div4, "class", "app-layout svelte-1hxh3t3");
-    			add_location(div4, file, 56, 3, 1717);
+    			attr_dev(div0, "class", "app-qqplot-area svelte-1i9mns");
+    			add_location(div0, file, 59, 6, 1881);
+    			attr_dev(div1, "class", "app-qqtable-area svelte-1i9mns");
+    			add_location(div1, file, 73, 6, 2598);
+    			attr_dev(div2, "class", "app-stattable-area svelte-1i9mns");
+    			add_location(div2, file, 87, 6, 2980);
+    			attr_dev(div3, "class", "app-controls-area svelte-1i9mns");
+    			add_location(div3, file, 99, 6, 3411);
+    			attr_dev(div4, "class", "app-layout svelte-1i9mns");
+    			add_location(div4, file, 56, 3, 1801);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div4, anchor);
@@ -7552,7 +7545,7 @@ var app = (function () {
     		p: function update(ctx, dirty) {
     			const axes_changes = {};
 
-    			if (dirty & /*$$scope, sz, sx, llx, lly, showPopLine*/ 4194540) {
+    			if (dirty & /*$$scope, sz, sx, llx, lly, showPopLine*/ 16777452) {
     				axes_changes.$$scope = { dirty, ctx };
     			}
 
@@ -7592,7 +7585,7 @@ var app = (function () {
     			datatable1.$set(datatable1_changes);
     			const appcontrolarea_changes = {};
 
-    			if (dirty & /*$$scope, sx, sampleSize, showPopLine*/ 4194317) {
+    			if (dirty & /*$$scope, sx, sampleSize, showPopLine*/ 16777229) {
     				appcontrolarea_changes.$$scope = { dirty, ctx };
     			}
 
@@ -7721,24 +7714,24 @@ var app = (function () {
     			em7 = element("em");
     			em7.textContent = "z";
     			t30 = text("-scores are shown\n         as x-axis. In case if values follow normal distribution ideally they have linear dependence on z-scores, so the\n         points will lie close to a straight line, shown as blue. The closer real points are to this line\n         the more likely that they came from normally distributed population.");
-    			add_location(h2, file, 110, 6, 3799);
-    			add_location(em0, file, 113, 64, 4023);
-    			add_location(em1, file, 116, 32, 4265);
-    			add_location(p0, file, 111, 6, 3837);
-    			add_location(em2, file, 119, 32, 4363);
-    			add_location(em3, file, 119, 66, 4397);
-    			add_location(code0, file, 120, 79, 4517);
-    			add_location(code1, file, 122, 20, 4642);
-    			add_location(code2, file, 123, 56, 4783);
-    			add_location(p1, file, 118, 6, 4327);
-    			add_location(em4, file, 127, 31, 4887);
-    			add_location(em5, file, 127, 80, 4936);
-    			add_location(code3, file, 129, 58, 5148);
-    			add_location(em6, file, 130, 17, 5228);
-    			add_location(em7, file, 130, 56, 5267);
-    			add_location(p2, file, 126, 6, 4852);
+    			add_location(h2, file, 110, 6, 3907);
+    			add_location(em0, file, 113, 64, 4131);
+    			add_location(em1, file, 116, 32, 4373);
+    			add_location(p0, file, 111, 6, 3945);
+    			add_location(em2, file, 119, 32, 4471);
+    			add_location(em3, file, 119, 66, 4505);
+    			add_location(code0, file, 120, 79, 4625);
+    			add_location(code1, file, 122, 20, 4750);
+    			add_location(code2, file, 123, 56, 4891);
+    			add_location(p1, file, 118, 6, 4435);
+    			add_location(em4, file, 127, 31, 4995);
+    			add_location(em5, file, 127, 80, 5044);
+    			add_location(code3, file, 129, 58, 5256);
+    			add_location(em6, file, 130, 17, 5336);
+    			add_location(em7, file, 130, 56, 5375);
+    			add_location(p2, file, 126, 6, 4960);
     			attr_dev(div, "slot", "help");
-    			add_location(div, file, 109, 3, 3775);
+    			add_location(div, file, 109, 3, 3883);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -7822,7 +7815,7 @@ var app = (function () {
     		p: function update(ctx, [dirty]) {
     			const statapp_changes = {};
 
-    			if (dirty & /*$$scope, sx, sampleSize, showPopLine, si, sp, sz, llx, lly*/ 4194559) {
+    			if (dirty & /*$$scope, sx, sampleSize, showPopLine, si, sp, sz, llx, lly*/ 16777471) {
     				statapp_changes.$$scope = { dirty, ctx };
     			}
 
@@ -7853,8 +7846,6 @@ var app = (function () {
     	return block;
     }
 
-    const sampleColor = "blue";
-    const populationColor = "#a0a0a0";
     const popMean = 170;
     const popStd = 10;
 
@@ -7872,6 +7863,8 @@ var app = (function () {
     	validate_slots("App", slots, []);
     	let showPopLine = "off";
     	let sampleSize = 6;
+    	const sampleColor = colors.plots.SAMPLES[0];
+    	const populationColor = colors.plots.POPULATIONS[0];
     	const limX = [-3.5, 3.5];
     	const limY = [popMean - 3.5 * popStd, popMean + 3.5 * popStd];
     	const zseq = seq(-5, 5, 100000);
@@ -7926,6 +7919,7 @@ var app = (function () {
     		LineSeries,
     		ScatterSeries,
     		StatApp,
+    		colors,
     		AppControlArea,
     		AppControlButton,
     		AppControlSwitch,
@@ -7962,9 +7956,9 @@ var app = (function () {
     		if ("sp" in $$props) $$invalidate(1, sp = $$props.sp);
     		if ("sz" in $$props) $$invalidate(5, sz = $$props.sz);
     		if ("sx" in $$props) $$invalidate(2, sx = $$props.sx);
-    		if ("lx" in $$props) $$invalidate(11, lx = $$props.lx);
-    		if ("la" in $$props) $$invalidate(12, la = $$props.la);
-    		if ("lb" in $$props) $$invalidate(13, lb = $$props.lb);
+    		if ("lx" in $$props) $$invalidate(13, lx = $$props.lx);
+    		if ("la" in $$props) $$invalidate(14, la = $$props.la);
+    		if ("lb" in $$props) $$invalidate(15, lb = $$props.lb);
     		if ("llx" in $$props) $$invalidate(6, llx = $$props.llx);
     		if ("lly" in $$props) $$invalidate(7, lly = $$props.lly);
     	};
@@ -7991,18 +7985,18 @@ var app = (function () {
     		}
 
     		if ($$self.$$.dirty & /*sx*/ 4) {
-    			$$invalidate(11, lx = quantile(sx, lp));
+    			$$invalidate(13, lx = quantile(sx, lp));
     		}
 
-    		if ($$self.$$.dirty & /*lx*/ 2048) {
-    			$$invalidate(12, la = diff(lx) / diff(lz));
+    		if ($$self.$$.dirty & /*lx*/ 8192) {
+    			$$invalidate(14, la = diff(lx) / diff(lz));
     		}
 
-    		if ($$self.$$.dirty & /*lx, la*/ 6144) {
-    			$$invalidate(13, lb = mean(lx) - la * mean(lz));
+    		if ($$self.$$.dirty & /*lx, la*/ 24576) {
+    			$$invalidate(15, lb = mean(lx) - la * mean(lz));
     		}
 
-    		if ($$self.$$.dirty & /*la, lb*/ 12288) {
+    		if ($$self.$$.dirty & /*la, lb*/ 49152) {
     			$$invalidate(7, lly = [-4 * la + lb, 4 * la + lb]);
     		}
     	};
@@ -8018,6 +8012,8 @@ var app = (function () {
     		sz,
     		llx,
     		lly,
+    		sampleColor,
+    		populationColor,
     		limX,
     		limY,
     		getSample,
