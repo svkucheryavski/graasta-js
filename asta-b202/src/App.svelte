@@ -27,9 +27,10 @@
    let sampSize = 10;
    let sampSizeOld = sampSize;
    let popPropOld = popProp;
-   let clicked;
-
    let reset = false;
+
+   // this is needed to force CI plot stats when two consequent samples are the same
+   let clicked;
 
    function takeNewSample() {
       sample = subset(shuffle(popIndex), seq(1, sampSize, sampSize));
