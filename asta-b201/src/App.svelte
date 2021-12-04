@@ -1,5 +1,5 @@
 <script>
-   import {seq, subset, rep, shuffle} from 'stat-js';
+   import {seq, subset, rep, sum, shuffle} from 'stat-js';
 
    // shared components
    import {default as StatApp} from '../../shared/StatApp.svelte';
@@ -21,10 +21,15 @@
    const popIndex = seq(1, popSize, popSize);
    const sampleColors = colors.plots.SAMPLES;
    const populationColors = colors.plots.POPULATIONS;
+   const labelStr = "# samples inside CI";
+   const xLabel = "Expected sample proportion";
 
    // variable parameters
    let popProp = 0.50;
    let sampSize = 10;
+   let sampSizeOld = sampSize;
+   let popPropOld = popProp;
+   let reset = false;
 
    function takeNewSample() {
       sample = subset(shuffle(popIndex), seq(1, sampSize, sampSize));
@@ -35,6 +40,22 @@
 
    // take a sample if population proportion has changed
    $: sample = popProp ? subset(shuffle(popIndex), seq(1, sampSize, sampSize)) : NULL;
+
+   // when sample size has changed - reset statistics
+   $: {
+      if (sampSizeOld !== sample.length || popPropOld !== popProp) {
+         reset = true;
+         sampSizeOld = sampSize;
+         popPropOld = popProp;
+         takeNewSample()
+      } else {
+         reset = false;
+      }
+   }
+
+   // proportion of current sample
+   $: sampProp = 1 - sum(subset(groups, sample).map(v => v - 1)) / sampSize;
+   $: popSD = Math.sqrt((1 - popProp) * popProp / sampSize);
 </script>
 
 <StatApp>
@@ -52,7 +73,7 @@
 
       <!-- confidence intervals and statistic table -->
       <div class="app-ci-plot-area">
-         <CIPlot {groups} {sample} lineColor={sampleColors[0]}/>
+         <CIPlot ciCenter={popProp} ciSD={popSD} ciStat={sampProp} reset={reset} {labelStr} {xLabel} />
       </div>
 
       <!-- control elements -->
