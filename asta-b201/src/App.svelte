@@ -31,8 +31,12 @@
    let popPropOld = popProp;
    let reset = false;
 
+   // this is needed to force CI plot stats when two consequent samples are the same
+   let clicked;
+
    function takeNewSample() {
       sample = subset(shuffle(popIndex), seq(1, sampSize, sampSize));
+      clicked = Math.random();
    }
 
    // generate groups of population randomly
@@ -73,7 +77,7 @@
 
       <!-- confidence intervals and statistic table -->
       <div class="app-ci-plot-area">
-         <CIPlot ciCenter={popProp} ciSD={popSD} ciStat={sampProp} reset={reset} {labelStr} {xLabel} />
+         <CIPlot {clicked} ciCenter={popProp} ciSD={popSD} ciStat={sampProp} reset={reset} {labelStr} {xLabel} />
       </div>
 
       <!-- control elements -->
