@@ -1,5 +1,5 @@
 <script>
-   import {seq, subset, rep, sum, shuffle} from 'stat-js';
+   import {seq, subset, rep, sum, shuffle, rnorm} from 'stat-js';
 
    // shared components
    import {default as StatApp} from '../../shared/StatApp.svelte';
@@ -27,11 +27,13 @@
    let sampSize = 10;
    let sampSizeOld = sampSize;
    let popPropOld = popProp;
+   let clicked;
 
    let reset = false;
 
    function takeNewSample() {
       sample = subset(shuffle(popIndex), seq(1, sampSize, sampSize));
+      clicked = Math.random()
    }
 
    // generate groups of population randomly
@@ -42,18 +44,22 @@
 
    // when sample size has changed - reset statistics
    $: {
-      if (!reset && (sample.length !== sampSizeOld || popProp !== popPropOld)) {
+      if (sampSizeOld !== sample.length || popPropOld !== popProp) {
          reset = true;
          sampSizeOld = sampSize;
          popPropOld = popProp;
+         takeNewSample();
       } else {
          reset = false;
       }
    }
 
    // proportion of current sample
-   $: sampProp = 1 - sum(subset(groups, sample).map(v => v - 1)) / sampSize;   // standard error for CI
+   $: sampProp = 1 - sum(subset(groups, sample).map(v => v - 1)) / sampSize;
+
+   // standard error for CI
    $: sampSD = Math.sqrt((1 - sampProp) * sampProp / sampSize);
+   $: console.log(sampProp)
 </script>
 
 <StatApp>
@@ -71,7 +77,7 @@
 
       <!-- confidence intervals and statistic table -->
       <div class="app-ci-plot-area">
-         <CIPlot ciCenter={sampProp} ciSD={sampSD} ciStat={popProp} reset={reset} xLabel="Expected population proportion"/>
+         <CIPlot {clicked} ciCenter={sampProp} ciSD={sampSD} ciStat={popProp} reset={reset} xLabel="Expected population proportion"/>
       </div>
 
       <!-- control elements -->
