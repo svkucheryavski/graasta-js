@@ -19,6 +19,8 @@
    // size of population and vector with element indices
    const popSize = 1600;
    const popIndex = seq(1, popSize, popSize);
+   const sampleColors = colors.plots.SAMPLES;
+   const populationColors = colors.plots.POPULATIONS;
 
    // variable parameters
    let popProp = 0.50;
@@ -40,17 +42,17 @@
 
       <!-- plot for population individuals  -->
       <div class="app-population-plot-area">
-         <PopulationPlot {groups} {sample} populationColors={colors.plots.POPULATIONS} sampleColors={colors.plots.SAMPLES}/>
+         <PopulationPlot {groups} {sample} {populationColors} {sampleColors}/>
       </div>
 
       <!-- plot for sample individuals -->
       <div class="app-sample-plot-area">
-         <SamplePlot {groups} {sample} colors={colors.plots.SAMPLES} />
+         <SamplePlot {groups} {sample} colors={sampleColors} />
       </div>
 
       <!-- confidence intervals and statistic table -->
       <div class="app-ci-plot-area">
-         <CIPlot {groups} {sample} lineColor={colors.plots.SAMPLES[0]}/>
+         <CIPlot {groups} {sample} lineColor={sampleColors[0]}/>
       </div>
 
       <!-- control elements -->
