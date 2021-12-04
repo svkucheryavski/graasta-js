@@ -1,8 +1,9 @@
 <script>
-   import {seq, subset, rep, shuffle} from 'stat-js';
+   import {seq, subset, rep, sum, shuffle} from 'stat-js';
 
    // shared components
    import {default as StatApp} from '../../shared/StatApp.svelte';
+   import { colors } from "../../shared/graasta";
 
    // shared components - controls
    import AppControlArea from '../../shared/controls/AppControlArea.svelte';
@@ -11,18 +12,23 @@
    import AppControlRange from '../../shared/controls/AppControlRange.svelte';
 
    // local components
-   import PopulationPlot from '../../asta-b201/src/PopulationPlot.svelte';
-   import SamplePlot from '../../asta-b201/src/SamplePlot.svelte';
-   import CIPlot from './CIPlot.svelte';
+   import PopulationPlot from '../../shared/plots/ProportionPopulationPlot.svelte';
+   import SamplePlot from '../../shared/plots/ProportionSamplePlot.svelte';
+   import CIPlot from '../../shared/plots/ProportionCIPlot.svelte';
 
    // size of population and vector with element indices
    const popSize = 1600;
    const popIndex = seq(1, popSize, popSize);
-   const colors = ["#ff0000", "#0000ff"];
+   const sampleColors = colors.plots.SAMPLES;
+   const populationColors = colors.plots.POPULATIONS;
 
    // variable parameters
    let popProp = 0.50;
    let sampSize = 10;
+   let sampSizeOld = sampSize;
+   let popPropOld = popProp;
+
+   let reset = false;
 
    function takeNewSample() {
       sample = subset(shuffle(popIndex), seq(1, sampSize, sampSize));
@@ -33,6 +39,21 @@
 
    // take a sample if population proportion has changed
    $: sample = popProp ? subset(shuffle(popIndex), seq(1, sampSize, sampSize)) : NULL;
+
+   // when sample size has changed - reset statistics
+   $: {
+      if (!reset && (sample.length !== sampSizeOld || popProp !== popPropOld)) {
+         reset = true;
+         sampSizeOld = sampSize;
+         popPropOld = popProp;
+      } else {
+         reset = false;
+      }
+   }
+
+   // proportion of current sample
+   $: sampProp = 1 - sum(subset(groups, sample).map(v => v - 1)) / sampSize;   // standard error for CI
+   $: sampSD = Math.sqrt((1 - sampProp) * sampProp / sampSize);
 </script>
 
 <StatApp>
@@ -40,17 +61,17 @@
 
       <!-- plot for population individuals  -->
       <div class="app-population-plot-area">
-         <PopulationPlot {groups} {sample} {colors} />
+         <PopulationPlot {groups} {sample} {populationColors} {sampleColors}/>
       </div>
 
       <!-- plot for sample individuals -->
       <div class="app-sample-plot-area">
-         <SamplePlot {groups} {sample} {colors} />
+         <SamplePlot {groups} {sample} colors={sampleColors} />
       </div>
 
       <!-- confidence intervals and statistic table -->
       <div class="app-ci-plot-area">
-         <CIPlot {groups} {sample} {colors} />
+         <CIPlot ciCenter={sampProp} ciSD={sampSD} ciStat={popProp} reset={reset} xLabel="Expected population proportion"/>
       </div>
 
       <!-- control elements -->
