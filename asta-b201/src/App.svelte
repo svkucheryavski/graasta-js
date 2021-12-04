@@ -50,7 +50,7 @@
 
       <!-- confidence intervals and statistic table -->
       <div class="app-ci-plot-area">
-         <CIPlot {groups} {sample} />
+         <CIPlot {groups} {sample} lineColor={colors.plots.SAMPLES[0]}/>
       </div>
 
       <!-- control elements -->
