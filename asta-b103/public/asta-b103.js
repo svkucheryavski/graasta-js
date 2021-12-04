@@ -833,8 +833,8 @@ var app = (function () {
     const get_help_slot_changes = dirty => ({});
     const get_help_slot_context = ctx => ({});
 
-    // (45:3) {:else}
-    function create_else_block$1(ctx) {
+    // (40:3) {#if showHelp}
+    function create_if_block$d(ctx) {
     	let div;
     	let current;
     	const help_slot_template = /*#slots*/ ctx[5].help;
@@ -844,8 +844,8 @@ var app = (function () {
     		c: function create() {
     			div = element("div");
     			if (help_slot) help_slot.c();
-    			attr_dev(div, "class", "helptext svelte-d5wxow");
-    			add_location(div, file$f, 45, 3, 1017);
+    			attr_dev(div, "class", "helptext svelte-coelov");
+    			add_location(div, file$f, 40, 3, 893);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -880,65 +880,9 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_else_block$1.name,
-    		type: "else",
-    		source: "(45:3) {:else}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (40:3) {#if !showHelp}
-    function create_if_block$d(ctx) {
-    	let div;
-    	let current;
-    	const default_slot_template = /*#slots*/ ctx[5].default;
-    	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[4], null);
-
-    	const block = {
-    		c: function create() {
-    			div = element("div");
-    			if (default_slot) default_slot.c();
-    			attr_dev(div, "class", "content svelte-d5wxow");
-    			add_location(div, file$f, 40, 3, 953);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, div, anchor);
-
-    			if (default_slot) {
-    				default_slot.m(div, null);
-    			}
-
-    			current = true;
-    		},
-    		p: function update(ctx, dirty) {
-    			if (default_slot) {
-    				if (default_slot.p && (!current || dirty & /*$$scope*/ 16)) {
-    					update_slot(default_slot, default_slot_template, ctx, /*$$scope*/ ctx[4], dirty, null, null);
-    				}
-    			}
-    		},
-    		i: function intro(local) {
-    			if (current) return;
-    			transition_in(default_slot, local);
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			transition_out(default_slot, local);
-    			current = false;
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(div);
-    			if (default_slot) default_slot.d(detaching);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
     		id: create_if_block$d.name,
     		type: "if",
-    		source: "(40:3) {#if !showHelp}",
+    		source: "(40:3) {#if showHelp}",
     		ctx
     	});
 
@@ -947,36 +891,41 @@ var app = (function () {
 
     function create_fragment$i(ctx) {
     	let main;
-    	let current_block_type_index;
-    	let if_block;
+    	let div;
+    	let t;
     	let main_class_value;
     	let current;
     	let mounted;
     	let dispose;
-    	const if_block_creators = [create_if_block$d, create_else_block$1];
-    	const if_blocks = [];
-
-    	function select_block_type(ctx, dirty) {
-    		if (!/*showHelp*/ ctx[0]) return 0;
-    		return 1;
-    	}
-
-    	current_block_type_index = select_block_type(ctx);
-    	if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
+    	const default_slot_template = /*#slots*/ ctx[5].default;
+    	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[4], null);
+    	let if_block = /*showHelp*/ ctx[0] && create_if_block$d(ctx);
 
     	const block = {
     		c: function create() {
     			main = element("main");
-    			if_block.c();
-    			attr_dev(main, "class", main_class_value = "mdatools-app mdatools-app_" + /*scale*/ ctx[1] + " svelte-d5wxow");
-    			add_location(main, file$f, 37, 0, 856);
+    			div = element("div");
+    			if (default_slot) default_slot.c();
+    			t = space();
+    			if (if_block) if_block.c();
+    			attr_dev(div, "class", "content svelte-coelov");
+    			add_location(div, file$f, 35, 3, 822);
+    			attr_dev(main, "class", main_class_value = "mdatools-app mdatools-app_" + /*scale*/ ctx[1] + " svelte-coelov");
+    			add_location(main, file$f, 33, 0, 744);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, main, anchor);
-    			if_blocks[current_block_type_index].m(main, null);
+    			append_dev(main, div);
+
+    			if (default_slot) {
+    				default_slot.m(div, null);
+    			}
+
+    			append_dev(main, t);
+    			if (if_block) if_block.m(main, null);
     			/*main_binding*/ ctx[6](main);
     			current = true;
 
@@ -986,48 +935,54 @@ var app = (function () {
     			}
     		},
     		p: function update(ctx, [dirty]) {
-    			let previous_block_index = current_block_type_index;
-    			current_block_type_index = select_block_type(ctx);
+    			if (default_slot) {
+    				if (default_slot.p && (!current || dirty & /*$$scope*/ 16)) {
+    					update_slot(default_slot, default_slot_template, ctx, /*$$scope*/ ctx[4], dirty, null, null);
+    				}
+    			}
 
-    			if (current_block_type_index === previous_block_index) {
-    				if_blocks[current_block_type_index].p(ctx, dirty);
-    			} else {
+    			if (/*showHelp*/ ctx[0]) {
+    				if (if_block) {
+    					if_block.p(ctx, dirty);
+
+    					if (dirty & /*showHelp*/ 1) {
+    						transition_in(if_block, 1);
+    					}
+    				} else {
+    					if_block = create_if_block$d(ctx);
+    					if_block.c();
+    					transition_in(if_block, 1);
+    					if_block.m(main, null);
+    				}
+    			} else if (if_block) {
     				group_outros();
 
-    				transition_out(if_blocks[previous_block_index], 1, 1, () => {
-    					if_blocks[previous_block_index] = null;
+    				transition_out(if_block, 1, 1, () => {
+    					if_block = null;
     				});
 
     				check_outros();
-    				if_block = if_blocks[current_block_type_index];
-
-    				if (!if_block) {
-    					if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
-    					if_block.c();
-    				} else {
-    					if_block.p(ctx, dirty);
-    				}
-
-    				transition_in(if_block, 1);
-    				if_block.m(main, null);
     			}
 
-    			if (!current || dirty & /*scale*/ 2 && main_class_value !== (main_class_value = "mdatools-app mdatools-app_" + /*scale*/ ctx[1] + " svelte-d5wxow")) {
+    			if (!current || dirty & /*scale*/ 2 && main_class_value !== (main_class_value = "mdatools-app mdatools-app_" + /*scale*/ ctx[1] + " svelte-coelov")) {
     				attr_dev(main, "class", main_class_value);
     			}
     		},
     		i: function intro(local) {
     			if (current) return;
+    			transition_in(default_slot, local);
     			transition_in(if_block);
     			current = true;
     		},
     		o: function outro(local) {
+    			transition_out(default_slot, local);
     			transition_out(if_block);
     			current = false;
     		},
     		d: function destroy(detaching) {
     			if (detaching) detach_dev(main);
-    			if_blocks[current_block_type_index].d();
+    			if (default_slot) default_slot.d(detaching);
+    			if (if_block) if_block.d();
     			/*main_binding*/ ctx[6](null);
     			mounted = false;
     			dispose();
@@ -1130,6 +1085,19 @@ var app = (function () {
     		});
     	}
     }
+
+    let colors = {
+       plots: {
+          // population colors
+          POPULATIONS_PALE: ["#33668820", "#ff990020"],
+          POPULATIONS: ["#33668850", "#ff990050"],
+          SAMPLES: ["#336688", "#ff9900"],
+
+          // statistics on plot legend
+          STAT_NAME: "#808080",
+          STAT_VALUE: "#202020"
+       }
+    };
 
     /* ../shared/controls/AppControlArea.svelte generated by Svelte v3.38.2 */
 
@@ -4246,12 +4214,12 @@ var app = (function () {
 
     function get_each_context$2(ctx, list, i) {
     	const child_ctx = ctx.slice();
-    	child_ctx[22] = list[i];
-    	child_ctx[24] = i;
+    	child_ctx[23] = list[i];
+    	child_ctx[25] = i;
     	return child_ctx;
     }
 
-    // (50:0) {#if rx !== undefined && ry !== undefined}
+    // (51:0) {#if rx !== undefined && ry !== undefined}
     function create_if_block$8(ctx) {
     	let each_1_anchor;
     	let each_value = /*left*/ ctx[0];
@@ -4312,14 +4280,14 @@ var app = (function () {
     		block,
     		id: create_if_block$8.name,
     		type: "if",
-    		source: "(50:0) {#if rx !== undefined && ry !== undefined}",
+    		source: "(51:0) {#if rx !== undefined && ry !== undefined}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (51:3) {#each left as v, i}
+    // (52:3) {#each left as v, i}
     function create_each_block$2(ctx) {
     	let rect;
     	let rect_x_value;
@@ -4330,30 +4298,30 @@ var app = (function () {
     	const block = {
     		c: function create() {
     			rect = svg_element("rect");
-    			attr_dev(rect, "x", rect_x_value = /*rx*/ ctx[1][/*i*/ ctx[24]]);
-    			attr_dev(rect, "y", rect_y_value = /*ry*/ ctx[2][/*i*/ ctx[24]]);
-    			attr_dev(rect, "width", rect_width_value = /*rw*/ ctx[3][/*i*/ ctx[24]]);
-    			attr_dev(rect, "height", rect_height_value = /*rh*/ ctx[4][/*i*/ ctx[24]]);
+    			attr_dev(rect, "x", rect_x_value = /*rx*/ ctx[1][/*i*/ ctx[25]]);
+    			attr_dev(rect, "y", rect_y_value = /*ry*/ ctx[2][/*i*/ ctx[25]]);
+    			attr_dev(rect, "width", rect_width_value = /*rw*/ ctx[3][/*i*/ ctx[25]]);
+    			attr_dev(rect, "height", rect_height_value = /*rh*/ ctx[4][/*i*/ ctx[25]]);
     			attr_dev(rect, "style", /*barsStyleStr*/ ctx[5]);
-    			add_location(rect, file$7, 51, 6, 1929);
+    			add_location(rect, file$7, 52, 6, 1969);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, rect, anchor);
     		},
     		p: function update(ctx, dirty) {
-    			if (dirty & /*rx*/ 2 && rect_x_value !== (rect_x_value = /*rx*/ ctx[1][/*i*/ ctx[24]])) {
+    			if (dirty & /*rx*/ 2 && rect_x_value !== (rect_x_value = /*rx*/ ctx[1][/*i*/ ctx[25]])) {
     				attr_dev(rect, "x", rect_x_value);
     			}
 
-    			if (dirty & /*ry*/ 4 && rect_y_value !== (rect_y_value = /*ry*/ ctx[2][/*i*/ ctx[24]])) {
+    			if (dirty & /*ry*/ 4 && rect_y_value !== (rect_y_value = /*ry*/ ctx[2][/*i*/ ctx[25]])) {
     				attr_dev(rect, "y", rect_y_value);
     			}
 
-    			if (dirty & /*rw*/ 8 && rect_width_value !== (rect_width_value = /*rw*/ ctx[3][/*i*/ ctx[24]])) {
+    			if (dirty & /*rw*/ 8 && rect_width_value !== (rect_width_value = /*rw*/ ctx[3][/*i*/ ctx[25]])) {
     				attr_dev(rect, "width", rect_width_value);
     			}
 
-    			if (dirty & /*rh*/ 16 && rect_height_value !== (rect_height_value = /*rh*/ ctx[4][/*i*/ ctx[24]])) {
+    			if (dirty & /*rh*/ 16 && rect_height_value !== (rect_height_value = /*rh*/ ctx[4][/*i*/ ctx[25]])) {
     				attr_dev(rect, "height", rect_height_value);
     			}
     		},
@@ -4366,7 +4334,7 @@ var app = (function () {
     		block,
     		id: create_each_block$2.name,
     		type: "each",
-    		source: "(51:3) {#each left as v, i}",
+    		source: "(52:3) {#each left as v, i}",
     		ctx
     	});
 
@@ -4440,9 +4408,10 @@ var app = (function () {
     	let { labels = undefined } = $$props;
     	let { faceColor = Colors.PRIMARY } = $$props;
     	let { borderColor = faceColor } = $$props;
+    	let { lineWidth = 1 } = $$props;
 
     	// styles for bars and labels
-    	const barsStyleStr = `fill:${faceColor};stroke:${borderColor};stroke-width: 1px;`;
+    	const barsStyleStr = `fill:${faceColor};stroke:${borderColor};stroke-width: ${lineWidth}px;`;
 
     	// multiply width and height values if needed
     	if (!Array.isArray(left) || !Array.isArray(top) || left.length < 1 || left.length != top.length) {
@@ -4469,17 +4438,27 @@ var app = (function () {
 
     	const xLim = axes.xLim;
     	validate_store(xLim, "xLim");
-    	component_subscribe($$self, xLim, value => $$invalidate(16, $xLim = value));
+    	component_subscribe($$self, xLim, value => $$invalidate(17, $xLim = value));
     	const yLim = axes.yLim;
     	validate_store(yLim, "yLim");
-    	component_subscribe($$self, yLim, value => $$invalidate(18, $yLim = value));
+    	component_subscribe($$self, yLim, value => $$invalidate(19, $yLim = value));
     	const axesWidth = axes.width;
     	validate_store(axesWidth, "axesWidth");
-    	component_subscribe($$self, axesWidth, value => $$invalidate(17, $axesWidth = value));
+    	component_subscribe($$self, axesWidth, value => $$invalidate(18, $axesWidth = value));
     	const axesHeight = axes.height;
     	validate_store(axesHeight, "axesHeight");
-    	component_subscribe($$self, axesHeight, value => $$invalidate(19, $axesHeight = value));
-    	const writable_props = ["left", "top", "width", "height", "labels", "faceColor", "borderColor"];
+    	component_subscribe($$self, axesHeight, value => $$invalidate(20, $axesHeight = value));
+
+    	const writable_props = [
+    		"left",
+    		"top",
+    		"width",
+    		"height",
+    		"labels",
+    		"faceColor",
+    		"borderColor",
+    		"lineWidth"
+    	];
 
     	Object.keys($$props).forEach(key => {
     		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== "$$") console.warn(`<Rectangles> was created with unknown prop '${key}'`);
@@ -4493,6 +4472,7 @@ var app = (function () {
     		if ("labels" in $$props) $$invalidate(13, labels = $$props.labels);
     		if ("faceColor" in $$props) $$invalidate(14, faceColor = $$props.faceColor);
     		if ("borderColor" in $$props) $$invalidate(15, borderColor = $$props.borderColor);
+    		if ("lineWidth" in $$props) $$invalidate(16, lineWidth = $$props.lineWidth);
     	};
 
     	$$self.$capture_state = () => ({
@@ -4505,6 +4485,7 @@ var app = (function () {
     		labels,
     		faceColor,
     		borderColor,
+    		lineWidth,
     		barsStyleStr,
     		n,
     		axes,
@@ -4530,6 +4511,7 @@ var app = (function () {
     		if ("labels" in $$props) $$invalidate(13, labels = $$props.labels);
     		if ("faceColor" in $$props) $$invalidate(14, faceColor = $$props.faceColor);
     		if ("borderColor" in $$props) $$invalidate(15, borderColor = $$props.borderColor);
+    		if ("lineWidth" in $$props) $$invalidate(16, lineWidth = $$props.lineWidth);
     		if ("rx" in $$props) $$invalidate(1, rx = $$props.rx);
     		if ("ry" in $$props) $$invalidate(2, ry = $$props.ry);
     		if ("rw" in $$props) $$invalidate(3, rw = $$props.rw);
@@ -4541,20 +4523,20 @@ var app = (function () {
     	}
 
     	$$self.$$.update = () => {
-    		if ($$self.$$.dirty & /*left, $xLim, $axesWidth*/ 196609) {
+    		if ($$self.$$.dirty & /*left, $xLim, $axesWidth*/ 393217) {
     			// reactive variables for coordinates of data points in pixels
     			$$invalidate(1, rx = axes.scaleX(left, $xLim, $axesWidth));
     		}
 
-    		if ($$self.$$.dirty & /*top, $yLim, $axesHeight*/ 790528) {
+    		if ($$self.$$.dirty & /*top, $yLim, $axesHeight*/ 1576960) {
     			$$invalidate(2, ry = axes.scaleY(top, $yLim, $axesHeight));
     		}
 
-    		if ($$self.$$.dirty & /*width, $xLim, $axesWidth*/ 197632) {
+    		if ($$self.$$.dirty & /*width, $xLim, $axesWidth*/ 394240) {
     			$$invalidate(3, rw = axes.scaleX(width, $xLim, $axesWidth, true));
     		}
 
-    		if ($$self.$$.dirty & /*height, $yLim, $axesHeight*/ 788480) {
+    		if ($$self.$$.dirty & /*height, $yLim, $axesHeight*/ 1574912) {
     			$$invalidate(4, rh = axes.scaleY(height, $yLim, $axesHeight, true));
     		}
     	};
@@ -4576,6 +4558,7 @@ var app = (function () {
     		labels,
     		faceColor,
     		borderColor,
+    		lineWidth,
     		$xLim,
     		$axesWidth,
     		$yLim,
@@ -4594,7 +4577,8 @@ var app = (function () {
     			height: 11,
     			labels: 13,
     			faceColor: 14,
-    			borderColor: 15
+    			borderColor: 15,
+    			lineWidth: 16
     		});
 
     		dispatch_dev("SvelteRegisterComponent", {
@@ -4677,6 +4661,14 @@ var app = (function () {
     	}
 
     	set borderColor(value) {
+    		throw new Error("<Rectangles>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get lineWidth() {
+    		throw new Error("<Rectangles>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set lineWidth(value) {
     		throw new Error("<Rectangles>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
     }
@@ -6912,7 +6904,7 @@ var app = (function () {
 
     /* src/PDFPlot.svelte generated by Svelte v3.38.2 */
 
-    // (20:0) <Axes title="PDF" xLabel={varName} yLabel="Density" {limX} {limY}>
+    // (22:0) <Axes title="PDF" xLabel={varName} yLabel="Density" {limX} {limY}>
     function create_default_slot$3(ctx) {
     	let lineseries0;
     	let t0;
@@ -6927,7 +6919,7 @@ var app = (function () {
 
     	lineseries0 = new LineSeries({
     			props: {
-    				lineColor: "#909090",
+    				lineColor: /*lineColor*/ ctx[6],
     				lineWidth: 2,
     				xValues: /*x*/ ctx[0],
     				yValues: /*y*/ ctx[1]
@@ -6937,39 +6929,43 @@ var app = (function () {
 
     	segments = new Segments({
     			props: {
-    				xStart: /*xs*/ ctx[6],
+    				lineColor: /*selectedLineColor*/ ctx[7],
+    				xStart: /*xs*/ ctx[8],
     				yStart: [0, 0],
-    				xEnd: /*xs*/ ctx[6],
-    				yEnd: /*ys*/ ctx[7]
+    				xEnd: /*xs*/ ctx[8],
+    				yEnd: /*ys*/ ctx[9]
     			},
     			$$inline: true
     		});
 
     	lineseries1 = new LineSeries({
     			props: {
+    				lineColor: /*selectedLineColor*/ ctx[7],
     				lineWidth: 2,
-    				xValues: /*xi*/ ctx[8],
-    				yValues: /*yi*/ ctx[9]
+    				xValues: /*xi*/ ctx[10],
+    				yValues: /*yi*/ ctx[11]
     			},
     			$$inline: true
     		});
 
     	areaseries = new AreaSeries({
     			props: {
+    				fillColor: /*selectedLineColor*/ ctx[7],
+    				lineColor: "transprent",
     				lineWidth: 2,
-    				xValues: /*xi*/ ctx[8],
-    				yValues: /*yi*/ ctx[9],
-    				opacity: 0.25
+    				xValues: /*xi*/ ctx[10],
+    				yValues: /*yi*/ ctx[11],
+    				opacity: 0.35
     			},
     			$$inline: true
     		});
 
     	textlabels = new TextLabels({
     			props: {
-    				xValues: [mean(/*xs*/ ctx[6])],
+    				faceColor: /*selectedLineColor*/ ctx[7],
+    				xValues: [mean(/*xs*/ ctx[8])],
     				yValues: [0],
     				labels: [/*p*/ ctx[2].toFixed(3)],
-    				faceColor: Colors.PRIMARY,
     				pos: 3
     			},
     			$$inline: true
@@ -7001,24 +6997,29 @@ var app = (function () {
     		},
     		p: function update(ctx, dirty) {
     			const lineseries0_changes = {};
+    			if (dirty & /*lineColor*/ 64) lineseries0_changes.lineColor = /*lineColor*/ ctx[6];
     			if (dirty & /*x*/ 1) lineseries0_changes.xValues = /*x*/ ctx[0];
     			if (dirty & /*y*/ 2) lineseries0_changes.yValues = /*y*/ ctx[1];
     			lineseries0.$set(lineseries0_changes);
     			const segments_changes = {};
-    			if (dirty & /*xs*/ 64) segments_changes.xStart = /*xs*/ ctx[6];
-    			if (dirty & /*xs*/ 64) segments_changes.xEnd = /*xs*/ ctx[6];
-    			if (dirty & /*ys*/ 128) segments_changes.yEnd = /*ys*/ ctx[7];
+    			if (dirty & /*selectedLineColor*/ 128) segments_changes.lineColor = /*selectedLineColor*/ ctx[7];
+    			if (dirty & /*xs*/ 256) segments_changes.xStart = /*xs*/ ctx[8];
+    			if (dirty & /*xs*/ 256) segments_changes.xEnd = /*xs*/ ctx[8];
+    			if (dirty & /*ys*/ 512) segments_changes.yEnd = /*ys*/ ctx[9];
     			segments.$set(segments_changes);
     			const lineseries1_changes = {};
-    			if (dirty & /*xi*/ 256) lineseries1_changes.xValues = /*xi*/ ctx[8];
-    			if (dirty & /*yi*/ 512) lineseries1_changes.yValues = /*yi*/ ctx[9];
+    			if (dirty & /*selectedLineColor*/ 128) lineseries1_changes.lineColor = /*selectedLineColor*/ ctx[7];
+    			if (dirty & /*xi*/ 1024) lineseries1_changes.xValues = /*xi*/ ctx[10];
+    			if (dirty & /*yi*/ 2048) lineseries1_changes.yValues = /*yi*/ ctx[11];
     			lineseries1.$set(lineseries1_changes);
     			const areaseries_changes = {};
-    			if (dirty & /*xi*/ 256) areaseries_changes.xValues = /*xi*/ ctx[8];
-    			if (dirty & /*yi*/ 512) areaseries_changes.yValues = /*yi*/ ctx[9];
+    			if (dirty & /*selectedLineColor*/ 128) areaseries_changes.fillColor = /*selectedLineColor*/ ctx[7];
+    			if (dirty & /*xi*/ 1024) areaseries_changes.xValues = /*xi*/ ctx[10];
+    			if (dirty & /*yi*/ 2048) areaseries_changes.yValues = /*yi*/ ctx[11];
     			areaseries.$set(areaseries_changes);
     			const textlabels_changes = {};
-    			if (dirty & /*xs*/ 64) textlabels_changes.xValues = [mean(/*xs*/ ctx[6])];
+    			if (dirty & /*selectedLineColor*/ 128) textlabels_changes.faceColor = /*selectedLineColor*/ ctx[7];
+    			if (dirty & /*xs*/ 256) textlabels_changes.xValues = [mean(/*xs*/ ctx[8])];
     			if (dirty & /*p*/ 4) textlabels_changes.labels = [/*p*/ ctx[2].toFixed(3)];
     			textlabels.$set(textlabels_changes);
     		},
@@ -7056,14 +7057,14 @@ var app = (function () {
     		block,
     		id: create_default_slot$3.name,
     		type: "slot",
-    		source: "(20:0) <Axes title=\\\"PDF\\\" xLabel={varName} yLabel=\\\"Density\\\" {limX} {limY}>",
+    		source: "(22:0) <Axes title=\\\"PDF\\\" xLabel={varName} yLabel=\\\"Density\\\" {limX} {limY}>",
     		ctx
     	});
 
     	return block;
     }
 
-    // (21:3) 
+    // (23:3) 
     function create_xaxis_slot$2(ctx) {
     	let xaxis;
     	let current;
@@ -7100,14 +7101,14 @@ var app = (function () {
     		block,
     		id: create_xaxis_slot$2.name,
     		type: "slot",
-    		source: "(21:3) ",
+    		source: "(23:3) ",
     		ctx
     	});
 
     	return block;
     }
 
-    // (22:3) 
+    // (24:3) 
     function create_yaxis_slot$2(ctx) {
     	let yaxis;
     	let current;
@@ -7144,14 +7145,14 @@ var app = (function () {
     		block,
     		id: create_yaxis_slot$2.name,
     		type: "slot",
-    		source: "(22:3) ",
+    		source: "(24:3) ",
     		ctx
     	});
 
     	return block;
     }
 
-    // (23:3) 
+    // (25:3) 
     function create_box_slot$2(ctx) {
     	let box;
     	let current;
@@ -7184,7 +7185,7 @@ var app = (function () {
     		block,
     		id: create_box_slot$2.name,
     		type: "slot",
-    		source: "(23:3) ",
+    		source: "(25:3) ",
     		ctx
     	});
 
@@ -7230,7 +7231,7 @@ var app = (function () {
     			if (dirty & /*limX*/ 8) axes_changes.limX = /*limX*/ ctx[3];
     			if (dirty & /*limY*/ 16) axes_changes.limY = /*limY*/ ctx[4];
 
-    			if (dirty & /*$$scope, xs, p, xi, yi, ys, x, y*/ 3015) {
+    			if (dirty & /*$$scope, selectedLineColor, xs, p, xi, yi, ys, lineColor, x, y*/ 12231) {
     				axes_changes.$$scope = { dirty, ctx };
     			}
 
@@ -7275,7 +7276,20 @@ var app = (function () {
     	let { limY } = $$props;
     	let { intInd } = $$props;
     	let { varName } = $$props;
-    	const writable_props = ["x", "y", "p", "limX", "limY", "intInd", "varName"];
+    	let { lineColor } = $$props;
+    	let { selectedLineColor } = $$props;
+
+    	const writable_props = [
+    		"x",
+    		"y",
+    		"p",
+    		"limX",
+    		"limY",
+    		"intInd",
+    		"varName",
+    		"lineColor",
+    		"selectedLineColor"
+    	];
 
     	Object.keys($$props).forEach(key => {
     		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== "$$") console.warn(`<PDFPlot> was created with unknown prop '${key}'`);
@@ -7287,8 +7301,10 @@ var app = (function () {
     		if ("p" in $$props) $$invalidate(2, p = $$props.p);
     		if ("limX" in $$props) $$invalidate(3, limX = $$props.limX);
     		if ("limY" in $$props) $$invalidate(4, limY = $$props.limY);
-    		if ("intInd" in $$props) $$invalidate(10, intInd = $$props.intInd);
+    		if ("intInd" in $$props) $$invalidate(12, intInd = $$props.intInd);
     		if ("varName" in $$props) $$invalidate(5, varName = $$props.varName);
+    		if ("lineColor" in $$props) $$invalidate(6, lineColor = $$props.lineColor);
+    		if ("selectedLineColor" in $$props) $$invalidate(7, selectedLineColor = $$props.selectedLineColor);
     	};
 
     	$$self.$capture_state = () => ({
@@ -7300,7 +7316,6 @@ var app = (function () {
     		Segments,
     		AreaSeries,
     		TextLabels,
-    		Colors,
     		LineSeries,
     		x,
     		y,
@@ -7309,6 +7324,8 @@ var app = (function () {
     		limY,
     		intInd,
     		varName,
+    		lineColor,
+    		selectedLineColor,
     		xs,
     		ys,
     		xi,
@@ -7321,12 +7338,14 @@ var app = (function () {
     		if ("p" in $$props) $$invalidate(2, p = $$props.p);
     		if ("limX" in $$props) $$invalidate(3, limX = $$props.limX);
     		if ("limY" in $$props) $$invalidate(4, limY = $$props.limY);
-    		if ("intInd" in $$props) $$invalidate(10, intInd = $$props.intInd);
+    		if ("intInd" in $$props) $$invalidate(12, intInd = $$props.intInd);
     		if ("varName" in $$props) $$invalidate(5, varName = $$props.varName);
-    		if ("xs" in $$props) $$invalidate(6, xs = $$props.xs);
-    		if ("ys" in $$props) $$invalidate(7, ys = $$props.ys);
-    		if ("xi" in $$props) $$invalidate(8, xi = $$props.xi);
-    		if ("yi" in $$props) $$invalidate(9, yi = $$props.yi);
+    		if ("lineColor" in $$props) $$invalidate(6, lineColor = $$props.lineColor);
+    		if ("selectedLineColor" in $$props) $$invalidate(7, selectedLineColor = $$props.selectedLineColor);
+    		if ("xs" in $$props) $$invalidate(8, xs = $$props.xs);
+    		if ("ys" in $$props) $$invalidate(9, ys = $$props.ys);
+    		if ("xi" in $$props) $$invalidate(10, xi = $$props.xi);
+    		if ("yi" in $$props) $$invalidate(11, yi = $$props.yi);
     	};
 
     	if ($$props && "$$inject" in $$props) {
@@ -7334,24 +7353,38 @@ var app = (function () {
     	}
 
     	$$self.$$.update = () => {
-    		if ($$self.$$.dirty & /*x, intInd*/ 1025) {
-    			$$invalidate(6, xs = [x[intInd[0]], x[intInd[1]]]);
+    		if ($$self.$$.dirty & /*x, intInd*/ 4097) {
+    			$$invalidate(8, xs = [x[intInd[0]], x[intInd[1]]]);
     		}
 
-    		if ($$self.$$.dirty & /*y, intInd*/ 1026) {
-    			$$invalidate(7, ys = [y[intInd[0]], y[intInd[1]]]);
+    		if ($$self.$$.dirty & /*y, intInd*/ 4098) {
+    			$$invalidate(9, ys = [y[intInd[0]], y[intInd[1]]]);
     		}
 
-    		if ($$self.$$.dirty & /*x, intInd*/ 1025) {
-    			$$invalidate(8, xi = x.filter((v, i) => i >= intInd[0] & i <= intInd[1]));
+    		if ($$self.$$.dirty & /*x, intInd*/ 4097) {
+    			$$invalidate(10, xi = x.filter((v, i) => i >= intInd[0] & i <= intInd[1]));
     		}
 
-    		if ($$self.$$.dirty & /*y, intInd*/ 1026) {
-    			$$invalidate(9, yi = y.filter((v, i) => i >= intInd[0] & i <= intInd[1]));
+    		if ($$self.$$.dirty & /*y, intInd*/ 4098) {
+    			$$invalidate(11, yi = y.filter((v, i) => i >= intInd[0] & i <= intInd[1]));
     		}
     	};
 
-    	return [x, y, p, limX, limY, varName, xs, ys, xi, yi, intInd];
+    	return [
+    		x,
+    		y,
+    		p,
+    		limX,
+    		limY,
+    		varName,
+    		lineColor,
+    		selectedLineColor,
+    		xs,
+    		ys,
+    		xi,
+    		yi,
+    		intInd
+    	];
     }
 
     class PDFPlot extends SvelteComponentDev {
@@ -7364,8 +7397,10 @@ var app = (function () {
     			p: 2,
     			limX: 3,
     			limY: 4,
-    			intInd: 10,
-    			varName: 5
+    			intInd: 12,
+    			varName: 5,
+    			lineColor: 6,
+    			selectedLineColor: 7
     		});
 
     		dispatch_dev("SvelteRegisterComponent", {
@@ -7398,12 +7433,20 @@ var app = (function () {
     			console.warn("<PDFPlot> was created without expected prop 'limY'");
     		}
 
-    		if (/*intInd*/ ctx[10] === undefined && !("intInd" in props)) {
+    		if (/*intInd*/ ctx[12] === undefined && !("intInd" in props)) {
     			console.warn("<PDFPlot> was created without expected prop 'intInd'");
     		}
 
     		if (/*varName*/ ctx[5] === undefined && !("varName" in props)) {
     			console.warn("<PDFPlot> was created without expected prop 'varName'");
+    		}
+
+    		if (/*lineColor*/ ctx[6] === undefined && !("lineColor" in props)) {
+    			console.warn("<PDFPlot> was created without expected prop 'lineColor'");
+    		}
+
+    		if (/*selectedLineColor*/ ctx[7] === undefined && !("selectedLineColor" in props)) {
+    			console.warn("<PDFPlot> was created without expected prop 'selectedLineColor'");
     		}
     	}
 
@@ -7462,57 +7505,54 @@ var app = (function () {
     	set varName(value) {
     		throw new Error("<PDFPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
+
+    	get lineColor() {
+    		throw new Error("<PDFPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set lineColor(value) {
+    		throw new Error("<PDFPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get selectedLineColor() {
+    		throw new Error("<PDFPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set selectedLineColor(value) {
+    		throw new Error("<PDFPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
     }
 
     /* src/CDFPlot.svelte generated by Svelte v3.38.2 */
 
-    // (34:3) {#if mode === "Interval"}
+    // (41:3) {#if mode === "Interval"}
     function create_if_block$2(ctx) {
     	let segments0;
     	let t0;
-    	let segments1;
-    	let t1;
-    	let lineseries;
-    	let t2;
     	let scatterseries;
-    	let t3;
+    	let t1;
     	let textlabels;
+    	let t2;
+    	let segments1;
     	let current;
 
     	segments0 = new Segments({
     			props: {
-    				xStart: [/*xs*/ ctx[7][0]],
-    				yStart: [/*limY*/ ctx[3][0]],
-    				xEnd: [/*xs*/ ctx[7][0]],
-    				yEnd: [/*ys*/ ctx[6][0]]
-    			},
-    			$$inline: true
-    		});
-
-    	segments1 = new Segments({
-    			props: {
     				xStart: [/*limX*/ ctx[2][0]],
-    				yStart: [/*ys*/ ctx[6][0]],
-    				xEnd: [/*xs*/ ctx[7][0]],
-    				yEnd: [/*ys*/ ctx[6][0]]
-    			},
-    			$$inline: true
-    		});
-
-    	lineseries = new LineSeries({
-    			props: {
-    				lineWidth: 2,
-    				xValues: /*xi*/ ctx[8],
-    				yValues: /*yi*/ ctx[9]
+    				yStart: [/*ys*/ ctx[8][0]],
+    				xEnd: [/*xs*/ ctx[9][0]],
+    				yEnd: [/*ys*/ ctx[8][0]],
+    				lineColor: /*selectedLineColor*/ ctx[7]
     			},
     			$$inline: true
     		});
 
     	scatterseries = new ScatterSeries({
     			props: {
-    				xValues: [/*xs*/ ctx[7][0]],
-    				yValues: [/*ys*/ ctx[6][0]],
-    				faceColor: Colors.PRIMARY
+    				xValues: [/*xs*/ ctx[9][0]],
+    				yValues: [/*ys*/ ctx[8][0]],
+    				borderColor: /*selectedLineColor*/ ctx[7],
+    				faceColor: /*selectedLineColor*/ ctx[7]
     			},
     			$$inline: true
     		});
@@ -7520,10 +7560,21 @@ var app = (function () {
     	textlabels = new TextLabels({
     			props: {
     				xValues: [/*limX*/ ctx[2][0] + 15],
-    				yValues: [/*ys*/ ctx[6][0]],
-    				labels: /*ys*/ ctx[6][0].toFixed(3),
-    				pos: /*pos*/ ctx[10],
-    				faceColor: Colors.PRIMARY
+    				yValues: [/*ys*/ ctx[8][0]],
+    				labels: /*ys*/ ctx[8][0].toFixed(4),
+    				pos: /*pos*/ ctx[12],
+    				faceColor: /*selectedLineColor*/ ctx[7]
+    			},
+    			$$inline: true
+    		});
+
+    	segments1 = new Segments({
+    			props: {
+    				xStart: [/*xs*/ ctx[9][0]],
+    				yStart: [/*limY*/ ctx[3][0]],
+    				xEnd: [/*xs*/ ctx[9][0]],
+    				yEnd: [/*ys*/ ctx[8][0]],
+    				lineColor: /*selectedLineColor*/ ctx[7]
     			},
     			$$inline: true
     		});
@@ -7532,81 +7583,74 @@ var app = (function () {
     		c: function create() {
     			create_component(segments0.$$.fragment);
     			t0 = space();
-    			create_component(segments1.$$.fragment);
-    			t1 = space();
-    			create_component(lineseries.$$.fragment);
-    			t2 = space();
     			create_component(scatterseries.$$.fragment);
-    			t3 = space();
+    			t1 = space();
     			create_component(textlabels.$$.fragment);
+    			t2 = space();
+    			create_component(segments1.$$.fragment);
     		},
     		m: function mount(target, anchor) {
     			mount_component(segments0, target, anchor);
     			insert_dev(target, t0, anchor);
-    			mount_component(segments1, target, anchor);
-    			insert_dev(target, t1, anchor);
-    			mount_component(lineseries, target, anchor);
-    			insert_dev(target, t2, anchor);
     			mount_component(scatterseries, target, anchor);
-    			insert_dev(target, t3, anchor);
+    			insert_dev(target, t1, anchor);
     			mount_component(textlabels, target, anchor);
+    			insert_dev(target, t2, anchor);
+    			mount_component(segments1, target, anchor);
     			current = true;
     		},
     		p: function update(ctx, dirty) {
     			const segments0_changes = {};
-    			if (dirty & /*xs*/ 128) segments0_changes.xStart = [/*xs*/ ctx[7][0]];
-    			if (dirty & /*limY*/ 8) segments0_changes.yStart = [/*limY*/ ctx[3][0]];
-    			if (dirty & /*xs*/ 128) segments0_changes.xEnd = [/*xs*/ ctx[7][0]];
-    			if (dirty & /*ys*/ 64) segments0_changes.yEnd = [/*ys*/ ctx[6][0]];
+    			if (dirty & /*limX*/ 4) segments0_changes.xStart = [/*limX*/ ctx[2][0]];
+    			if (dirty & /*ys*/ 256) segments0_changes.yStart = [/*ys*/ ctx[8][0]];
+    			if (dirty & /*xs*/ 512) segments0_changes.xEnd = [/*xs*/ ctx[9][0]];
+    			if (dirty & /*ys*/ 256) segments0_changes.yEnd = [/*ys*/ ctx[8][0]];
+    			if (dirty & /*selectedLineColor*/ 128) segments0_changes.lineColor = /*selectedLineColor*/ ctx[7];
     			segments0.$set(segments0_changes);
-    			const segments1_changes = {};
-    			if (dirty & /*limX*/ 4) segments1_changes.xStart = [/*limX*/ ctx[2][0]];
-    			if (dirty & /*ys*/ 64) segments1_changes.yStart = [/*ys*/ ctx[6][0]];
-    			if (dirty & /*xs*/ 128) segments1_changes.xEnd = [/*xs*/ ctx[7][0]];
-    			if (dirty & /*ys*/ 64) segments1_changes.yEnd = [/*ys*/ ctx[6][0]];
-    			segments1.$set(segments1_changes);
-    			const lineseries_changes = {};
-    			if (dirty & /*xi*/ 256) lineseries_changes.xValues = /*xi*/ ctx[8];
-    			if (dirty & /*yi*/ 512) lineseries_changes.yValues = /*yi*/ ctx[9];
-    			lineseries.$set(lineseries_changes);
     			const scatterseries_changes = {};
-    			if (dirty & /*xs*/ 128) scatterseries_changes.xValues = [/*xs*/ ctx[7][0]];
-    			if (dirty & /*ys*/ 64) scatterseries_changes.yValues = [/*ys*/ ctx[6][0]];
+    			if (dirty & /*xs*/ 512) scatterseries_changes.xValues = [/*xs*/ ctx[9][0]];
+    			if (dirty & /*ys*/ 256) scatterseries_changes.yValues = [/*ys*/ ctx[8][0]];
+    			if (dirty & /*selectedLineColor*/ 128) scatterseries_changes.borderColor = /*selectedLineColor*/ ctx[7];
+    			if (dirty & /*selectedLineColor*/ 128) scatterseries_changes.faceColor = /*selectedLineColor*/ ctx[7];
     			scatterseries.$set(scatterseries_changes);
     			const textlabels_changes = {};
     			if (dirty & /*limX*/ 4) textlabels_changes.xValues = [/*limX*/ ctx[2][0] + 15];
-    			if (dirty & /*ys*/ 64) textlabels_changes.yValues = [/*ys*/ ctx[6][0]];
-    			if (dirty & /*ys*/ 64) textlabels_changes.labels = /*ys*/ ctx[6][0].toFixed(3);
-    			if (dirty & /*pos*/ 1024) textlabels_changes.pos = /*pos*/ ctx[10];
+    			if (dirty & /*ys*/ 256) textlabels_changes.yValues = [/*ys*/ ctx[8][0]];
+    			if (dirty & /*ys*/ 256) textlabels_changes.labels = /*ys*/ ctx[8][0].toFixed(4);
+    			if (dirty & /*pos*/ 4096) textlabels_changes.pos = /*pos*/ ctx[12];
+    			if (dirty & /*selectedLineColor*/ 128) textlabels_changes.faceColor = /*selectedLineColor*/ ctx[7];
     			textlabels.$set(textlabels_changes);
+    			const segments1_changes = {};
+    			if (dirty & /*xs*/ 512) segments1_changes.xStart = [/*xs*/ ctx[9][0]];
+    			if (dirty & /*limY*/ 8) segments1_changes.yStart = [/*limY*/ ctx[3][0]];
+    			if (dirty & /*xs*/ 512) segments1_changes.xEnd = [/*xs*/ ctx[9][0]];
+    			if (dirty & /*ys*/ 256) segments1_changes.yEnd = [/*ys*/ ctx[8][0]];
+    			if (dirty & /*selectedLineColor*/ 128) segments1_changes.lineColor = /*selectedLineColor*/ ctx[7];
+    			segments1.$set(segments1_changes);
     		},
     		i: function intro(local) {
     			if (current) return;
     			transition_in(segments0.$$.fragment, local);
-    			transition_in(segments1.$$.fragment, local);
-    			transition_in(lineseries.$$.fragment, local);
     			transition_in(scatterseries.$$.fragment, local);
     			transition_in(textlabels.$$.fragment, local);
+    			transition_in(segments1.$$.fragment, local);
     			current = true;
     		},
     		o: function outro(local) {
     			transition_out(segments0.$$.fragment, local);
-    			transition_out(segments1.$$.fragment, local);
-    			transition_out(lineseries.$$.fragment, local);
     			transition_out(scatterseries.$$.fragment, local);
     			transition_out(textlabels.$$.fragment, local);
+    			transition_out(segments1.$$.fragment, local);
     			current = false;
     		},
     		d: function destroy(detaching) {
     			destroy_component(segments0, detaching);
     			if (detaching) detach_dev(t0);
-    			destroy_component(segments1, detaching);
-    			if (detaching) detach_dev(t1);
-    			destroy_component(lineseries, detaching);
-    			if (detaching) detach_dev(t2);
     			destroy_component(scatterseries, detaching);
-    			if (detaching) detach_dev(t3);
+    			if (detaching) detach_dev(t1);
     			destroy_component(textlabels, detaching);
+    			if (detaching) detach_dev(t2);
+    			destroy_component(segments1, detaching);
     		}
     	};
 
@@ -7614,33 +7658,33 @@ var app = (function () {
     		block,
     		id: create_if_block$2.name,
     		type: "if",
-    		source: "(34:3) {#if mode === \\\"Interval\\\"}",
+    		source: "(41:3) {#if mode === \\\"Interval\\\"}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (21:0) <Axes title="CDF" xLabel={varName} yLabel="Probability, p" {limX} {limY} >
+    // (22:0) <Axes title="CDF" xLabel={varName} yLabel="Probability, p" {limX} {limY} >
     function create_default_slot$2(ctx) {
     	let lineseries0;
     	let t0;
-    	let segments0;
-    	let t1;
-    	let segments1;
-    	let t2;
     	let lineseries1;
-    	let t3;
+    	let t1;
+    	let segments0;
+    	let t2;
     	let scatterseries;
-    	let t4;
+    	let t3;
     	let textlabels;
+    	let t4;
+    	let segments1;
     	let t5;
     	let if_block_anchor;
     	let current;
 
     	lineseries0 = new LineSeries({
     			props: {
-    				lineColor: "#909090",
+    				lineColor: /*lineColor*/ ctx[6],
     				lineWidth: 2,
     				xValues: /*x*/ ctx[0],
     				yValues: /*y*/ ctx[1]
@@ -7648,40 +7692,33 @@ var app = (function () {
     			$$inline: true
     		});
 
-    	segments0 = new Segments({
-    			props: {
-    				xStart: [/*xs*/ ctx[7][1]],
-    				yStart: [/*limY*/ ctx[3][0]],
-    				xEnd: [/*xs*/ ctx[7][1]],
-    				yEnd: [/*ys*/ ctx[6][1]]
-    			},
-    			$$inline: true
-    		});
-
-    	segments1 = new Segments({
-    			props: {
-    				xStart: [/*limX*/ ctx[2][0]],
-    				yStart: [/*ys*/ ctx[6][1]],
-    				xEnd: [/*xs*/ ctx[7][1]],
-    				yEnd: [/*ys*/ ctx[6][1]]
-    			},
-    			$$inline: true
-    		});
-
     	lineseries1 = new LineSeries({
     			props: {
     				lineWidth: 2,
-    				xValues: /*xi*/ ctx[8],
-    				yValues: /*yi*/ ctx[9]
+    				xValues: /*xi*/ ctx[10],
+    				yValues: /*yi*/ ctx[11],
+    				lineColor: /*selectedLineColor*/ ctx[7]
+    			},
+    			$$inline: true
+    		});
+
+    	segments0 = new Segments({
+    			props: {
+    				xStart: [/*xs*/ ctx[9][1]],
+    				yStart: [/*limY*/ ctx[3][0]],
+    				xEnd: [/*xs*/ ctx[9][1]],
+    				yEnd: [/*ys*/ ctx[8][1]],
+    				lineColor: /*selectedLineColor*/ ctx[7]
     			},
     			$$inline: true
     		});
 
     	scatterseries = new ScatterSeries({
     			props: {
-    				xValues: [/*xs*/ ctx[7][1]],
-    				yValues: [/*ys*/ ctx[6][1]],
-    				faceColor: Colors.PRIMARY
+    				xValues: [/*xs*/ ctx[9][1]],
+    				yValues: [/*ys*/ ctx[8][1]],
+    				borderColor: /*selectedLineColor*/ ctx[7],
+    				faceColor: /*selectedLineColor*/ ctx[7]
     			},
     			$$inline: true
     		});
@@ -7689,10 +7726,21 @@ var app = (function () {
     	textlabels = new TextLabels({
     			props: {
     				xValues: [/*limX*/ ctx[2][0] + 15],
-    				yValues: [/*ys*/ ctx[6][1]],
-    				labels: /*ys*/ ctx[6][1].toFixed(4),
+    				yValues: [/*ys*/ ctx[8][1]],
+    				labels: /*ys*/ ctx[8][1].toFixed(4),
     				pos: 3,
-    				faceColor: Colors.PRIMARY
+    				faceColor: /*selectedLineColor*/ ctx[7]
+    			},
+    			$$inline: true
+    		});
+
+    	segments1 = new Segments({
+    			props: {
+    				xStart: [/*limX*/ ctx[2][0]],
+    				yStart: [/*ys*/ ctx[8][1]],
+    				xEnd: [/*xs*/ ctx[9][1]],
+    				yEnd: [/*ys*/ ctx[8][1]],
+    				lineColor: /*selectedLineColor*/ ctx[7]
     			},
     			$$inline: true
     		});
@@ -7703,15 +7751,15 @@ var app = (function () {
     		c: function create() {
     			create_component(lineseries0.$$.fragment);
     			t0 = space();
-    			create_component(segments0.$$.fragment);
-    			t1 = space();
-    			create_component(segments1.$$.fragment);
-    			t2 = space();
     			create_component(lineseries1.$$.fragment);
-    			t3 = space();
+    			t1 = space();
+    			create_component(segments0.$$.fragment);
+    			t2 = space();
     			create_component(scatterseries.$$.fragment);
-    			t4 = space();
+    			t3 = space();
     			create_component(textlabels.$$.fragment);
+    			t4 = space();
+    			create_component(segments1.$$.fragment);
     			t5 = space();
     			if (if_block) if_block.c();
     			if_block_anchor = empty();
@@ -7719,15 +7767,15 @@ var app = (function () {
     		m: function mount(target, anchor) {
     			mount_component(lineseries0, target, anchor);
     			insert_dev(target, t0, anchor);
-    			mount_component(segments0, target, anchor);
-    			insert_dev(target, t1, anchor);
-    			mount_component(segments1, target, anchor);
-    			insert_dev(target, t2, anchor);
     			mount_component(lineseries1, target, anchor);
-    			insert_dev(target, t3, anchor);
+    			insert_dev(target, t1, anchor);
+    			mount_component(segments0, target, anchor);
+    			insert_dev(target, t2, anchor);
     			mount_component(scatterseries, target, anchor);
-    			insert_dev(target, t4, anchor);
+    			insert_dev(target, t3, anchor);
     			mount_component(textlabels, target, anchor);
+    			insert_dev(target, t4, anchor);
+    			mount_component(segments1, target, anchor);
     			insert_dev(target, t5, anchor);
     			if (if_block) if_block.m(target, anchor);
     			insert_dev(target, if_block_anchor, anchor);
@@ -7735,34 +7783,41 @@ var app = (function () {
     		},
     		p: function update(ctx, dirty) {
     			const lineseries0_changes = {};
+    			if (dirty & /*lineColor*/ 64) lineseries0_changes.lineColor = /*lineColor*/ ctx[6];
     			if (dirty & /*x*/ 1) lineseries0_changes.xValues = /*x*/ ctx[0];
     			if (dirty & /*y*/ 2) lineseries0_changes.yValues = /*y*/ ctx[1];
     			lineseries0.$set(lineseries0_changes);
-    			const segments0_changes = {};
-    			if (dirty & /*xs*/ 128) segments0_changes.xStart = [/*xs*/ ctx[7][1]];
-    			if (dirty & /*limY*/ 8) segments0_changes.yStart = [/*limY*/ ctx[3][0]];
-    			if (dirty & /*xs*/ 128) segments0_changes.xEnd = [/*xs*/ ctx[7][1]];
-    			if (dirty & /*ys*/ 64) segments0_changes.yEnd = [/*ys*/ ctx[6][1]];
-    			segments0.$set(segments0_changes);
-    			const segments1_changes = {};
-    			if (dirty & /*limX*/ 4) segments1_changes.xStart = [/*limX*/ ctx[2][0]];
-    			if (dirty & /*ys*/ 64) segments1_changes.yStart = [/*ys*/ ctx[6][1]];
-    			if (dirty & /*xs*/ 128) segments1_changes.xEnd = [/*xs*/ ctx[7][1]];
-    			if (dirty & /*ys*/ 64) segments1_changes.yEnd = [/*ys*/ ctx[6][1]];
-    			segments1.$set(segments1_changes);
     			const lineseries1_changes = {};
-    			if (dirty & /*xi*/ 256) lineseries1_changes.xValues = /*xi*/ ctx[8];
-    			if (dirty & /*yi*/ 512) lineseries1_changes.yValues = /*yi*/ ctx[9];
+    			if (dirty & /*xi*/ 1024) lineseries1_changes.xValues = /*xi*/ ctx[10];
+    			if (dirty & /*yi*/ 2048) lineseries1_changes.yValues = /*yi*/ ctx[11];
+    			if (dirty & /*selectedLineColor*/ 128) lineseries1_changes.lineColor = /*selectedLineColor*/ ctx[7];
     			lineseries1.$set(lineseries1_changes);
+    			const segments0_changes = {};
+    			if (dirty & /*xs*/ 512) segments0_changes.xStart = [/*xs*/ ctx[9][1]];
+    			if (dirty & /*limY*/ 8) segments0_changes.yStart = [/*limY*/ ctx[3][0]];
+    			if (dirty & /*xs*/ 512) segments0_changes.xEnd = [/*xs*/ ctx[9][1]];
+    			if (dirty & /*ys*/ 256) segments0_changes.yEnd = [/*ys*/ ctx[8][1]];
+    			if (dirty & /*selectedLineColor*/ 128) segments0_changes.lineColor = /*selectedLineColor*/ ctx[7];
+    			segments0.$set(segments0_changes);
     			const scatterseries_changes = {};
-    			if (dirty & /*xs*/ 128) scatterseries_changes.xValues = [/*xs*/ ctx[7][1]];
-    			if (dirty & /*ys*/ 64) scatterseries_changes.yValues = [/*ys*/ ctx[6][1]];
+    			if (dirty & /*xs*/ 512) scatterseries_changes.xValues = [/*xs*/ ctx[9][1]];
+    			if (dirty & /*ys*/ 256) scatterseries_changes.yValues = [/*ys*/ ctx[8][1]];
+    			if (dirty & /*selectedLineColor*/ 128) scatterseries_changes.borderColor = /*selectedLineColor*/ ctx[7];
+    			if (dirty & /*selectedLineColor*/ 128) scatterseries_changes.faceColor = /*selectedLineColor*/ ctx[7];
     			scatterseries.$set(scatterseries_changes);
     			const textlabels_changes = {};
     			if (dirty & /*limX*/ 4) textlabels_changes.xValues = [/*limX*/ ctx[2][0] + 15];
-    			if (dirty & /*ys*/ 64) textlabels_changes.yValues = [/*ys*/ ctx[6][1]];
-    			if (dirty & /*ys*/ 64) textlabels_changes.labels = /*ys*/ ctx[6][1].toFixed(4);
+    			if (dirty & /*ys*/ 256) textlabels_changes.yValues = [/*ys*/ ctx[8][1]];
+    			if (dirty & /*ys*/ 256) textlabels_changes.labels = /*ys*/ ctx[8][1].toFixed(4);
+    			if (dirty & /*selectedLineColor*/ 128) textlabels_changes.faceColor = /*selectedLineColor*/ ctx[7];
     			textlabels.$set(textlabels_changes);
+    			const segments1_changes = {};
+    			if (dirty & /*limX*/ 4) segments1_changes.xStart = [/*limX*/ ctx[2][0]];
+    			if (dirty & /*ys*/ 256) segments1_changes.yStart = [/*ys*/ ctx[8][1]];
+    			if (dirty & /*xs*/ 512) segments1_changes.xEnd = [/*xs*/ ctx[9][1]];
+    			if (dirty & /*ys*/ 256) segments1_changes.yEnd = [/*ys*/ ctx[8][1]];
+    			if (dirty & /*selectedLineColor*/ 128) segments1_changes.lineColor = /*selectedLineColor*/ ctx[7];
+    			segments1.$set(segments1_changes);
 
     			if (/*mode*/ ctx[4] === "Interval") {
     				if (if_block) {
@@ -7790,36 +7845,36 @@ var app = (function () {
     		i: function intro(local) {
     			if (current) return;
     			transition_in(lineseries0.$$.fragment, local);
-    			transition_in(segments0.$$.fragment, local);
-    			transition_in(segments1.$$.fragment, local);
     			transition_in(lineseries1.$$.fragment, local);
+    			transition_in(segments0.$$.fragment, local);
     			transition_in(scatterseries.$$.fragment, local);
     			transition_in(textlabels.$$.fragment, local);
+    			transition_in(segments1.$$.fragment, local);
     			transition_in(if_block);
     			current = true;
     		},
     		o: function outro(local) {
     			transition_out(lineseries0.$$.fragment, local);
-    			transition_out(segments0.$$.fragment, local);
-    			transition_out(segments1.$$.fragment, local);
     			transition_out(lineseries1.$$.fragment, local);
+    			transition_out(segments0.$$.fragment, local);
     			transition_out(scatterseries.$$.fragment, local);
     			transition_out(textlabels.$$.fragment, local);
+    			transition_out(segments1.$$.fragment, local);
     			transition_out(if_block);
     			current = false;
     		},
     		d: function destroy(detaching) {
     			destroy_component(lineseries0, detaching);
     			if (detaching) detach_dev(t0);
-    			destroy_component(segments0, detaching);
-    			if (detaching) detach_dev(t1);
-    			destroy_component(segments1, detaching);
-    			if (detaching) detach_dev(t2);
     			destroy_component(lineseries1, detaching);
-    			if (detaching) detach_dev(t3);
+    			if (detaching) detach_dev(t1);
+    			destroy_component(segments0, detaching);
+    			if (detaching) detach_dev(t2);
     			destroy_component(scatterseries, detaching);
-    			if (detaching) detach_dev(t4);
+    			if (detaching) detach_dev(t3);
     			destroy_component(textlabels, detaching);
+    			if (detaching) detach_dev(t4);
+    			destroy_component(segments1, detaching);
     			if (detaching) detach_dev(t5);
     			if (if_block) if_block.d(detaching);
     			if (detaching) detach_dev(if_block_anchor);
@@ -7830,14 +7885,14 @@ var app = (function () {
     		block,
     		id: create_default_slot$2.name,
     		type: "slot",
-    		source: "(21:0) <Axes title=\\\"CDF\\\" xLabel={varName} yLabel=\\\"Probability, p\\\" {limX} {limY} >",
+    		source: "(22:0) <Axes title=\\\"CDF\\\" xLabel={varName} yLabel=\\\"Probability, p\\\" {limX} {limY} >",
     		ctx
     	});
 
     	return block;
     }
 
-    // (22:3) 
+    // (23:3) 
     function create_xaxis_slot$1(ctx) {
     	let xaxis;
     	let current;
@@ -7874,14 +7929,14 @@ var app = (function () {
     		block,
     		id: create_xaxis_slot$1.name,
     		type: "slot",
-    		source: "(22:3) ",
+    		source: "(23:3) ",
     		ctx
     	});
 
     	return block;
     }
 
-    // (23:3) 
+    // (24:3) 
     function create_yaxis_slot$1(ctx) {
     	let yaxis;
     	let current;
@@ -7918,14 +7973,14 @@ var app = (function () {
     		block,
     		id: create_yaxis_slot$1.name,
     		type: "slot",
-    		source: "(23:3) ",
+    		source: "(24:3) ",
     		ctx
     	});
 
     	return block;
     }
 
-    // (24:3) 
+    // (25:3) 
     function create_box_slot$1(ctx) {
     	let box;
     	let current;
@@ -7958,7 +8013,7 @@ var app = (function () {
     		block,
     		id: create_box_slot$1.name,
     		type: "slot",
-    		source: "(24:3) ",
+    		source: "(25:3) ",
     		ctx
     	});
 
@@ -8004,7 +8059,7 @@ var app = (function () {
     			if (dirty & /*limX*/ 4) axes_changes.limX = /*limX*/ ctx[2];
     			if (dirty & /*limY*/ 8) axes_changes.limY = /*limY*/ ctx[3];
 
-    			if (dirty & /*$$scope, limX, ys, pos, xs, xi, yi, limY, mode, x, y*/ 6111) {
+    			if (dirty & /*$$scope, xs, limY, ys, selectedLineColor, limX, pos, mode, xi, yi, lineColor, x, y*/ 24543) {
     				axes_changes.$$scope = { dirty, ctx };
     			}
 
@@ -8050,7 +8105,20 @@ var app = (function () {
     	let { mode } = $$props;
     	let { intInd } = $$props;
     	let { varName } = $$props;
-    	const writable_props = ["x", "y", "limX", "limY", "mode", "intInd", "varName"];
+    	let { lineColor } = $$props;
+    	let { selectedLineColor } = $$props;
+
+    	const writable_props = [
+    		"x",
+    		"y",
+    		"limX",
+    		"limY",
+    		"mode",
+    		"intInd",
+    		"varName",
+    		"lineColor",
+    		"selectedLineColor"
+    	];
 
     	Object.keys($$props).forEach(key => {
     		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== "$$") console.warn(`<CDFPlot> was created with unknown prop '${key}'`);
@@ -8062,21 +8130,20 @@ var app = (function () {
     		if ("limX" in $$props) $$invalidate(2, limX = $$props.limX);
     		if ("limY" in $$props) $$invalidate(3, limY = $$props.limY);
     		if ("mode" in $$props) $$invalidate(4, mode = $$props.mode);
-    		if ("intInd" in $$props) $$invalidate(11, intInd = $$props.intInd);
+    		if ("intInd" in $$props) $$invalidate(13, intInd = $$props.intInd);
     		if ("varName" in $$props) $$invalidate(5, varName = $$props.varName);
+    		if ("lineColor" in $$props) $$invalidate(6, lineColor = $$props.lineColor);
+    		if ("selectedLineColor" in $$props) $$invalidate(7, selectedLineColor = $$props.selectedLineColor);
     	};
 
     	$$self.$capture_state = () => ({
-    		mean,
     		Axes,
     		XAxis,
     		YAxis,
     		Box,
     		Segments,
     		ScatterSeries,
-    		Colors,
     		TextLabels,
-    		AreaSeries,
     		LineSeries,
     		x,
     		y,
@@ -8085,6 +8152,8 @@ var app = (function () {
     		mode,
     		intInd,
     		varName,
+    		lineColor,
+    		selectedLineColor,
     		xs,
     		ys,
     		xi,
@@ -8098,13 +8167,15 @@ var app = (function () {
     		if ("limX" in $$props) $$invalidate(2, limX = $$props.limX);
     		if ("limY" in $$props) $$invalidate(3, limY = $$props.limY);
     		if ("mode" in $$props) $$invalidate(4, mode = $$props.mode);
-    		if ("intInd" in $$props) $$invalidate(11, intInd = $$props.intInd);
+    		if ("intInd" in $$props) $$invalidate(13, intInd = $$props.intInd);
     		if ("varName" in $$props) $$invalidate(5, varName = $$props.varName);
-    		if ("xs" in $$props) $$invalidate(7, xs = $$props.xs);
-    		if ("ys" in $$props) $$invalidate(6, ys = $$props.ys);
-    		if ("xi" in $$props) $$invalidate(8, xi = $$props.xi);
-    		if ("yi" in $$props) $$invalidate(9, yi = $$props.yi);
-    		if ("pos" in $$props) $$invalidate(10, pos = $$props.pos);
+    		if ("lineColor" in $$props) $$invalidate(6, lineColor = $$props.lineColor);
+    		if ("selectedLineColor" in $$props) $$invalidate(7, selectedLineColor = $$props.selectedLineColor);
+    		if ("xs" in $$props) $$invalidate(9, xs = $$props.xs);
+    		if ("ys" in $$props) $$invalidate(8, ys = $$props.ys);
+    		if ("xi" in $$props) $$invalidate(10, xi = $$props.xi);
+    		if ("yi" in $$props) $$invalidate(11, yi = $$props.yi);
+    		if ("pos" in $$props) $$invalidate(12, pos = $$props.pos);
     	};
 
     	if ($$props && "$$inject" in $$props) {
@@ -8112,28 +8183,43 @@ var app = (function () {
     	}
 
     	$$self.$$.update = () => {
-    		if ($$self.$$.dirty & /*x, intInd*/ 2049) {
-    			$$invalidate(7, xs = [x[intInd[0]], x[intInd[1]]]);
+    		if ($$self.$$.dirty & /*x, intInd*/ 8193) {
+    			$$invalidate(9, xs = [x[intInd[0]], x[intInd[1]]]);
     		}
 
-    		if ($$self.$$.dirty & /*y, intInd*/ 2050) {
-    			$$invalidate(6, ys = [y[intInd[0]], y[intInd[1]]]);
+    		if ($$self.$$.dirty & /*y, intInd*/ 8194) {
+    			$$invalidate(8, ys = [y[intInd[0]], y[intInd[1]]]);
     		}
 
-    		if ($$self.$$.dirty & /*x, intInd*/ 2049) {
-    			$$invalidate(8, xi = x.filter((v, i) => i >= intInd[0] & i <= intInd[1]));
+    		if ($$self.$$.dirty & /*x, intInd*/ 8193) {
+    			$$invalidate(10, xi = x.filter((v, i) => i >= intInd[0] & i <= intInd[1]));
     		}
 
-    		if ($$self.$$.dirty & /*y, intInd*/ 2050) {
-    			$$invalidate(9, yi = y.filter((v, i) => i >= intInd[0] & i <= intInd[1]));
+    		if ($$self.$$.dirty & /*y, intInd*/ 8194) {
+    			$$invalidate(11, yi = y.filter((v, i) => i >= intInd[0] & i <= intInd[1]));
     		}
 
-    		if ($$self.$$.dirty & /*ys*/ 64) {
-    			$$invalidate(10, pos = ys[0] < 0.08 ? 3 : 1);
+    		if ($$self.$$.dirty & /*ys*/ 256) {
+    			$$invalidate(12, pos = ys[0] < 0.08 ? 3 : 1);
     		}
     	};
 
-    	return [x, y, limX, limY, mode, varName, ys, xs, xi, yi, pos, intInd];
+    	return [
+    		x,
+    		y,
+    		limX,
+    		limY,
+    		mode,
+    		varName,
+    		lineColor,
+    		selectedLineColor,
+    		ys,
+    		xs,
+    		xi,
+    		yi,
+    		pos,
+    		intInd
+    	];
     }
 
     class CDFPlot extends SvelteComponentDev {
@@ -8146,8 +8232,10 @@ var app = (function () {
     			limX: 2,
     			limY: 3,
     			mode: 4,
-    			intInd: 11,
-    			varName: 5
+    			intInd: 13,
+    			varName: 5,
+    			lineColor: 6,
+    			selectedLineColor: 7
     		});
 
     		dispatch_dev("SvelteRegisterComponent", {
@@ -8180,12 +8268,20 @@ var app = (function () {
     			console.warn("<CDFPlot> was created without expected prop 'mode'");
     		}
 
-    		if (/*intInd*/ ctx[11] === undefined && !("intInd" in props)) {
+    		if (/*intInd*/ ctx[13] === undefined && !("intInd" in props)) {
     			console.warn("<CDFPlot> was created without expected prop 'intInd'");
     		}
 
     		if (/*varName*/ ctx[5] === undefined && !("varName" in props)) {
     			console.warn("<CDFPlot> was created without expected prop 'varName'");
+    		}
+
+    		if (/*lineColor*/ ctx[6] === undefined && !("lineColor" in props)) {
+    			console.warn("<CDFPlot> was created without expected prop 'lineColor'");
+    		}
+
+    		if (/*selectedLineColor*/ ctx[7] === undefined && !("selectedLineColor" in props)) {
+    			console.warn("<CDFPlot> was created without expected prop 'selectedLineColor'");
     		}
     	}
 
@@ -8244,29 +8340,44 @@ var app = (function () {
     	set varName(value) {
     		throw new Error("<CDFPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
+
+    	get lineColor() {
+    		throw new Error("<CDFPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set lineColor(value) {
+    		throw new Error("<CDFPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get selectedLineColor() {
+    		throw new Error("<CDFPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set selectedLineColor(value) {
+    		throw new Error("<CDFPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
     }
 
     /* src/ICDFPlot.svelte generated by Svelte v3.38.2 */
 
-    // (45:3) {#if mode === "Interval"}
+    // (47:3) {#if mode === "Interval"}
     function create_if_block$1(ctx) {
     	let segments0;
     	let t0;
     	let segments1;
     	let t1;
-    	let lineseries;
-    	let t2;
     	let scatterseries;
-    	let t3;
+    	let t2;
     	let textlabels;
     	let current;
 
     	segments0 = new Segments({
     			props: {
-    				xStart: [/*ys*/ ctx[7][0]],
+    				xStart: [/*ys*/ ctx[9][0]],
     				yStart: [/*limX*/ ctx[2][0]],
-    				xEnd: [/*ys*/ ctx[7][0]],
-    				yEnd: [/*xs*/ ctx[6][0]]
+    				xEnd: [/*ys*/ ctx[9][0]],
+    				yEnd: [/*xs*/ ctx[8][0]],
+    				lineColor: /*selectedLineColor*/ ctx[7]
     			},
     			$$inline: true
     		});
@@ -8274,27 +8385,20 @@ var app = (function () {
     	segments1 = new Segments({
     			props: {
     				xStart: [/*limY*/ ctx[3][0]],
-    				yStart: [/*xs*/ ctx[6][0]],
-    				xEnd: [/*ys*/ ctx[7][0]],
-    				yEnd: [/*xs*/ ctx[6][0]]
-    			},
-    			$$inline: true
-    		});
-
-    	lineseries = new LineSeries({
-    			props: {
-    				lineWidth: 2,
-    				xValues: /*yi*/ ctx[9],
-    				yValues: /*xi*/ ctx[8]
+    				yStart: [/*xs*/ ctx[8][0]],
+    				xEnd: [/*ys*/ ctx[9][0]],
+    				yEnd: [/*xs*/ ctx[8][0]],
+    				lineColor: /*selectedLineColor*/ ctx[7]
     			},
     			$$inline: true
     		});
 
     	scatterseries = new ScatterSeries({
     			props: {
-    				xValues: [/*ys*/ ctx[7][0]],
-    				yValues: [/*xs*/ ctx[6][0]],
-    				faceColor: Colors.PRIMARY
+    				xValues: [/*ys*/ ctx[9][0]],
+    				yValues: [/*xs*/ ctx[8][0]],
+    				faceColor: /*selectedLineColor*/ ctx[7],
+    				borderColor: /*selectedLineColor*/ ctx[7]
     			},
     			$$inline: true
     		});
@@ -8302,10 +8406,10 @@ var app = (function () {
     	textlabels = new TextLabels({
     			props: {
     				xValues: [/*limY*/ ctx[3][0] + 0.1],
-    				yValues: [/*xs*/ ctx[6][0]],
-    				labels: /*xs*/ ctx[6][0].toFixed(1),
-    				pos: /*pos*/ ctx[10],
-    				faceColor: Colors.PRIMARY
+    				yValues: [/*xs*/ ctx[8][0]],
+    				labels: /*xs*/ ctx[8][0].toFixed(1),
+    				pos: /*pos*/ ctx[12],
+    				faceColor: /*selectedLineColor*/ ctx[7]
     			},
     			$$inline: true
     		});
@@ -8316,10 +8420,8 @@ var app = (function () {
     			t0 = space();
     			create_component(segments1.$$.fragment);
     			t1 = space();
-    			create_component(lineseries.$$.fragment);
-    			t2 = space();
     			create_component(scatterseries.$$.fragment);
-    			t3 = space();
+    			t2 = space();
     			create_component(textlabels.$$.fragment);
     		},
     		m: function mount(target, anchor) {
@@ -8327,46 +8429,44 @@ var app = (function () {
     			insert_dev(target, t0, anchor);
     			mount_component(segments1, target, anchor);
     			insert_dev(target, t1, anchor);
-    			mount_component(lineseries, target, anchor);
-    			insert_dev(target, t2, anchor);
     			mount_component(scatterseries, target, anchor);
-    			insert_dev(target, t3, anchor);
+    			insert_dev(target, t2, anchor);
     			mount_component(textlabels, target, anchor);
     			current = true;
     		},
     		p: function update(ctx, dirty) {
     			const segments0_changes = {};
-    			if (dirty & /*ys*/ 128) segments0_changes.xStart = [/*ys*/ ctx[7][0]];
+    			if (dirty & /*ys*/ 512) segments0_changes.xStart = [/*ys*/ ctx[9][0]];
     			if (dirty & /*limX*/ 4) segments0_changes.yStart = [/*limX*/ ctx[2][0]];
-    			if (dirty & /*ys*/ 128) segments0_changes.xEnd = [/*ys*/ ctx[7][0]];
-    			if (dirty & /*xs*/ 64) segments0_changes.yEnd = [/*xs*/ ctx[6][0]];
+    			if (dirty & /*ys*/ 512) segments0_changes.xEnd = [/*ys*/ ctx[9][0]];
+    			if (dirty & /*xs*/ 256) segments0_changes.yEnd = [/*xs*/ ctx[8][0]];
+    			if (dirty & /*selectedLineColor*/ 128) segments0_changes.lineColor = /*selectedLineColor*/ ctx[7];
     			segments0.$set(segments0_changes);
     			const segments1_changes = {};
     			if (dirty & /*limY*/ 8) segments1_changes.xStart = [/*limY*/ ctx[3][0]];
-    			if (dirty & /*xs*/ 64) segments1_changes.yStart = [/*xs*/ ctx[6][0]];
-    			if (dirty & /*ys*/ 128) segments1_changes.xEnd = [/*ys*/ ctx[7][0]];
-    			if (dirty & /*xs*/ 64) segments1_changes.yEnd = [/*xs*/ ctx[6][0]];
+    			if (dirty & /*xs*/ 256) segments1_changes.yStart = [/*xs*/ ctx[8][0]];
+    			if (dirty & /*ys*/ 512) segments1_changes.xEnd = [/*ys*/ ctx[9][0]];
+    			if (dirty & /*xs*/ 256) segments1_changes.yEnd = [/*xs*/ ctx[8][0]];
+    			if (dirty & /*selectedLineColor*/ 128) segments1_changes.lineColor = /*selectedLineColor*/ ctx[7];
     			segments1.$set(segments1_changes);
-    			const lineseries_changes = {};
-    			if (dirty & /*yi*/ 512) lineseries_changes.xValues = /*yi*/ ctx[9];
-    			if (dirty & /*xi*/ 256) lineseries_changes.yValues = /*xi*/ ctx[8];
-    			lineseries.$set(lineseries_changes);
     			const scatterseries_changes = {};
-    			if (dirty & /*ys*/ 128) scatterseries_changes.xValues = [/*ys*/ ctx[7][0]];
-    			if (dirty & /*xs*/ 64) scatterseries_changes.yValues = [/*xs*/ ctx[6][0]];
+    			if (dirty & /*ys*/ 512) scatterseries_changes.xValues = [/*ys*/ ctx[9][0]];
+    			if (dirty & /*xs*/ 256) scatterseries_changes.yValues = [/*xs*/ ctx[8][0]];
+    			if (dirty & /*selectedLineColor*/ 128) scatterseries_changes.faceColor = /*selectedLineColor*/ ctx[7];
+    			if (dirty & /*selectedLineColor*/ 128) scatterseries_changes.borderColor = /*selectedLineColor*/ ctx[7];
     			scatterseries.$set(scatterseries_changes);
     			const textlabels_changes = {};
     			if (dirty & /*limY*/ 8) textlabels_changes.xValues = [/*limY*/ ctx[3][0] + 0.1];
-    			if (dirty & /*xs*/ 64) textlabels_changes.yValues = [/*xs*/ ctx[6][0]];
-    			if (dirty & /*xs*/ 64) textlabels_changes.labels = /*xs*/ ctx[6][0].toFixed(1);
-    			if (dirty & /*pos*/ 1024) textlabels_changes.pos = /*pos*/ ctx[10];
+    			if (dirty & /*xs*/ 256) textlabels_changes.yValues = [/*xs*/ ctx[8][0]];
+    			if (dirty & /*xs*/ 256) textlabels_changes.labels = /*xs*/ ctx[8][0].toFixed(1);
+    			if (dirty & /*pos*/ 4096) textlabels_changes.pos = /*pos*/ ctx[12];
+    			if (dirty & /*selectedLineColor*/ 128) textlabels_changes.faceColor = /*selectedLineColor*/ ctx[7];
     			textlabels.$set(textlabels_changes);
     		},
     		i: function intro(local) {
     			if (current) return;
     			transition_in(segments0.$$.fragment, local);
     			transition_in(segments1.$$.fragment, local);
-    			transition_in(lineseries.$$.fragment, local);
     			transition_in(scatterseries.$$.fragment, local);
     			transition_in(textlabels.$$.fragment, local);
     			current = true;
@@ -8374,7 +8474,6 @@ var app = (function () {
     		o: function outro(local) {
     			transition_out(segments0.$$.fragment, local);
     			transition_out(segments1.$$.fragment, local);
-    			transition_out(lineseries.$$.fragment, local);
     			transition_out(scatterseries.$$.fragment, local);
     			transition_out(textlabels.$$.fragment, local);
     			current = false;
@@ -8384,10 +8483,8 @@ var app = (function () {
     			if (detaching) detach_dev(t0);
     			destroy_component(segments1, detaching);
     			if (detaching) detach_dev(t1);
-    			destroy_component(lineseries, detaching);
-    			if (detaching) detach_dev(t2);
     			destroy_component(scatterseries, detaching);
-    			if (detaching) detach_dev(t3);
+    			if (detaching) detach_dev(t2);
     			destroy_component(textlabels, detaching);
     		}
     	};
@@ -8396,14 +8493,14 @@ var app = (function () {
     		block,
     		id: create_if_block$1.name,
     		type: "if",
-    		source: "(45:3) {#if mode === \\\"Interval\\\"}",
+    		source: "(47:3) {#if mode === \\\"Interval\\\"}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (25:0) <Axes title="Inverse CDF" xLabel="Probability" yLabel={varName} limX={limY} limY={limX} >
+    // (27:0) <Axes title="Inverse CDF" xLabel="Probability" yLabel={varName} limX={limY} limY={[limX[0], limX[1] + 10]} >
     function create_default_slot$1(ctx) {
     	let lineseries0;
     	let t0;
@@ -8422,20 +8519,21 @@ var app = (function () {
 
     	lineseries0 = new LineSeries({
     			props: {
-    				lineColor: "#909090",
     				lineWidth: 2,
     				xValues: /*y*/ ctx[1],
-    				yValues: /*x*/ ctx[0]
+    				yValues: /*x*/ ctx[0],
+    				lineColor: /*lineColor*/ ctx[6]
     			},
     			$$inline: true
     		});
 
     	segments0 = new Segments({
     			props: {
-    				xStart: [/*ys*/ ctx[7][1]],
+    				xStart: [/*ys*/ ctx[9][1]],
     				yStart: [/*limX*/ ctx[2][0]],
-    				xEnd: [/*ys*/ ctx[7][1]],
-    				yEnd: [/*xs*/ ctx[6][1]]
+    				xEnd: [/*ys*/ ctx[9][1]],
+    				yEnd: [/*xs*/ ctx[8][1]],
+    				lineColor: /*selectedLineColor*/ ctx[7]
     			},
     			$$inline: true
     		});
@@ -8443,9 +8541,10 @@ var app = (function () {
     	segments1 = new Segments({
     			props: {
     				xStart: [/*limY*/ ctx[3][0]],
-    				yStart: [/*xs*/ ctx[6][1]],
-    				xEnd: [/*ys*/ ctx[7][1]],
-    				yEnd: [/*xs*/ ctx[6][1]]
+    				yStart: [/*xs*/ ctx[8][1]],
+    				xEnd: [/*ys*/ ctx[9][1]],
+    				yEnd: [/*xs*/ ctx[8][1]],
+    				lineColor: /*selectedLineColor*/ ctx[7]
     			},
     			$$inline: true
     		});
@@ -8453,17 +8552,19 @@ var app = (function () {
     	lineseries1 = new LineSeries({
     			props: {
     				lineWidth: 2,
-    				xValues: /*yi*/ ctx[9],
-    				yValues: /*xi*/ ctx[8]
+    				xValues: /*yi*/ ctx[11],
+    				yValues: /*xi*/ ctx[10],
+    				lineColor: /*selectedLineColor*/ ctx[7]
     			},
     			$$inline: true
     		});
 
     	scatterseries = new ScatterSeries({
     			props: {
-    				xValues: [/*ys*/ ctx[7][1]],
-    				yValues: [/*xs*/ ctx[6][1]],
-    				faceColor: Colors.PRIMARY
+    				xValues: [/*ys*/ ctx[9][1]],
+    				yValues: [/*xs*/ ctx[8][1]],
+    				borderColor: /*selectedLineColor*/ ctx[7],
+    				faceColor: /*selectedLineColor*/ ctx[7]
     			},
     			$$inline: true
     		});
@@ -8471,10 +8572,10 @@ var app = (function () {
     	textlabels = new TextLabels({
     			props: {
     				xValues: [/*limY*/ ctx[3][0] + 0.1],
-    				yValues: [/*xs*/ ctx[6][1]],
-    				labels: /*xs*/ ctx[6][1].toFixed(1),
+    				yValues: [/*xs*/ ctx[8][1]],
+    				labels: /*xs*/ ctx[8][1].toFixed(1),
     				pos: 3,
-    				faceColor: Colors.PRIMARY
+    				faceColor: /*selectedLineColor*/ ctx[7]
     			},
     			$$inline: true
     		});
@@ -8519,31 +8620,38 @@ var app = (function () {
     			const lineseries0_changes = {};
     			if (dirty & /*y*/ 2) lineseries0_changes.xValues = /*y*/ ctx[1];
     			if (dirty & /*x*/ 1) lineseries0_changes.yValues = /*x*/ ctx[0];
+    			if (dirty & /*lineColor*/ 64) lineseries0_changes.lineColor = /*lineColor*/ ctx[6];
     			lineseries0.$set(lineseries0_changes);
     			const segments0_changes = {};
-    			if (dirty & /*ys*/ 128) segments0_changes.xStart = [/*ys*/ ctx[7][1]];
+    			if (dirty & /*ys*/ 512) segments0_changes.xStart = [/*ys*/ ctx[9][1]];
     			if (dirty & /*limX*/ 4) segments0_changes.yStart = [/*limX*/ ctx[2][0]];
-    			if (dirty & /*ys*/ 128) segments0_changes.xEnd = [/*ys*/ ctx[7][1]];
-    			if (dirty & /*xs*/ 64) segments0_changes.yEnd = [/*xs*/ ctx[6][1]];
+    			if (dirty & /*ys*/ 512) segments0_changes.xEnd = [/*ys*/ ctx[9][1]];
+    			if (dirty & /*xs*/ 256) segments0_changes.yEnd = [/*xs*/ ctx[8][1]];
+    			if (dirty & /*selectedLineColor*/ 128) segments0_changes.lineColor = /*selectedLineColor*/ ctx[7];
     			segments0.$set(segments0_changes);
     			const segments1_changes = {};
     			if (dirty & /*limY*/ 8) segments1_changes.xStart = [/*limY*/ ctx[3][0]];
-    			if (dirty & /*xs*/ 64) segments1_changes.yStart = [/*xs*/ ctx[6][1]];
-    			if (dirty & /*ys*/ 128) segments1_changes.xEnd = [/*ys*/ ctx[7][1]];
-    			if (dirty & /*xs*/ 64) segments1_changes.yEnd = [/*xs*/ ctx[6][1]];
+    			if (dirty & /*xs*/ 256) segments1_changes.yStart = [/*xs*/ ctx[8][1]];
+    			if (dirty & /*ys*/ 512) segments1_changes.xEnd = [/*ys*/ ctx[9][1]];
+    			if (dirty & /*xs*/ 256) segments1_changes.yEnd = [/*xs*/ ctx[8][1]];
+    			if (dirty & /*selectedLineColor*/ 128) segments1_changes.lineColor = /*selectedLineColor*/ ctx[7];
     			segments1.$set(segments1_changes);
     			const lineseries1_changes = {};
-    			if (dirty & /*yi*/ 512) lineseries1_changes.xValues = /*yi*/ ctx[9];
-    			if (dirty & /*xi*/ 256) lineseries1_changes.yValues = /*xi*/ ctx[8];
+    			if (dirty & /*yi*/ 2048) lineseries1_changes.xValues = /*yi*/ ctx[11];
+    			if (dirty & /*xi*/ 1024) lineseries1_changes.yValues = /*xi*/ ctx[10];
+    			if (dirty & /*selectedLineColor*/ 128) lineseries1_changes.lineColor = /*selectedLineColor*/ ctx[7];
     			lineseries1.$set(lineseries1_changes);
     			const scatterseries_changes = {};
-    			if (dirty & /*ys*/ 128) scatterseries_changes.xValues = [/*ys*/ ctx[7][1]];
-    			if (dirty & /*xs*/ 64) scatterseries_changes.yValues = [/*xs*/ ctx[6][1]];
+    			if (dirty & /*ys*/ 512) scatterseries_changes.xValues = [/*ys*/ ctx[9][1]];
+    			if (dirty & /*xs*/ 256) scatterseries_changes.yValues = [/*xs*/ ctx[8][1]];
+    			if (dirty & /*selectedLineColor*/ 128) scatterseries_changes.borderColor = /*selectedLineColor*/ ctx[7];
+    			if (dirty & /*selectedLineColor*/ 128) scatterseries_changes.faceColor = /*selectedLineColor*/ ctx[7];
     			scatterseries.$set(scatterseries_changes);
     			const textlabels_changes = {};
     			if (dirty & /*limY*/ 8) textlabels_changes.xValues = [/*limY*/ ctx[3][0] + 0.1];
-    			if (dirty & /*xs*/ 64) textlabels_changes.yValues = [/*xs*/ ctx[6][1]];
-    			if (dirty & /*xs*/ 64) textlabels_changes.labels = /*xs*/ ctx[6][1].toFixed(1);
+    			if (dirty & /*xs*/ 256) textlabels_changes.yValues = [/*xs*/ ctx[8][1]];
+    			if (dirty & /*xs*/ 256) textlabels_changes.labels = /*xs*/ ctx[8][1].toFixed(1);
+    			if (dirty & /*selectedLineColor*/ 128) textlabels_changes.faceColor = /*selectedLineColor*/ ctx[7];
     			textlabels.$set(textlabels_changes);
 
     			if (/*mode*/ ctx[4] === "Interval") {
@@ -8612,14 +8720,14 @@ var app = (function () {
     		block,
     		id: create_default_slot$1.name,
     		type: "slot",
-    		source: "(25:0) <Axes title=\\\"Inverse CDF\\\" xLabel=\\\"Probability\\\" yLabel={varName} limX={limY} limY={limX} >",
+    		source: "(27:0) <Axes title=\\\"Inverse CDF\\\" xLabel=\\\"Probability\\\" yLabel={varName} limX={limY} limY={[limX[0], limX[1] + 10]} >",
     		ctx
     	});
 
     	return block;
     }
 
-    // (27:3) 
+    // (29:3) 
     function create_xaxis_slot(ctx) {
     	let xaxis;
     	let current;
@@ -8656,14 +8764,14 @@ var app = (function () {
     		block,
     		id: create_xaxis_slot.name,
     		type: "slot",
-    		source: "(27:3) ",
+    		source: "(29:3) ",
     		ctx
     	});
 
     	return block;
     }
 
-    // (28:3) 
+    // (30:3) 
     function create_yaxis_slot(ctx) {
     	let yaxis;
     	let current;
@@ -8700,14 +8808,14 @@ var app = (function () {
     		block,
     		id: create_yaxis_slot.name,
     		type: "slot",
-    		source: "(28:3) ",
+    		source: "(30:3) ",
     		ctx
     	});
 
     	return block;
     }
 
-    // (29:3) 
+    // (31:3) 
     function create_box_slot(ctx) {
     	let box;
     	let current;
@@ -8740,7 +8848,7 @@ var app = (function () {
     		block,
     		id: create_box_slot.name,
     		type: "slot",
-    		source: "(29:3) ",
+    		source: "(31:3) ",
     		ctx
     	});
 
@@ -8757,7 +8865,7 @@ var app = (function () {
     				xLabel: "Probability",
     				yLabel: /*varName*/ ctx[5],
     				limX: /*limY*/ ctx[3],
-    				limY: /*limX*/ ctx[2],
+    				limY: [/*limX*/ ctx[2][0], /*limX*/ ctx[2][1] + 10],
     				$$slots: {
     					box: [create_box_slot],
     					yaxis: [create_yaxis_slot],
@@ -8784,9 +8892,9 @@ var app = (function () {
     			const axes_changes = {};
     			if (dirty & /*varName*/ 32) axes_changes.yLabel = /*varName*/ ctx[5];
     			if (dirty & /*limY*/ 8) axes_changes.limX = /*limY*/ ctx[3];
-    			if (dirty & /*limX*/ 4) axes_changes.limY = /*limX*/ ctx[2];
+    			if (dirty & /*limX*/ 4) axes_changes.limY = [/*limX*/ ctx[2][0], /*limX*/ ctx[2][1] + 10];
 
-    			if (dirty & /*$$scope, limY, xs, pos, ys, yi, xi, limX, mode, y, x*/ 6111) {
+    			if (dirty & /*$$scope, limY, xs, pos, selectedLineColor, ys, limX, mode, yi, xi, y, x, lineColor*/ 24543) {
     				axes_changes.$$scope = { dirty, ctx };
     			}
 
@@ -8832,7 +8940,20 @@ var app = (function () {
     	let { mode } = $$props;
     	let { intInd } = $$props;
     	let { varName } = $$props;
-    	const writable_props = ["x", "y", "limX", "limY", "mode", "intInd", "varName"];
+    	let { lineColor } = $$props;
+    	let { selectedLineColor } = $$props;
+
+    	const writable_props = [
+    		"x",
+    		"y",
+    		"limX",
+    		"limY",
+    		"mode",
+    		"intInd",
+    		"varName",
+    		"lineColor",
+    		"selectedLineColor"
+    	];
 
     	Object.keys($$props).forEach(key => {
     		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== "$$") console.warn(`<ICDFPlot> was created with unknown prop '${key}'`);
@@ -8844,8 +8965,10 @@ var app = (function () {
     		if ("limX" in $$props) $$invalidate(2, limX = $$props.limX);
     		if ("limY" in $$props) $$invalidate(3, limY = $$props.limY);
     		if ("mode" in $$props) $$invalidate(4, mode = $$props.mode);
-    		if ("intInd" in $$props) $$invalidate(11, intInd = $$props.intInd);
+    		if ("intInd" in $$props) $$invalidate(13, intInd = $$props.intInd);
     		if ("varName" in $$props) $$invalidate(5, varName = $$props.varName);
+    		if ("lineColor" in $$props) $$invalidate(6, lineColor = $$props.lineColor);
+    		if ("selectedLineColor" in $$props) $$invalidate(7, selectedLineColor = $$props.selectedLineColor);
     	};
 
     	$$self.$capture_state = () => ({
@@ -8855,7 +8978,6 @@ var app = (function () {
     		Box,
     		Segments,
     		ScatterSeries,
-    		Colors,
     		TextLabels,
     		LineSeries,
     		x,
@@ -8865,6 +8987,8 @@ var app = (function () {
     		mode,
     		intInd,
     		varName,
+    		lineColor,
+    		selectedLineColor,
     		xs,
     		ys,
     		xi,
@@ -8878,13 +9002,15 @@ var app = (function () {
     		if ("limX" in $$props) $$invalidate(2, limX = $$props.limX);
     		if ("limY" in $$props) $$invalidate(3, limY = $$props.limY);
     		if ("mode" in $$props) $$invalidate(4, mode = $$props.mode);
-    		if ("intInd" in $$props) $$invalidate(11, intInd = $$props.intInd);
+    		if ("intInd" in $$props) $$invalidate(13, intInd = $$props.intInd);
     		if ("varName" in $$props) $$invalidate(5, varName = $$props.varName);
-    		if ("xs" in $$props) $$invalidate(6, xs = $$props.xs);
-    		if ("ys" in $$props) $$invalidate(7, ys = $$props.ys);
-    		if ("xi" in $$props) $$invalidate(8, xi = $$props.xi);
-    		if ("yi" in $$props) $$invalidate(9, yi = $$props.yi);
-    		if ("pos" in $$props) $$invalidate(10, pos = $$props.pos);
+    		if ("lineColor" in $$props) $$invalidate(6, lineColor = $$props.lineColor);
+    		if ("selectedLineColor" in $$props) $$invalidate(7, selectedLineColor = $$props.selectedLineColor);
+    		if ("xs" in $$props) $$invalidate(8, xs = $$props.xs);
+    		if ("ys" in $$props) $$invalidate(9, ys = $$props.ys);
+    		if ("xi" in $$props) $$invalidate(10, xi = $$props.xi);
+    		if ("yi" in $$props) $$invalidate(11, yi = $$props.yi);
+    		if ("pos" in $$props) $$invalidate(12, pos = $$props.pos);
     	};
 
     	if ($$props && "$$inject" in $$props) {
@@ -8892,31 +9018,46 @@ var app = (function () {
     	}
 
     	$$self.$$.update = () => {
-    		if ($$self.$$.dirty & /*x, intInd*/ 2049) {
+    		if ($$self.$$.dirty & /*x, intInd*/ 8193) {
     			// coordinates of end points of the interval
-    			$$invalidate(6, xs = [x[intInd[0]], x[intInd[1]]]);
+    			$$invalidate(8, xs = [x[intInd[0]], x[intInd[1]]]);
     		}
 
-    		if ($$self.$$.dirty & /*y, intInd*/ 2050) {
-    			$$invalidate(7, ys = [y[intInd[0]], y[intInd[1]]]);
+    		if ($$self.$$.dirty & /*y, intInd*/ 8194) {
+    			$$invalidate(9, ys = [y[intInd[0]], y[intInd[1]]]);
     		}
 
-    		if ($$self.$$.dirty & /*x, intInd*/ 2049) {
+    		if ($$self.$$.dirty & /*x, intInd*/ 8193) {
     			// coordinates of points between the end points
-    			$$invalidate(8, xi = x.filter((v, i) => i >= intInd[0] & i <= intInd[1]));
+    			$$invalidate(10, xi = x.filter((v, i) => i >= intInd[0] & i <= intInd[1]));
     		}
 
-    		if ($$self.$$.dirty & /*y, intInd*/ 2050) {
-    			$$invalidate(9, yi = y.filter((v, i) => i >= intInd[0] & i <= intInd[1]));
+    		if ($$self.$$.dirty & /*y, intInd*/ 8194) {
+    			$$invalidate(11, yi = y.filter((v, i) => i >= intInd[0] & i <= intInd[1]));
     		}
 
-    		if ($$self.$$.dirty & /*xs, limX*/ 68) {
+    		if ($$self.$$.dirty & /*xs, limX*/ 260) {
     			// position of label for p1
-    			$$invalidate(10, pos = xs[0] < limX[0] + 15 ? 3 : 1);
+    			$$invalidate(12, pos = xs[0] < limX[0] + 15 ? 3 : 1);
     		}
     	};
 
-    	return [x, y, limX, limY, mode, varName, xs, ys, xi, yi, pos, intInd];
+    	return [
+    		x,
+    		y,
+    		limX,
+    		limY,
+    		mode,
+    		varName,
+    		lineColor,
+    		selectedLineColor,
+    		xs,
+    		ys,
+    		xi,
+    		yi,
+    		pos,
+    		intInd
+    	];
     }
 
     class ICDFPlot extends SvelteComponentDev {
@@ -8929,8 +9070,10 @@ var app = (function () {
     			limX: 2,
     			limY: 3,
     			mode: 4,
-    			intInd: 11,
-    			varName: 5
+    			intInd: 13,
+    			varName: 5,
+    			lineColor: 6,
+    			selectedLineColor: 7
     		});
 
     		dispatch_dev("SvelteRegisterComponent", {
@@ -8963,12 +9106,20 @@ var app = (function () {
     			console.warn("<ICDFPlot> was created without expected prop 'mode'");
     		}
 
-    		if (/*intInd*/ ctx[11] === undefined && !("intInd" in props)) {
+    		if (/*intInd*/ ctx[13] === undefined && !("intInd" in props)) {
     			console.warn("<ICDFPlot> was created without expected prop 'intInd'");
     		}
 
     		if (/*varName*/ ctx[5] === undefined && !("varName" in props)) {
     			console.warn("<ICDFPlot> was created without expected prop 'varName'");
+    		}
+
+    		if (/*lineColor*/ ctx[6] === undefined && !("lineColor" in props)) {
+    			console.warn("<ICDFPlot> was created without expected prop 'lineColor'");
+    		}
+
+    		if (/*selectedLineColor*/ ctx[7] === undefined && !("selectedLineColor" in props)) {
+    			console.warn("<ICDFPlot> was created without expected prop 'selectedLineColor'");
     		}
     	}
 
@@ -9027,6 +9178,22 @@ var app = (function () {
     	set varName(value) {
     		throw new Error("<ICDFPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
+
+    	get lineColor() {
+    		throw new Error("<ICDFPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set lineColor(value) {
+    		throw new Error("<ICDFPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get selectedLineColor() {
+    		throw new Error("<ICDFPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set selectedLineColor(value) {
+    		throw new Error("<ICDFPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
     }
 
     /* src/App.svelte generated by Svelte v3.38.2 */
@@ -9034,7 +9201,7 @@ var app = (function () {
     const { Object: Object_1 } = globals;
     const file = "src/App.svelte";
 
-    // (95:12) <AppControlArea>
+    // (100:12) <AppControlArea>
     function create_default_slot_3(ctx) {
     	let appcontrolswitch;
     	let updating_value;
@@ -9047,13 +9214,13 @@ var app = (function () {
     	let current;
 
     	function appcontrolswitch_value_binding(value) {
-    		/*appcontrolswitch_value_binding*/ ctx[13](value);
+    		/*appcontrolswitch_value_binding*/ ctx[15](value);
     	}
 
     	let appcontrolswitch_props = {
     		id: "distributionName",
     		label: "Distribution",
-    		options: Object.keys(/*distrs*/ ctx[12])
+    		options: Object.keys(/*distrs*/ ctx[14])
     	};
 
     	if (/*selectedName*/ ctx[5] !== void 0) {
@@ -9068,7 +9235,7 @@ var app = (function () {
     	binding_callbacks.push(() => bind(appcontrolswitch, "value", appcontrolswitch_value_binding));
 
     	function appcontrolrange0_value_binding(value) {
-    		/*appcontrolrange0_value_binding*/ ctx[14](value);
+    		/*appcontrolrange0_value_binding*/ ctx[16](value);
     	}
 
     	let appcontrolrange0_props = {
@@ -9090,7 +9257,7 @@ var app = (function () {
     	binding_callbacks.push(() => bind(appcontrolrange0, "value", appcontrolrange0_value_binding));
 
     	function appcontrolrange1_value_binding(value) {
-    		/*appcontrolrange1_value_binding*/ ctx[15](value);
+    		/*appcontrolrange1_value_binding*/ ctx[17](value);
     	}
 
     	let appcontrolrange1_props = {
@@ -9188,14 +9355,14 @@ var app = (function () {
     		block,
     		id: create_default_slot_3.name,
     		type: "slot",
-    		source: "(95:12) <AppControlArea>",
+    		source: "(100:12) <AppControlArea>",
     		ctx
     	});
 
     	return block;
     }
 
-    // (125:15) {:else}
+    // (130:15) {:else}
     function create_else_block_1(ctx) {
     	let appcontrol;
     	let current;
@@ -9232,21 +9399,21 @@ var app = (function () {
     		block,
     		id: create_else_block_1.name,
     		type: "else",
-    		source: "(125:15) {:else}",
+    		source: "(130:15) {:else}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (123:15) {#if mode === "Interval"}
+    // (128:15) {#if mode === "Interval"}
     function create_if_block_1(ctx) {
     	let appcontrolrange;
     	let updating_value;
     	let current;
 
     	function appcontrolrange_value_binding(value) {
-    		/*appcontrolrange_value_binding*/ ctx[16](value);
+    		/*appcontrolrange_value_binding*/ ctx[18](value);
     	}
 
     	let appcontrolrange_props = {
@@ -9305,14 +9472,14 @@ var app = (function () {
     		block,
     		id: create_if_block_1.name,
     		type: "if",
-    		source: "(123:15) {#if mode === \\\"Interval\\\"}",
+    		source: "(128:15) {#if mode === \\\"Interval\\\"}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (122:12) <AppControlArea>
+    // (127:12) <AppControlArea>
     function create_default_slot_2(ctx) {
     	let current_block_type_index;
     	let if_block;
@@ -9335,7 +9502,7 @@ var app = (function () {
     	if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
 
     	function appcontrolrange_value_binding_1(value) {
-    		/*appcontrolrange_value_binding_1*/ ctx[17](value);
+    		/*appcontrolrange_value_binding_1*/ ctx[19](value);
     	}
 
     	let appcontrolrange_props = {
@@ -9358,7 +9525,7 @@ var app = (function () {
     	binding_callbacks.push(() => bind(appcontrolrange, "value", appcontrolrange_value_binding_1));
 
     	function appcontrolswitch_value_binding_1(value) {
-    		/*appcontrolswitch_value_binding_1*/ ctx[18](value);
+    		/*appcontrolswitch_value_binding_1*/ ctx[20](value);
     	}
 
     	let appcontrolswitch_props = {
@@ -9466,14 +9633,14 @@ var app = (function () {
     		block,
     		id: create_default_slot_2.name,
     		type: "slot",
-    		source: "(122:12) <AppControlArea>",
+    		source: "(127:12) <AppControlArea>",
     		ctx
     	});
 
     	return block;
     }
 
-    // (144:15) {:else}
+    // (149:15) {:else}
     function create_else_block(ctx) {
     	let appcontrol;
     	let current;
@@ -9510,21 +9677,21 @@ var app = (function () {
     		block,
     		id: create_else_block.name,
     		type: "else",
-    		source: "(144:15) {:else}",
+    		source: "(149:15) {:else}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (142:15) {#if mode === "Interval"}
+    // (147:15) {#if mode === "Interval"}
     function create_if_block(ctx) {
     	let appcontrolrange;
     	let updating_value;
     	let current;
 
     	function appcontrolrange_value_binding_2(value) {
-    		/*appcontrolrange_value_binding_2*/ ctx[19](value);
+    		/*appcontrolrange_value_binding_2*/ ctx[21](value);
     	}
 
     	let appcontrolrange_props = {
@@ -9584,14 +9751,14 @@ var app = (function () {
     		block,
     		id: create_if_block.name,
     		type: "if",
-    		source: "(142:15) {#if mode === \\\"Interval\\\"}",
+    		source: "(147:15) {#if mode === \\\"Interval\\\"}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (141:12) <AppControlArea>
+    // (146:12) <AppControlArea>
     function create_default_slot_1(ctx) {
     	let current_block_type_index;
     	let if_block;
@@ -9614,7 +9781,7 @@ var app = (function () {
     	if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
 
     	function appcontrolrange_value_binding_3(value) {
-    		/*appcontrolrange_value_binding_3*/ ctx[20](value);
+    		/*appcontrolrange_value_binding_3*/ ctx[22](value);
     	}
 
     	let appcontrolrange_props = {
@@ -9638,7 +9805,7 @@ var app = (function () {
     	binding_callbacks.push(() => bind(appcontrolrange, "value", appcontrolrange_value_binding_3));
 
     	function appcontrolswitch_value_binding_2(value) {
-    		/*appcontrolswitch_value_binding_2*/ ctx[21](value);
+    		/*appcontrolswitch_value_binding_2*/ ctx[23](value);
     	}
 
     	let appcontrolswitch_props = {
@@ -9746,14 +9913,14 @@ var app = (function () {
     		block,
     		id: create_default_slot_1.name,
     		type: "slot",
-    		source: "(141:12) <AppControlArea>",
+    		source: "(146:12) <AppControlArea>",
     		ctx
     	});
 
     	return block;
     }
 
-    // (90:0) <StatApp>
+    // (95:0) <StatApp>
     function create_default_slot(ctx) {
     	let div6;
     	let div1;
@@ -9782,6 +9949,8 @@ var app = (function () {
     				varName,
     				intInd: /*intInd*/ ctx[9],
     				p: /*p*/ ctx[6][/*intInd*/ ctx[9][1]] - /*p*/ ctx[6][/*intInd*/ ctx[9][0]],
+    				lineColor: /*lineColor*/ ctx[12],
+    				selectedLineColor: /*selectedLineColor*/ ctx[13],
     				limX: /*limX*/ ctx[11],
     				limY: /*distr*/ ctx[8].limY
     			},
@@ -9804,7 +9973,9 @@ var app = (function () {
     				mode: /*mode*/ ctx[0],
     				intInd: /*intInd*/ ctx[9],
     				limX: /*limX*/ ctx[11],
-    				limY: [-0.05, 1.05]
+    				lineColor: /*lineColor*/ ctx[12],
+    				selectedLineColor: /*selectedLineColor*/ ctx[13],
+    				limY: [-0.05, 1.1]
     			},
     			$$inline: true
     		});
@@ -9825,6 +9996,8 @@ var app = (function () {
     				mode: /*mode*/ ctx[0],
     				intInd: /*intInd*/ ctx[9],
     				limX: /*limX*/ ctx[11],
+    				lineColor: /*lineColor*/ ctx[12],
+    				selectedLineColor: /*selectedLineColor*/ ctx[13],
     				limY: [-0.05, 1.05]
     			},
     			$$inline: true
@@ -9859,19 +10032,19 @@ var app = (function () {
     			div4 = element("div");
     			create_component(appcontrolarea2.$$.fragment);
     			attr_dev(div0, "class", "app-control-area svelte-ycups1");
-    			add_location(div0, file, 93, 9, 2530);
+    			add_location(div0, file, 98, 9, 2741);
     			attr_dev(div1, "class", "app-layout-column pdf-area svelte-ycups1");
-    			add_location(div1, file, 91, 6, 2366);
+    			add_location(div1, file, 96, 6, 2545);
     			attr_dev(div2, "class", "app-control-area svelte-ycups1");
-    			add_location(div2, file, 120, 9, 3559);
+    			add_location(div2, file, 125, 9, 3801);
     			attr_dev(div3, "class", "app-layout-column cdf-area svelte-ycups1");
-    			add_location(div3, file, 118, 6, 3417);
+    			add_location(div3, file, 123, 6, 3628);
     			attr_dev(div4, "class", "app-control-area svelte-ycups1");
-    			add_location(div4, file, 139, 9, 4414);
+    			add_location(div4, file, 144, 9, 4688);
     			attr_dev(div5, "class", "app-layout-column icdf-area svelte-ycups1");
-    			add_location(div5, file, 137, 6, 4270);
+    			add_location(div5, file, 142, 6, 4512);
     			attr_dev(div6, "class", "app-layout svelte-ycups1");
-    			add_location(div6, file, 90, 3, 2335);
+    			add_location(div6, file, 95, 3, 2514);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div6, anchor);
@@ -9904,7 +10077,7 @@ var app = (function () {
     			pdfplot.$set(pdfplot_changes);
     			const appcontrolarea0_changes = {};
 
-    			if (dirty & /*$$scope, distr, selectedName*/ 16777504) {
+    			if (dirty & /*$$scope, distr, selectedName*/ 67109152) {
     				appcontrolarea0_changes.$$scope = { dirty, ctx };
     			}
 
@@ -9917,7 +10090,7 @@ var app = (function () {
     			cdfplot.$set(cdfplot_changes);
     			const appcontrolarea1_changes = {};
 
-    			if (dirty & /*$$scope, mode, x2, x1*/ 16777223) {
+    			if (dirty & /*$$scope, mode, x2, x1*/ 67108871) {
     				appcontrolarea1_changes.$$scope = { dirty, ctx };
     			}
 
@@ -9930,7 +10103,7 @@ var app = (function () {
     			icdfplot.$set(icdfplot_changes);
     			const appcontrolarea2_changes = {};
 
-    			if (dirty & /*$$scope, mode, p2, p1*/ 16777241) {
+    			if (dirty & /*$$scope, mode, p2, p1*/ 67108889) {
     				appcontrolarea2_changes.$$scope = { dirty, ctx };
     			}
 
@@ -9970,14 +10143,14 @@ var app = (function () {
     		block,
     		id: create_default_slot.name,
     		type: "slot",
-    		source: "(90:0) <StatApp>",
+    		source: "(95:0) <StatApp>",
     		ctx
     	});
 
     	return block;
     }
 
-    // (159:3) 
+    // (164:3) 
     function create_help_slot(ctx) {
     	let div;
     	let h2;
@@ -10040,20 +10213,20 @@ var app = (function () {
     			sub1 = element("sub");
     			sub1.textContent = "2";
     			t20 = text(" to 180 under the CDF plot and you will see the result (in this case the chance is around 0.683 or 68.3%).");
-    			add_location(h2, file, 159, 6, 5161);
-    			add_location(em0, file, 162, 102, 5302);
-    			add_location(em1, file, 162, 147, 5347);
-    			add_location(em2, file, 162, 199, 5399);
-    			add_location(em3, file, 163, 285, 5742);
-    			add_location(p0, file, 161, 6, 5196);
-    			add_location(p1_1, file, 166, 6, 5824);
-    			add_location(em4, file, 170, 360, 6513);
-    			add_location(sub0, file, 170, 370, 6523);
-    			add_location(em5, file, 170, 394, 6547);
-    			add_location(sub1, file, 170, 404, 6557);
-    			add_location(p2_1, file, 169, 9, 6149);
+    			add_location(h2, file, 164, 6, 5435);
+    			add_location(em0, file, 167, 102, 5576);
+    			add_location(em1, file, 167, 147, 5621);
+    			add_location(em2, file, 167, 199, 5673);
+    			add_location(em3, file, 168, 285, 6016);
+    			add_location(p0, file, 166, 6, 5470);
+    			add_location(p1_1, file, 171, 6, 6098);
+    			add_location(em4, file, 175, 360, 6787);
+    			add_location(sub0, file, 175, 370, 6797);
+    			add_location(em5, file, 175, 394, 6821);
+    			add_location(sub1, file, 175, 404, 6831);
+    			add_location(p2_1, file, 174, 9, 6423);
     			attr_dev(div, "slot", "help");
-    			add_location(div, file, 158, 3, 5137);
+    			add_location(div, file, 163, 3, 5411);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -10090,7 +10263,7 @@ var app = (function () {
     		block,
     		id: create_help_slot.name,
     		type: "slot",
-    		source: "(159:3) ",
+    		source: "(164:3) ",
     		ctx
     	});
 
@@ -10126,7 +10299,7 @@ var app = (function () {
     		p: function update(ctx, [dirty]) {
     			const statapp_changes = {};
 
-    			if (dirty & /*$$scope, mode, p2, p1, x, p, intInd, x2, x1, distr, selectedName, d*/ 16779263) {
+    			if (dirty & /*$$scope, mode, p2, p1, x, p, intInd, x2, x1, distr, selectedName, d*/ 67110911) {
     				statapp_changes.$$scope = { dirty, ctx };
     			}
 
@@ -10168,6 +10341,8 @@ var app = (function () {
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots("App", slots, []);
     	const limX = [100, 230];
+    	const lineColor = colors.plots.POPULATIONS[0];
+    	const selectedLineColor = colors.plots.SAMPLES[0];
     	let mode = "Value";
 
     	let distrs = {
@@ -10238,14 +10413,14 @@ var app = (function () {
     	function appcontrolrange0_value_binding(value) {
     		if ($$self.$$.not_equal(distr.params[0], value)) {
     			distr.params[0] = value;
-    			(($$invalidate(8, distr), $$invalidate(12, distrs)), $$invalidate(5, selectedName));
+    			(($$invalidate(8, distr), $$invalidate(14, distrs)), $$invalidate(5, selectedName));
     		}
     	}
 
     	function appcontrolrange1_value_binding(value) {
     		if ($$self.$$.not_equal(distr.params[1], value)) {
     			distr.params[1] = value;
-    			(($$invalidate(8, distr), $$invalidate(12, distrs)), $$invalidate(5, selectedName));
+    			(($$invalidate(8, distr), $$invalidate(14, distrs)), $$invalidate(5, selectedName));
     		}
     	}
 
@@ -10287,6 +10462,7 @@ var app = (function () {
     		punif,
     		closestIndex,
     		StatApp,
+    		colors,
     		AppControlArea,
     		AppControlSwitch,
     		AppControlRange,
@@ -10297,6 +10473,8 @@ var app = (function () {
     		size,
     		limX,
     		varName,
+    		lineColor,
+    		selectedLineColor,
     		mode,
     		distrs,
     		intInd,
@@ -10315,7 +10493,7 @@ var app = (function () {
 
     	$$self.$inject_state = $$props => {
     		if ("mode" in $$props) $$invalidate(0, mode = $$props.mode);
-    		if ("distrs" in $$props) $$invalidate(12, distrs = $$props.distrs);
+    		if ("distrs" in $$props) $$invalidate(14, distrs = $$props.distrs);
     		if ("intInd" in $$props) $$invalidate(9, intInd = $$props.intInd);
     		if ("x1" in $$props) $$invalidate(1, x1 = $$props.x1);
     		if ("x2" in $$props) $$invalidate(2, x2 = $$props.x2);
@@ -10369,6 +10547,8 @@ var app = (function () {
     		intInd,
     		d,
     		limX,
+    		lineColor,
+    		selectedLineColor,
     		distrs,
     		appcontrolswitch_value_binding,
     		appcontrolrange0_value_binding,

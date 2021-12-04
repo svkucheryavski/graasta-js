@@ -1,6 +1,6 @@
 <script>
    import { mean } from "stat-js";
-   import {Axes, XAxis, YAxis, Box, Segments, AreaSeries, TextLabels, Colors, LineSeries} from "svelte-plots-basic";
+   import {Axes, XAxis, YAxis, Box, Segments, AreaSeries, TextLabels, LineSeries} from "svelte-plots-basic";
 
    export let x;
    export let y;
@@ -9,6 +9,8 @@
    export let limY;
    export let intInd;
    export let varName;
+   export let lineColor;
+   export let selectedLineColor;
 
    $: xs = [x[intInd[0]], x[intInd[1]]];
    $: ys = [y[intInd[0]], y[intInd[1]]];
@@ -22,9 +24,10 @@
    <YAxis slot="yaxis" showGrid={true}></YAxis>
    <Box slot="box"></Box>
 
-   <LineSeries lineColor="#909090" lineWidth={2} xValues={x} yValues={y} />
-   <Segments xStart={xs} yStart={[0, 0]} xEnd={xs} yEnd={ys} />
-   <LineSeries lineWidth={2} xValues={xi} yValues={yi} />
-   <AreaSeries lineWidth={2} xValues={xi} yValues={yi} opacity={0.25}/>
-   <TextLabels xValues={[mean(xs)]} yValues={[0]} labels={[p.toFixed(3)]} faceColor={Colors.PRIMARY} pos={3} />
+   <LineSeries lineColor={lineColor} lineWidth={2} xValues={x} yValues={y} />
+   <Segments lineColor={selectedLineColor} xStart={xs} yStart={[0, 0]} xEnd={xs} yEnd={ys} />
+
+   <LineSeries lineColor={selectedLineColor} lineWidth={2} xValues={xi} yValues={yi} />
+   <AreaSeries fillColor={selectedLineColor} lineColor="transprent" lineWidth={2} xValues={xi} yValues={yi} opacity={0.35}/>
+   <TextLabels faceColor={selectedLineColor} xValues={[mean(xs)]} yValues={[0]} labels={[p.toFixed(3)]} pos={3} />
 </Axes>

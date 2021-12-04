@@ -3,6 +3,7 @@
 
    // shared components
    import {default as StatApp} from '../../shared/StatApp.svelte';
+   import {colors} from "../../shared/graasta";
 
    // shared components - controls
    import AppControlArea from '../../shared/controls/AppControlArea.svelte';
@@ -15,10 +16,13 @@
    import CDFPlot from './CDFPlot.svelte';
    import ICDFPlot from './ICDFPlot.svelte';
 
-
+   // constant parameters
    const size = 1301;
    const limX = [100, 230];
    const varName = "Height, cm";
+   const lineColor = colors.plots.POPULATIONS[0];
+   const selectedLineColor = colors.plots.SAMPLES[0];
+
    let mode = "Value";
 
    let distrs = {
@@ -83,6 +87,7 @@
    $: x = seq(limX[0], limX[1], size);
    $: d = distr.pdf(x, distr.params[0], distr.params[1]);
    $: p = distr.cdf(x, distr.params[0], distr.params[1]);
+
    $: changeValues(x, x1, x2, mode);
    $: changeProbabilities(p, p1, p2, mode);
 </script>
@@ -90,7 +95,7 @@
 <StatApp>
    <div class="app-layout">
       <div class="app-layout-column pdf-area">
-         <PDFPlot x={x} y={d} {varName} {intInd} p={p[intInd[1]] - p[intInd[0]]} limX={limX} limY={distr.limY} />
+         <PDFPlot x={x} y={d} {varName} {intInd} p={p[intInd[1]] - p[intInd[0]]} {lineColor} {selectedLineColor} limX={limX} limY={distr.limY} />
          <div class="app-control-area">
             <AppControlArea>
                <AppControlSwitch
@@ -117,7 +122,7 @@
          </div>
       </div>
       <div class="app-layout-column cdf-area">
-         <CDFPlot x={x} y={p} {varName} {mode} {intInd} limX={limX} limY={[-0.05, 1.05]} />
+         <CDFPlot x={x} y={p} {varName} {mode} {intInd} limX={limX} {lineColor} {selectedLineColor} limY={[-0.05, 1.1]} />
          <div class="app-control-area">
             <AppControlArea>
                {#if mode === "Interval"}
@@ -136,7 +141,7 @@
          </div>
       </div>
       <div class="app-layout-column icdf-area">
-         <ICDFPlot x={x} y={p} {varName} {mode} {intInd} limX={limX} limY={[-0.05, 1.05]} />
+         <ICDFPlot x={x} y={p} {varName} {mode} {intInd} limX={limX} {lineColor} {selectedLineColor} limY={[-0.05, 1.05]} />
          <div class="app-control-area">
             <AppControlArea>
                {#if mode === "Interval"}
