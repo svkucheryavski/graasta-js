@@ -27,6 +27,7 @@
    let sampSize = 10;
    let sampSizeOld = sampSize;
    let popPropOld = popProp;
+   let sample = [];
    let reset = false;
 
    // this is needed to force CI plot stats when two consequent samples are the same
@@ -40,12 +41,9 @@
    // generate groups of population randomly
    $: groups = shuffle(rep(1, Math.round(popProp * popSize)).concat(rep(2, Math.round((1 - popProp) * popSize))));
 
-   // take a sample if population proportion has changed
-   $: sample = popProp ? subset(shuffle(popIndex), seq(1, sampSize, sampSize)) : NULL;
-
    // when sample size has changed - reset statistics
    $: {
-      if (sampSizeOld !== sample.length || popPropOld !== popProp) {
+      if (sample && (sampSizeOld !== sampSize || popPropOld !== popProp)) {
          reset = true;
          sampSizeOld = sampSize;
          popPropOld = popProp;
@@ -60,7 +58,9 @@
 
    // standard error for CI
    $: sampSD = Math.sqrt((1 - sampProp) * sampProp / sampSize);
-   $: console.log(sampProp)
+
+   // tale first sample
+   takeNewSample();
 </script>
 
 <StatApp>
