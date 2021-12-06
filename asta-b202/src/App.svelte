@@ -1,5 +1,5 @@
 <script>
-   import {seq, subset, rep, sum, shuffle, rnorm} from 'stat-js';
+   import {seq, subset, rep, sum, shuffle} from 'stat-js';
 
    // shared components
    import {default as StatApp} from '../../shared/StatApp.svelte';
@@ -21,6 +21,7 @@
    const popIndex = seq(1, popSize, popSize);
    const sampleColors = colors.plots.SAMPLES;
    const populationColors = colors.plots.POPULATIONS;
+   const xLabel = "Expected population proportion";
 
    // variable parameters
    let popProp = 0.50;
@@ -78,7 +79,7 @@
 
       <!-- confidence intervals and statistic table -->
       <div class="app-ci-plot-area">
-         <CIPlot {clicked} ciCenter={sampProp} ciSD={sampSD} ciStat={popProp} reset={reset} xLabel="Expected population proportion"/>
+         <CIPlot {clicked} ciCenter={sampProp} ciSD={sampSD} ciStat={popProp} {reset} {xLabel} />
       </div>
 
       <!-- control elements -->
