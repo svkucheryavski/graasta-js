@@ -1,42 +1,77 @@
 <script>
-   import {mrange} from 'stat-js';
-   import {Axes, XAxis, TextLegend, Segments} from 'svelte-plots-basic';
+   import {max} from 'stat-js';
+   import {Axes, XAxis, LineSeries, AreaSeries, TextLegend, Segments} from 'svelte-plots-basic';
+   import { formatLabels } from '../../shared/graasta';
 
-   export let limX = null;
-   export let limY = [-1, 1];
 
-   export let effectExpected;
-   export let effectObserved;
+   export let x;
+   export let f;
+
    export let ci;
+   export let cix;
+   export let cif;
+   export let ciStat;
 
-   export let expectedEffectColor = "#000000";
-   export let ciColor = "#606060";
+   export let limX = [-0.02, 1.02]; // default value is suitable for proportions CIs
 
-   export let se = null;
-   export let showLegend = true;
-   export let xLabel = "";
+   export let lineColor = "#000000";
+   export let mainColor = "#6f6666";
+
+   export let errmsg = "";
+   export let labelStr = "# samples inside CI";
+   export let xLabel = "Expected sample statistic";
+   export let reset = false;
+   export let clicked;
+
+   let nSamples = 0;
+   let nSamplesInside = 0;
+
+   $: {
+
+      // this is needed to force CI plot stats when two consequent samples are the same
+      clicked;
+
+      // when sample size or population properties changed - reset statistics
+      if (reset) {
+         nSamples = 0;
+         nSamplesInside = 0;
+      }
+
+      nSamples = nSamples + 1;
+      nSamplesInside = nSamplesInside + (ciStat >= ci[0] && ciStat <= ci[1] ? 1 : 0);
+   }
+
+   // text values for stat table
+   $: labelsStr = formatLabels([
+      {name: "95% CI", value: `[${ci[0].toFixed(2)}, ${ci[1].toFixed(2)}]`},
+      {name: labelStr, value: `${nSamplesInside}/${nSamples} (${(nSamplesInside/nSamples * 100).toFixed(1)}%)`}
+   ])
+
 </script>
 
 <!-- plot with population based CI and position of current sample proportion -->
-<Axes limX={limX === null ? mrange([ci[0], ci[1], effectExpected], 0.1) : limX} {limY} {xLabel}>
+{#if errmsg === ""  }
+   <Axes {limX} limY={[-0.01, max(f) * 1.50]} {xLabel} >
+      <!-- legend -->
+      <TextLegend textSize={1.15} x={90} y={max(f) * 1.40} pos={2} dx="1.25em" elements = {labelsStr} />
 
-   <!-- statistics -->
-   {#if showLegend}
-   <TextLegend textSize={1.05} x={0} y={0.85} pos={2} dx="2em" dy="1.35em" elements = {[
-         "observed effect: " + effectObserved.toFixed(2),
-         se !== null ? "standard error: " + se.toFixed(2) : ""
-   ]} />
-   {/if}
+      <!-- PDF and intervaæ  -->
+      <AreaSeries xValues={cix} yValues={cif} lineColor={mainColor + "40"} fillColor={mainColor + "40"}/>
+      <LineSeries xValues={x} yValues={f} lineColor={mainColor + "40"} />
 
-   {#if effectExpected !== null}
-   <Segments xStart={[effectExpected]} xEnd={[effectExpected]} yStart={[-1]} yEnd={[1]} lineType={3} lineColor={expectedEffectColor} />
-   {/if}
+      <!-- vertical line with statistic-->
+      <Segments xStart={[ciStat]} xEnd={[ciStat]} yStart={[0]} yEnd={[max(f)]} lineColor={lineColor} />
+      <XAxis slot="xaxis" ></XAxis>
+   </Axes>
+{:else}
+   <div class="error">{errmsg}</div>
+{/if}
 
-   <Segments xStart={[ci[0]]} xEnd={[ci[1]]} yStart={[0]} yEnd={[0]} lineColor={ciColor} />
-   <Segments xStart={ci} xEnd={ci} yStart={[-0.1, -0.1]} yEnd={[0.1, 0.1]} lineColor={ciColor}/>
-   <Segments xStart={[effectObserved]} xEnd={[effectObserved]} yStart={[-0.1]} yEnd={[0.1]} lineColor={ciColor} />
-
-   <slot></slot>
-   <XAxis slot="xaxis" ></XAxis>
-</Axes>
-
+<style>
+   .error{
+      padding: 2em;
+      text-align: center;
+      line-height: 1.25em;
+      color: #aa3311;
+   }
+</style>
