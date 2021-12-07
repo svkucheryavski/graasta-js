@@ -35,6 +35,6 @@
    <Segments xStart={[popMean]} xEnd={[popMean]} yStart={[0]} yEnd={[max(popY)]} lineColor={popColor} lineType={2} />
 
    <!-- sample statistics -->
-   <TextLegend textSize={1.15} x={90} y={max(popY) * 0.40} pos={2} dx="1.25em" elements = {labelsStr} />
+   <TextLegend textSize={1.15} x={90} y={max(popY) * 0.40} pos={2} dx="1.25em" elements={labelsStr} />
 </Axes>
 
