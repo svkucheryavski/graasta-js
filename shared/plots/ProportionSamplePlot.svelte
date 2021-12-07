@@ -13,7 +13,10 @@
    // indices and groups of sample individuals
    $: sampIndex = seq(1, sample.length, sample.length);
    $: sampGroups = subset(groups, sample);
-   $: labelText = formatLabels({name: "Sample proportion", value: sum(sampGroups.map(v => v == 1)) / sample.length});
+   $: labelText = formatLabels({
+      name: "Sample proportion",
+      value: (sum(sampGroups.map(v => v == 1)) / sample.length).toFixed(3)
+   });
 
    // indices of points for each group
    $: samp1Index = sampIndex.filter(v => sampGroups[v - 1] == 1);
