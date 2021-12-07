@@ -1,9 +1,10 @@
 <script>
-   import {mrange, max} from 'stat-js';
-   import {TextLegend} from 'svelte-plots-basic';
+   import {mrange, max} from "stat-js";
+   import {TextLegend} from "svelte-plots-basic";
 
    // graasta shared components
    import DistributionPlot from '../../shared/plots/DistributionPlot.svelte';
+   import { formatLabels } from "../../shared/graasta.js";
 
    export let x;
    export let f;
@@ -12,6 +13,7 @@
    export let pValue;
    export let alpha;
    export let xLabel;
+   export let clicked;
 
    export let showLegend = true;
    export let H0LegendStr = "";
@@ -30,10 +32,12 @@
    $: areaColor = lineColor + "40";
    $: statColor = lineColor + "90";
 
-   $: limYLocal = limY === null ? [0, max(f) * (showLegend ? 1.5 : 1.2)] : limY;
+   $: limYLocal = limY === null ? [0, max(f) * (showLegend ? 1.45 : 1.2)] : limY;
 
    // cumulative statistics
    $: {
+
+      clicked;
 
       // reset statistics if sample size, population proportion or a test tail has been changed
       if (reset) {
@@ -46,18 +50,24 @@
       nSamplesBelowAlpha = nSamplesBelowAlpha + (pValue < alpha);
    }
 
-   $: percentBelowAlphaStr = `# samples with p < ${alpha} = ${nSamplesBelowAlpha}/${nSamples}
-      (${(100 * nSamplesBelowAlpha/nSamples).toFixed(1)}%)`;
+   // text values for stat table
+   $: labelsStr = formatLabels([
+      {
+         name: H0LegendStr + ", p",
+         value: pValue.toFixed(3)
+      },
+      {
+         name: `# samples with p < ${alpha}`,
+         value:  `${nSamplesBelowAlpha}/${nSamples} (${(100 * nSamplesBelowAlpha/nSamples).toFixed(1)}%)`
+      }
+   ]);
 </script>
 
 <!-- plot with population based CI and position of current sample proportion -->
 <DistributionPlot {x} {f} {xLabel} {crit} {tail} {lineColor} {areaColor} {statColor} {limX} limY={limYLocal} >
    <slot name="legend">
    {#if showLegend}
-      <TextLegend textSize={1.05} x={0} y={max(f) * 1.3} pos={2} dx="2em" dy="1.35em" elements = {[
-            H0LegendStr + ", p: " + pValue.toFixed(3),
-            percentBelowAlphaStr,
-      ]} />
+      <TextLegend textSize={1.15} x={0} y={max(f) * 1.35} pos={2} dx="1.5em" dy="1.35em" elements={labelsStr} />
    {/if}
    </slot>
 </DistributionPlot>
