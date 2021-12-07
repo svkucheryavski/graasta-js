@@ -1,12 +1,10 @@
 <script>
    import { seq, sum, min } from "stat-js";
-   import {Axes, TextLabels } from "svelte-plots-basic"
-   import SampleSeries from "./SampleSeries.svelte";
+   import OutcomesColumn from "./OutcomesColumn.svelte";
 
    export let sample;
    export let tail;
    export let value;
-   export let colors;
 
    // sample size, number of heads and tails
    $: n = sample.length;
@@ -47,30 +45,9 @@
       value = [N1, N2, N3];
    }
 
-   $: limY = n == 4 ? [-1.5, N + 1] : [-4.5, N + 0.5]
-   $: mYPos = n == 4 ? [-1] : [-2];
-   $: mSize = n == 4 ? 2 : 1;
 </script>
 
 
-   <Axes limX={[0, n + 1]} limY={limY}>
-      {#each outcomes2 as outcome, i}
-      <SampleSeries sample={outcome} yPos={i} markerSize={mSize} />
-      {/each}
-      <TextLabels textSize={1.3} xValues={[n/2 + 0.5]} yValues={mYPos} faceColor={colors[0]} labels={"more extreme: " + N2} />
-   </Axes>
-
-   <Axes limX={[0, n + 1]} limY={limY}>
-      {#each outcomes1 as outcome, i}
-      <SampleSeries sample={outcome} yPos={i} markerSize={mSize} />
-      {/each}
-      <TextLabels textSize={1.3} xValues={[n/2 + 0.5]} yValues={mYPos} faceColor={colors[1]} labels={"equally extreme: " + N1} />
-   </Axes>
-
-   <Axes limX={[0, n + 1]} limY={limY}>
-      {#each outcomes3 as outcome, i}
-      <SampleSeries sample={outcome} yPos={i} markerSize={mSize} />
-      {/each}
-      <TextLabels textSize={1.3} xValues={[n/2 + 0.5]} yValues={mYPos} faceColor={colors[2]} labels={"less extreme: " + N3} />
-   </Axes>
-
+<OutcomesColumn outcomes={outcomes2} sampSize={n} name="more extreme" />
+<OutcomesColumn outcomes={outcomes1} sampSize={n} name="equally extreme" />
+<OutcomesColumn outcomes={outcomes3} sampSize={n} name="less extreme" />

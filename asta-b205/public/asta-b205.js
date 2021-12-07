@@ -761,8 +761,8 @@ var app = (function () {
     const get_help_slot_changes = dirty => ({});
     const get_help_slot_context = ctx => ({});
 
-    // (41:3) {:else}
-    function create_else_block$2(ctx) {
+    // (40:3) {#if showHelp}
+    function create_if_block$7(ctx) {
     	let div;
     	let current;
     	const help_slot_template = /*#slots*/ ctx[5].help;
@@ -772,8 +772,8 @@ var app = (function () {
     		c: function create() {
     			div = element("div");
     			if (help_slot) help_slot.c();
-    			attr_dev(div, "class", "helptext svelte-d5wxow");
-    			add_location(div, file$a, 41, 3, 905);
+    			attr_dev(div, "class", "helptext svelte-coelov");
+    			add_location(div, file$a, 40, 3, 893);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -808,95 +808,37 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_else_block$2.name,
-    		type: "else",
-    		source: "(41:3) {:else}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (36:3) {#if !showHelp}
-    function create_if_block$7(ctx) {
-    	let div;
-    	let current;
-    	const default_slot_template = /*#slots*/ ctx[5].default;
-    	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[4], null);
-
-    	const block = {
-    		c: function create() {
-    			div = element("div");
-    			if (default_slot) default_slot.c();
-    			attr_dev(div, "class", "content svelte-d5wxow");
-    			add_location(div, file$a, 36, 3, 841);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, div, anchor);
-
-    			if (default_slot) {
-    				default_slot.m(div, null);
-    			}
-
-    			current = true;
-    		},
-    		p: function update(ctx, dirty) {
-    			if (default_slot) {
-    				if (default_slot.p && (!current || dirty & /*$$scope*/ 16)) {
-    					update_slot(default_slot, default_slot_template, ctx, /*$$scope*/ ctx[4], dirty, null, null);
-    				}
-    			}
-    		},
-    		i: function intro(local) {
-    			if (current) return;
-    			transition_in(default_slot, local);
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			transition_out(default_slot, local);
-    			current = false;
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(div);
-    			if (default_slot) default_slot.d(detaching);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
     		id: create_if_block$7.name,
     		type: "if",
-    		source: "(36:3) {#if !showHelp}",
+    		source: "(40:3) {#if showHelp}",
     		ctx
     	});
 
     	return block;
     }
 
-    function create_fragment$d(ctx) {
+    function create_fragment$e(ctx) {
     	let main;
-    	let current_block_type_index;
-    	let if_block;
+    	let div;
+    	let t;
     	let main_class_value;
     	let current;
     	let mounted;
     	let dispose;
-    	const if_block_creators = [create_if_block$7, create_else_block$2];
-    	const if_blocks = [];
-
-    	function select_block_type(ctx, dirty) {
-    		if (!/*showHelp*/ ctx[0]) return 0;
-    		return 1;
-    	}
-
-    	current_block_type_index = select_block_type(ctx);
-    	if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
+    	const default_slot_template = /*#slots*/ ctx[5].default;
+    	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[4], null);
+    	let if_block = /*showHelp*/ ctx[0] && create_if_block$7(ctx);
 
     	const block = {
     		c: function create() {
     			main = element("main");
-    			if_block.c();
-    			attr_dev(main, "class", main_class_value = "mdatools-app mdatools-app_" + /*scale*/ ctx[1] + " svelte-d5wxow");
+    			div = element("div");
+    			if (default_slot) default_slot.c();
+    			t = space();
+    			if (if_block) if_block.c();
+    			attr_dev(div, "class", "content svelte-coelov");
+    			add_location(div, file$a, 35, 3, 822);
+    			attr_dev(main, "class", main_class_value = "mdatools-app mdatools-app_" + /*scale*/ ctx[1] + " svelte-coelov");
     			add_location(main, file$a, 33, 0, 744);
     		},
     		l: function claim(nodes) {
@@ -904,7 +846,14 @@ var app = (function () {
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, main, anchor);
-    			if_blocks[current_block_type_index].m(main, null);
+    			append_dev(main, div);
+
+    			if (default_slot) {
+    				default_slot.m(div, null);
+    			}
+
+    			append_dev(main, t);
+    			if (if_block) if_block.m(main, null);
     			/*main_binding*/ ctx[6](main);
     			current = true;
 
@@ -914,48 +863,54 @@ var app = (function () {
     			}
     		},
     		p: function update(ctx, [dirty]) {
-    			let previous_block_index = current_block_type_index;
-    			current_block_type_index = select_block_type(ctx);
+    			if (default_slot) {
+    				if (default_slot.p && (!current || dirty & /*$$scope*/ 16)) {
+    					update_slot(default_slot, default_slot_template, ctx, /*$$scope*/ ctx[4], dirty, null, null);
+    				}
+    			}
 
-    			if (current_block_type_index === previous_block_index) {
-    				if_blocks[current_block_type_index].p(ctx, dirty);
-    			} else {
+    			if (/*showHelp*/ ctx[0]) {
+    				if (if_block) {
+    					if_block.p(ctx, dirty);
+
+    					if (dirty & /*showHelp*/ 1) {
+    						transition_in(if_block, 1);
+    					}
+    				} else {
+    					if_block = create_if_block$7(ctx);
+    					if_block.c();
+    					transition_in(if_block, 1);
+    					if_block.m(main, null);
+    				}
+    			} else if (if_block) {
     				group_outros();
 
-    				transition_out(if_blocks[previous_block_index], 1, 1, () => {
-    					if_blocks[previous_block_index] = null;
+    				transition_out(if_block, 1, 1, () => {
+    					if_block = null;
     				});
 
     				check_outros();
-    				if_block = if_blocks[current_block_type_index];
-
-    				if (!if_block) {
-    					if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
-    					if_block.c();
-    				} else {
-    					if_block.p(ctx, dirty);
-    				}
-
-    				transition_in(if_block, 1);
-    				if_block.m(main, null);
     			}
 
-    			if (!current || dirty & /*scale*/ 2 && main_class_value !== (main_class_value = "mdatools-app mdatools-app_" + /*scale*/ ctx[1] + " svelte-d5wxow")) {
+    			if (!current || dirty & /*scale*/ 2 && main_class_value !== (main_class_value = "mdatools-app mdatools-app_" + /*scale*/ ctx[1] + " svelte-coelov")) {
     				attr_dev(main, "class", main_class_value);
     			}
     		},
     		i: function intro(local) {
     			if (current) return;
+    			transition_in(default_slot, local);
     			transition_in(if_block);
     			current = true;
     		},
     		o: function outro(local) {
+    			transition_out(default_slot, local);
     			transition_out(if_block);
     			current = false;
     		},
     		d: function destroy(detaching) {
     			if (detaching) detach_dev(main);
-    			if_blocks[current_block_type_index].d();
+    			if (default_slot) default_slot.d(detaching);
+    			if (if_block) if_block.d();
     			/*main_binding*/ ctx[6](null);
     			mounted = false;
     			dispose();
@@ -964,7 +919,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$d.name,
+    		id: create_fragment$e.name,
     		type: "component",
     		source: "",
     		ctx
@@ -973,7 +928,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$d($$self, $$props, $$invalidate) {
+    function instance$e($$self, $$props, $$invalidate) {
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots("StatApp", slots, ['default','help']);
     	let showHelp = false;
@@ -1048,13 +1003,13 @@ var app = (function () {
     class StatApp extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$d, create_fragment$d, safe_not_equal, {});
+    		init(this, options, instance$e, create_fragment$e, safe_not_equal, {});
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "StatApp",
     			options,
-    			id: create_fragment$d.name
+    			id: create_fragment$e.name
     		});
     	}
     }
@@ -1098,7 +1053,7 @@ var app = (function () {
     	return block;
     }
 
-    function create_fragment$c(ctx) {
+    function create_fragment$d(ctx) {
     	let fieldset;
     	let t;
     	let current;
@@ -1167,7 +1122,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$c.name,
+    		id: create_fragment$d.name,
     		type: "component",
     		source: "",
     		ctx
@@ -1176,7 +1131,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$c($$self, $$props, $$invalidate) {
+    function instance$d($$self, $$props, $$invalidate) {
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots("AppControlArea", slots, ['default']);
     	let { errormsg = undefined } = $$props;
@@ -1207,13 +1162,13 @@ var app = (function () {
     class AppControlArea extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$c, create_fragment$c, safe_not_equal, { errormsg: 0 });
+    		init(this, options, instance$d, create_fragment$d, safe_not_equal, { errormsg: 0 });
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "AppControlArea",
     			options,
-    			id: create_fragment$c.name
+    			id: create_fragment$d.name
     		});
     	}
 
@@ -1230,7 +1185,7 @@ var app = (function () {
 
     const file$8 = "../shared/controls/AppControl.svelte";
 
-    function create_fragment$b(ctx) {
+    function create_fragment$c(ctx) {
     	let div;
     	let label_1;
     	let t;
@@ -1294,7 +1249,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$b.name,
+    		id: create_fragment$c.name,
     		type: "component",
     		source: "",
     		ctx
@@ -1303,7 +1258,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$b($$self, $$props, $$invalidate) {
+    function instance$c($$self, $$props, $$invalidate) {
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots("AppControl", slots, ['default']);
     	let { id } = $$props;
@@ -1337,13 +1292,13 @@ var app = (function () {
     class AppControl extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$b, create_fragment$b, safe_not_equal, { id: 0, label: 1 });
+    		init(this, options, instance$c, create_fragment$c, safe_not_equal, { id: 0, label: 1 });
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "AppControl",
     			options,
-    			id: create_fragment$b.name
+    			id: create_fragment$c.name
     		});
 
     		const { ctx } = this.$$;
@@ -1422,7 +1377,7 @@ var app = (function () {
     	return block;
     }
 
-    function create_fragment$a(ctx) {
+    function create_fragment$b(ctx) {
     	let appcontrol;
     	let current;
 
@@ -1474,7 +1429,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$a.name,
+    		id: create_fragment$b.name,
     		type: "component",
     		source: "",
     		ctx
@@ -1483,7 +1438,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$a($$self, $$props, $$invalidate) {
+    function instance$b($$self, $$props, $$invalidate) {
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots("AppControlButton", slots, []);
     	let { id } = $$props;
@@ -1523,13 +1478,13 @@ var app = (function () {
     class AppControlButton extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$a, create_fragment$a, safe_not_equal, { id: 0, label: 1, text: 2 });
+    		init(this, options, instance$b, create_fragment$b, safe_not_equal, { id: 0, label: 1, text: 2 });
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "AppControlButton",
     			options,
-    			id: create_fragment$a.name
+    			id: create_fragment$b.name
     		});
 
     		const { ctx } = this.$$;
@@ -1743,7 +1698,7 @@ var app = (function () {
     	return block;
     }
 
-    function create_fragment$9(ctx) {
+    function create_fragment$a(ctx) {
     	let appcontrol;
     	let current;
 
@@ -1795,7 +1750,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$9.name,
+    		id: create_fragment$a.name,
     		type: "component",
     		source: "",
     		ctx
@@ -1804,7 +1759,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$9($$self, $$props, $$invalidate) {
+    function instance$a($$self, $$props, $$invalidate) {
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots("AppControlSwitch", slots, []);
     	let { id } = $$props;
@@ -1857,13 +1812,13 @@ var app = (function () {
     class AppControlSwitch extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$9, create_fragment$9, safe_not_equal, { id: 1, label: 2, options: 3, value: 0 });
+    		init(this, options, instance$a, create_fragment$a, safe_not_equal, { id: 1, label: 2, options: 3, value: 0 });
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "AppControlSwitch",
     			options,
-    			id: create_fragment$9.name
+    			id: create_fragment$a.name
     		});
 
     		const { ctx } = this.$$;
@@ -1919,7 +1874,7 @@ var app = (function () {
 
     const file$5 = "../shared/tables/DataTableValues.svelte";
 
-    function get_each_context_1$2(ctx, list, i) {
+    function get_each_context_1$1(ctx, list, i) {
     	const child_ctx = ctx.slice();
     	child_ctx[2] = list[i];
     	return child_ctx;
@@ -1939,7 +1894,7 @@ var app = (function () {
     	let each_blocks = [];
 
     	for (let i = 0; i < each_value_1.length; i += 1) {
-    		each_blocks[i] = create_each_block_1$2(get_each_context_1$2(ctx, each_value_1, i));
+    		each_blocks[i] = create_each_block_1$1(get_each_context_1$1(ctx, each_value_1, i));
     	}
 
     	const block = {
@@ -1964,12 +1919,12 @@ var app = (function () {
     				let i;
 
     				for (i = 0; i < each_value_1.length; i += 1) {
-    					const child_ctx = get_each_context_1$2(ctx, each_value_1, i);
+    					const child_ctx = get_each_context_1$1(ctx, each_value_1, i);
 
     					if (each_blocks[i]) {
     						each_blocks[i].p(child_ctx, dirty);
     					} else {
-    						each_blocks[i] = create_each_block_1$2(child_ctx);
+    						each_blocks[i] = create_each_block_1$1(child_ctx);
     						each_blocks[i].c();
     						each_blocks[i].m(each_1_anchor.parentNode, each_1_anchor);
     					}
@@ -2068,7 +2023,7 @@ var app = (function () {
     }
 
     // (11:3) {#each values as value}
-    function create_each_block_1$2(ctx) {
+    function create_each_block_1$1(ctx) {
     	let td;
     	let raw_value = /*value*/ ctx[2] + "";
 
@@ -2091,7 +2046,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_each_block_1$2.name,
+    		id: create_each_block_1$1.name,
     		type: "each",
     		source: "(11:3) {#each values as value}",
     		ctx
@@ -2136,7 +2091,7 @@ var app = (function () {
     	return block;
     }
 
-    function create_fragment$8(ctx) {
+    function create_fragment$9(ctx) {
     	let if_block_anchor;
 
     	function select_block_type(ctx, dirty) {
@@ -2182,7 +2137,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$8.name,
+    		id: create_fragment$9.name,
     		type: "component",
     		source: "",
     		ctx
@@ -2191,7 +2146,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$8($$self, $$props, $$invalidate) {
+    function instance$9($$self, $$props, $$invalidate) {
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots("DataTableValues", slots, []);
     	let { values } = $$props;
@@ -2224,13 +2179,13 @@ var app = (function () {
     class DataTableValues extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$8, create_fragment$8, safe_not_equal, { values: 0, decNum: 1 });
+    		init(this, options, instance$9, create_fragment$9, safe_not_equal, { values: 0, decNum: 1 });
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "DataTableValues",
     			options,
-    			id: create_fragment$8.name
+    			id: create_fragment$9.name
     		});
 
     		const { ctx } = this.$$;
@@ -2265,14 +2220,14 @@ var app = (function () {
     /* ../shared/tables/DataTable.svelte generated by Svelte v3.38.2 */
     const file$4 = "../shared/tables/DataTable.svelte";
 
-    function get_each_context_1$1(ctx, list, i) {
+    function get_each_context_1(ctx, list, i) {
     	const child_ctx = ctx.slice();
     	child_ctx[8] = list[i];
     	child_ctx[10] = i;
     	return child_ctx;
     }
 
-    function get_each_context_2$1(ctx, list, i) {
+    function get_each_context_2(ctx, list, i) {
     	const child_ctx = ctx.slice();
     	child_ctx[4] = list[i].label;
     	child_ctx[5] = list[i].values;
@@ -2314,7 +2269,7 @@ var app = (function () {
     	let each_blocks = [];
 
     	for (let i = 0; i < each_value_1.length; i += 1) {
-    		each_blocks[i] = create_each_block_1$1(get_each_context_1$1(ctx, each_value_1, i));
+    		each_blocks[i] = create_each_block_1(get_each_context_1(ctx, each_value_1, i));
     	}
 
     	const out = i => transition_out(each_blocks[i], 1, 1, () => {
@@ -2386,13 +2341,13 @@ var app = (function () {
     				let i;
 
     				for (i = 0; i < each_value_1.length; i += 1) {
-    					const child_ctx = get_each_context_1$1(ctx, each_value_1, i);
+    					const child_ctx = get_each_context_1(ctx, each_value_1, i);
 
     					if (each_blocks[i]) {
     						each_blocks[i].p(child_ctx, dirty);
     						transition_in(each_blocks[i], 1);
     					} else {
-    						each_blocks[i] = create_each_block_1$1(child_ctx);
+    						each_blocks[i] = create_each_block_1(child_ctx);
     						each_blocks[i].c();
     						transition_in(each_blocks[i], 1);
     						each_blocks[i].m(each1_anchor.parentNode, each1_anchor);
@@ -2579,7 +2534,7 @@ var app = (function () {
     }
 
     // (33:6) {#each variables as {label, values}
-    function create_each_block_2$1(ctx) {
+    function create_each_block_2(ctx) {
     	let datatablevalues;
     	let current;
 
@@ -2621,7 +2576,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_each_block_2$1.name,
+    		id: create_each_block_2.name,
     		type: "each",
     		source: "(33:6) {#each variables as {label, values}",
     		ctx
@@ -2631,7 +2586,7 @@ var app = (function () {
     }
 
     // (31:3) {#each variables[0].values as value, j}
-    function create_each_block_1$1(ctx) {
+    function create_each_block_1(ctx) {
     	let tr;
     	let t;
     	let current;
@@ -2640,7 +2595,7 @@ var app = (function () {
     	let each_blocks = [];
 
     	for (let i = 0; i < each_value_2.length; i += 1) {
-    		each_blocks[i] = create_each_block_2$1(get_each_context_2$1(ctx, each_value_2, i));
+    		each_blocks[i] = create_each_block_2(get_each_context_2(ctx, each_value_2, i));
     	}
 
     	const out = i => transition_out(each_blocks[i], 1, 1, () => {
@@ -2676,13 +2631,13 @@ var app = (function () {
     				let i;
 
     				for (i = 0; i < each_value_2.length; i += 1) {
-    					const child_ctx = get_each_context_2$1(ctx, each_value_2, i);
+    					const child_ctx = get_each_context_2(ctx, each_value_2, i);
 
     					if (each_blocks[i]) {
     						each_blocks[i].p(child_ctx, dirty);
     						transition_in(each_blocks[i], 1);
     					} else {
-    						each_blocks[i] = create_each_block_2$1(child_ctx);
+    						each_blocks[i] = create_each_block_2(child_ctx);
     						each_blocks[i].c();
     						transition_in(each_blocks[i], 1);
     						each_blocks[i].m(tr, t);
@@ -2724,7 +2679,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_each_block_1$1.name,
+    		id: create_each_block_1.name,
     		type: "each",
     		source: "(31:3) {#each variables[0].values as value, j}",
     		ctx
@@ -2807,7 +2762,7 @@ var app = (function () {
     	return block;
     }
 
-    function create_fragment$7(ctx) {
+    function create_fragment$8(ctx) {
     	let table;
     	let current_block_type_index;
     	let if_block;
@@ -2882,7 +2837,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$7.name,
+    		id: create_fragment$8.name,
     		type: "component",
     		source: "",
     		ctx
@@ -2891,7 +2846,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$7($$self, $$props, $$invalidate) {
+    function instance$8($$self, $$props, $$invalidate) {
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots("DataTable", slots, []);
     	let { variables = [] } = $$props;
@@ -2949,13 +2904,13 @@ var app = (function () {
     class DataTable extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$7, create_fragment$7, safe_not_equal, { variables: 0, horizontal: 1, decNum: 2 });
+    		init(this, options, instance$8, create_fragment$8, safe_not_equal, { variables: 0, horizontal: 1, decNum: 2 });
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "DataTable",
     			options,
-    			id: create_fragment$7.name
+    			id: create_fragment$8.name
     		});
     	}
 
@@ -3188,7 +3143,7 @@ var app = (function () {
     	return block;
     }
 
-    function create_fragment$6(ctx) {
+    function create_fragment$7(ctx) {
     	let div1;
     	let t0;
     	let t1;
@@ -3429,7 +3384,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$6.name,
+    		id: create_fragment$7.name,
     		type: "component",
     		source: "",
     		ctx
@@ -3463,7 +3418,7 @@ var app = (function () {
     	return "large";
     }
 
-    function instance$6($$self, $$props, $$invalidate) {
+    function instance$7($$self, $$props, $$invalidate) {
     	let margins;
     	let cpx;
     	let cpy;
@@ -3861,8 +3816,8 @@ var app = (function () {
     		init(
     			this,
     			options,
-    			instance$6,
-    			create_fragment$6,
+    			instance$7,
+    			create_fragment$7,
     			safe_not_equal,
     			{
     				limX: 15,
@@ -3879,7 +3834,7 @@ var app = (function () {
     			component: this,
     			tagName: "Axes",
     			options,
-    			id: create_fragment$6.name
+    			id: create_fragment$7.name
     		});
     	}
 
@@ -4090,7 +4045,7 @@ var app = (function () {
     	return block;
     }
 
-    function create_fragment$5(ctx) {
+    function create_fragment$6(ctx) {
     	let if_block_anchor;
     	let if_block = /*x*/ ctx[2] !== undefined && /*y*/ ctx[3] !== undefined && create_if_block$2(ctx);
 
@@ -4130,7 +4085,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$5.name,
+    		id: create_fragment$6.name,
     		type: "component",
     		source: "",
     		ctx
@@ -4139,7 +4094,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$5($$self, $$props, $$invalidate) {
+    function instance$6($$self, $$props, $$invalidate) {
     	let x;
     	let y;
     	let dx;
@@ -4337,7 +4292,7 @@ var app = (function () {
     	constructor(options) {
     		super(options);
 
-    		init(this, options, instance$5, create_fragment$5, safe_not_equal, {
+    		init(this, options, instance$6, create_fragment$6, safe_not_equal, {
     			xValues: 13,
     			yValues: 14,
     			labels: 0,
@@ -4352,7 +4307,7 @@ var app = (function () {
     			component: this,
     			tagName: "TextLabels",
     			options,
-    			id: create_fragment$5.name
+    			id: create_fragment$6.name
     		});
 
     		const { ctx } = this.$$;
@@ -4439,7 +4394,7 @@ var app = (function () {
     /* ../../svelte-plots-basic/src/ScatterSeries.svelte generated by Svelte v3.38.2 */
     const file$1 = "../../svelte-plots-basic/src/ScatterSeries.svelte";
 
-    function create_fragment$4(ctx) {
+    function create_fragment$5(ctx) {
     	let g;
     	let textlabels;
     	let current;
@@ -4505,7 +4460,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$4.name,
+    		id: create_fragment$5.name,
     		type: "component",
     		source: "",
     		ctx
@@ -4514,7 +4469,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$4($$self, $$props, $$invalidate) {
+    function instance$5($$self, $$props, $$invalidate) {
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots("ScatterSeries", slots, []);
     	let { xValues } = $$props;
@@ -4651,7 +4606,7 @@ var app = (function () {
     	constructor(options) {
     		super(options);
 
-    		init(this, options, instance$4, create_fragment$4, safe_not_equal, {
+    		init(this, options, instance$5, create_fragment$5, safe_not_equal, {
     			xValues: 0,
     			yValues: 1,
     			marker: 8,
@@ -4666,7 +4621,7 @@ var app = (function () {
     			component: this,
     			tagName: "ScatterSeries",
     			options,
-    			id: create_fragment$4.name
+    			id: create_fragment$5.name
     		});
 
     		const { ctx } = this.$$;
@@ -4746,9 +4701,36 @@ var app = (function () {
     	}
     }
 
+    let colors = {
+       plots: {
+          // population colors
+          POPULATIONS_PALE: ["#33668820", "#ff990020"],
+          POPULATIONS: ["#33668850", "#ff990050"],
+          SAMPLES: ["#336688", "#ff9900"],
+
+          // statistics on plot legend
+          STAT_NAME: "#808080",
+          STAT_VALUE: "#202020"
+       }
+    };
+
+
+    function formatLabels(labels) {
+
+       if (!Array.isArray(labels)) labels = [labels];
+       let labelsStr = Array(length = labels.length);
+
+
+       for (let i = 0; i < labels.length; i++) {
+          labelsStr[i] =    "<tspan fill=" + colors.plots.STAT_NAME + ">" + labels[i].name + ":</tspan> " + labels[i].value;
+       }
+
+       return labelsStr;
+    }
+
     /* src/SampleSeries.svelte generated by Svelte v3.38.2 */
 
-    // (28:0) {#if nT > 0}
+    // (32:0) {#if nT > 0}
     function create_if_block_1(ctx) {
     	let scatterseries;
     	let current;
@@ -4758,8 +4740,9 @@ var app = (function () {
     				xValues: /*xT*/ ctx[4],
     				yValues: /*yT*/ ctx[5],
     				markerSize: /*markerSize*/ ctx[0],
-    				faceColor: /*bgColor*/ ctx[2],
-    				borderColor: /*lineColor*/ ctx[1]
+    				borderWidth,
+    				faceColor: /*bgColors*/ ctx[2][0],
+    				borderColor: /*lineColors*/ ctx[1][0]
     			},
     			$$inline: true
     		});
@@ -4777,8 +4760,8 @@ var app = (function () {
     			if (dirty & /*xT*/ 16) scatterseries_changes.xValues = /*xT*/ ctx[4];
     			if (dirty & /*yT*/ 32) scatterseries_changes.yValues = /*yT*/ ctx[5];
     			if (dirty & /*markerSize*/ 1) scatterseries_changes.markerSize = /*markerSize*/ ctx[0];
-    			if (dirty & /*bgColor*/ 4) scatterseries_changes.faceColor = /*bgColor*/ ctx[2];
-    			if (dirty & /*lineColor*/ 2) scatterseries_changes.borderColor = /*lineColor*/ ctx[1];
+    			if (dirty & /*bgColors*/ 4) scatterseries_changes.faceColor = /*bgColors*/ ctx[2][0];
+    			if (dirty & /*lineColors*/ 2) scatterseries_changes.borderColor = /*lineColors*/ ctx[1][0];
     			scatterseries.$set(scatterseries_changes);
     		},
     		i: function intro(local) {
@@ -4799,14 +4782,14 @@ var app = (function () {
     		block,
     		id: create_if_block_1.name,
     		type: "if",
-    		source: "(28:0) {#if nT > 0}",
+    		source: "(32:0) {#if nT > 0}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (32:0) {#if nH > 0}
+    // (36:0) {#if nH > 0}
     function create_if_block$1(ctx) {
     	let scatterseries;
     	let current;
@@ -4816,8 +4799,9 @@ var app = (function () {
     				xValues: /*xH*/ ctx[7],
     				yValues: /*yH*/ ctx[8],
     				markerSize: /*markerSize*/ ctx[0],
-    				faceColor: /*lineColor*/ ctx[1],
-    				borderColor: /*lineColor*/ ctx[1]
+    				borderWidth,
+    				faceColor: /*bgColors*/ ctx[2][1],
+    				borderColor: /*lineColors*/ ctx[1][1]
     			},
     			$$inline: true
     		});
@@ -4835,8 +4819,8 @@ var app = (function () {
     			if (dirty & /*xH*/ 128) scatterseries_changes.xValues = /*xH*/ ctx[7];
     			if (dirty & /*yH*/ 256) scatterseries_changes.yValues = /*yH*/ ctx[8];
     			if (dirty & /*markerSize*/ 1) scatterseries_changes.markerSize = /*markerSize*/ ctx[0];
-    			if (dirty & /*lineColor*/ 2) scatterseries_changes.faceColor = /*lineColor*/ ctx[1];
-    			if (dirty & /*lineColor*/ 2) scatterseries_changes.borderColor = /*lineColor*/ ctx[1];
+    			if (dirty & /*bgColors*/ 4) scatterseries_changes.faceColor = /*bgColors*/ ctx[2][1];
+    			if (dirty & /*lineColors*/ 2) scatterseries_changes.borderColor = /*lineColors*/ ctx[1][1];
     			scatterseries.$set(scatterseries_changes);
     		},
     		i: function intro(local) {
@@ -4857,14 +4841,14 @@ var app = (function () {
     		block,
     		id: create_if_block$1.name,
     		type: "if",
-    		source: "(32:0) {#if nH > 0}",
+    		source: "(36:0) {#if nH > 0}",
     		ctx
     	});
 
     	return block;
     }
 
-    function create_fragment$3(ctx) {
+    function create_fragment$4(ctx) {
     	let t;
     	let if_block1_anchor;
     	let current;
@@ -4956,7 +4940,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$3.name,
+    		id: create_fragment$4.name,
     		type: "component",
     		source: "",
     		ctx
@@ -4965,7 +4949,9 @@ var app = (function () {
     	return block;
     }
 
-    function instance$3($$self, $$props, $$invalidate) {
+    const borderWidth = 1.5;
+
+    function instance$4($$self, $$props, $$invalidate) {
     	let n;
     	let x;
     	let y;
@@ -4980,9 +4966,9 @@ var app = (function () {
     	let { yPos = 0 } = $$props;
     	let { sample = [] } = $$props;
     	let { markerSize = 5 } = $$props;
-    	let { lineColor = "#606060" } = $$props;
-    	let { bgColor = "#f0f0f0" } = $$props;
-    	const writable_props = ["yPos", "sample", "markerSize", "lineColor", "bgColor"];
+    	let { lineColors = colors.plots.SAMPLES } = $$props;
+    	let { bgColors = colors.plots.POPULATIONS } = $$props;
+    	const writable_props = ["yPos", "sample", "markerSize", "lineColors", "bgColors"];
 
     	Object.keys($$props).forEach(key => {
     		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== "$$") console.warn(`<SampleSeries> was created with unknown prop '${key}'`);
@@ -4992,8 +4978,8 @@ var app = (function () {
     		if ("yPos" in $$props) $$invalidate(9, yPos = $$props.yPos);
     		if ("sample" in $$props) $$invalidate(10, sample = $$props.sample);
     		if ("markerSize" in $$props) $$invalidate(0, markerSize = $$props.markerSize);
-    		if ("lineColor" in $$props) $$invalidate(1, lineColor = $$props.lineColor);
-    		if ("bgColor" in $$props) $$invalidate(2, bgColor = $$props.bgColor);
+    		if ("lineColors" in $$props) $$invalidate(1, lineColors = $$props.lineColors);
+    		if ("bgColors" in $$props) $$invalidate(2, bgColors = $$props.bgColors);
     	};
 
     	$$self.$capture_state = () => ({
@@ -5001,11 +4987,13 @@ var app = (function () {
     		rep,
     		sum,
     		ScatterSeries,
+    		colors,
     		yPos,
     		sample,
     		markerSize,
-    		lineColor,
-    		bgColor,
+    		lineColors,
+    		bgColors,
+    		borderWidth,
     		n,
     		x,
     		y,
@@ -5021,8 +5009,8 @@ var app = (function () {
     		if ("yPos" in $$props) $$invalidate(9, yPos = $$props.yPos);
     		if ("sample" in $$props) $$invalidate(10, sample = $$props.sample);
     		if ("markerSize" in $$props) $$invalidate(0, markerSize = $$props.markerSize);
-    		if ("lineColor" in $$props) $$invalidate(1, lineColor = $$props.lineColor);
-    		if ("bgColor" in $$props) $$invalidate(2, bgColor = $$props.bgColor);
+    		if ("lineColors" in $$props) $$invalidate(1, lineColors = $$props.lineColors);
+    		if ("bgColors" in $$props) $$invalidate(2, bgColors = $$props.bgColors);
     		if ("n" in $$props) $$invalidate(11, n = $$props.n);
     		if ("x" in $$props) $$invalidate(12, x = $$props.x);
     		if ("y" in $$props) $$invalidate(13, y = $$props.y);
@@ -5079,26 +5067,41 @@ var app = (function () {
     		}
     	};
 
-    	return [markerSize, lineColor, bgColor, nT, xT, yT, nH, xH, yH, yPos, sample, n, x, y];
+    	return [
+    		markerSize,
+    		lineColors,
+    		bgColors,
+    		nT,
+    		xT,
+    		yT,
+    		nH,
+    		xH,
+    		yH,
+    		yPos,
+    		sample,
+    		n,
+    		x,
+    		y
+    	];
     }
 
     class SampleSeries extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
 
-    		init(this, options, instance$3, create_fragment$3, safe_not_equal, {
+    		init(this, options, instance$4, create_fragment$4, safe_not_equal, {
     			yPos: 9,
     			sample: 10,
     			markerSize: 0,
-    			lineColor: 1,
-    			bgColor: 2
+    			lineColors: 1,
+    			bgColors: 2
     		});
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "SampleSeries",
     			options,
-    			id: create_fragment$3.name
+    			id: create_fragment$4.name
     		});
     	}
 
@@ -5126,402 +5129,42 @@ var app = (function () {
     		throw new Error("<SampleSeries>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
 
-    	get lineColor() {
+    	get lineColors() {
     		throw new Error("<SampleSeries>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
 
-    	set lineColor(value) {
+    	set lineColors(value) {
     		throw new Error("<SampleSeries>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
 
-    	get bgColor() {
+    	get bgColors() {
     		throw new Error("<SampleSeries>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
 
-    	set bgColor(value) {
+    	set bgColors(value) {
     		throw new Error("<SampleSeries>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
     }
 
-    /* src/OutcomesPlot.svelte generated by Svelte v3.38.2 */
+    /* src/OutcomesColumn.svelte generated by Svelte v3.38.2 */
 
     function get_each_context(ctx, list, i) {
     	const child_ctx = ctx.slice();
-    	child_ctx[18] = list[i];
-    	child_ctx[20] = i;
+    	child_ctx[7] = list[i];
+    	child_ctx[9] = i;
     	return child_ctx;
     }
 
-    function get_each_context_1(ctx, list, i) {
-    	const child_ctx = ctx.slice();
-    	child_ctx[18] = list[i];
-    	child_ctx[20] = i;
-    	return child_ctx;
-    }
-
-    function get_each_context_2(ctx, list, i) {
-    	const child_ctx = ctx.slice();
-    	child_ctx[18] = list[i];
-    	child_ctx[20] = i;
-    	return child_ctx;
-    }
-
-    // (57:6) {#each outcomes2 as outcome, i}
-    function create_each_block_2(ctx) {
-    	let sampleseries;
-    	let current;
-
-    	sampleseries = new SampleSeries({
-    			props: {
-    				sample: /*outcome*/ ctx[18],
-    				yPos: /*i*/ ctx[20],
-    				markerSize: /*mSize*/ ctx[10]
-    			},
-    			$$inline: true
-    		});
-
-    	const block = {
-    		c: function create() {
-    			create_component(sampleseries.$$.fragment);
-    		},
-    		m: function mount(target, anchor) {
-    			mount_component(sampleseries, target, anchor);
-    			current = true;
-    		},
-    		p: function update(ctx, dirty) {
-    			const sampleseries_changes = {};
-    			if (dirty & /*outcomes2*/ 4) sampleseries_changes.sample = /*outcome*/ ctx[18];
-    			if (dirty & /*mSize*/ 1024) sampleseries_changes.markerSize = /*mSize*/ ctx[10];
-    			sampleseries.$set(sampleseries_changes);
-    		},
-    		i: function intro(local) {
-    			if (current) return;
-    			transition_in(sampleseries.$$.fragment, local);
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			transition_out(sampleseries.$$.fragment, local);
-    			current = false;
-    		},
-    		d: function destroy(detaching) {
-    			destroy_component(sampleseries, detaching);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_each_block_2.name,
-    		type: "each",
-    		source: "(57:6) {#each outcomes2 as outcome, i}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (56:3) <Axes limX={[0, n + 1]} limY={limY}>
-    function create_default_slot_2(ctx) {
-    	let t;
-    	let textlabels;
-    	let current;
-    	let each_value_2 = /*outcomes2*/ ctx[2];
-    	validate_each_argument(each_value_2);
-    	let each_blocks = [];
-
-    	for (let i = 0; i < each_value_2.length; i += 1) {
-    		each_blocks[i] = create_each_block_2(get_each_context_2(ctx, each_value_2, i));
-    	}
-
-    	const out = i => transition_out(each_blocks[i], 1, 1, () => {
-    		each_blocks[i] = null;
-    	});
-
-    	textlabels = new TextLabels({
-    			props: {
-    				textSize: 1.3,
-    				xValues: [/*n*/ ctx[7] / 2 + 0.5],
-    				yValues: /*mYPos*/ ctx[9],
-    				faceColor: /*colors*/ ctx[0][0],
-    				labels: "more extreme: " + /*N2*/ ctx[5]
-    			},
-    			$$inline: true
-    		});
-
-    	const block = {
-    		c: function create() {
-    			for (let i = 0; i < each_blocks.length; i += 1) {
-    				each_blocks[i].c();
-    			}
-
-    			t = space();
-    			create_component(textlabels.$$.fragment);
-    		},
-    		m: function mount(target, anchor) {
-    			for (let i = 0; i < each_blocks.length; i += 1) {
-    				each_blocks[i].m(target, anchor);
-    			}
-
-    			insert_dev(target, t, anchor);
-    			mount_component(textlabels, target, anchor);
-    			current = true;
-    		},
-    		p: function update(ctx, dirty) {
-    			if (dirty & /*outcomes2, mSize*/ 1028) {
-    				each_value_2 = /*outcomes2*/ ctx[2];
-    				validate_each_argument(each_value_2);
-    				let i;
-
-    				for (i = 0; i < each_value_2.length; i += 1) {
-    					const child_ctx = get_each_context_2(ctx, each_value_2, i);
-
-    					if (each_blocks[i]) {
-    						each_blocks[i].p(child_ctx, dirty);
-    						transition_in(each_blocks[i], 1);
-    					} else {
-    						each_blocks[i] = create_each_block_2(child_ctx);
-    						each_blocks[i].c();
-    						transition_in(each_blocks[i], 1);
-    						each_blocks[i].m(t.parentNode, t);
-    					}
-    				}
-
-    				group_outros();
-
-    				for (i = each_value_2.length; i < each_blocks.length; i += 1) {
-    					out(i);
-    				}
-
-    				check_outros();
-    			}
-
-    			const textlabels_changes = {};
-    			if (dirty & /*n*/ 128) textlabels_changes.xValues = [/*n*/ ctx[7] / 2 + 0.5];
-    			if (dirty & /*mYPos*/ 512) textlabels_changes.yValues = /*mYPos*/ ctx[9];
-    			if (dirty & /*colors*/ 1) textlabels_changes.faceColor = /*colors*/ ctx[0][0];
-    			if (dirty & /*N2*/ 32) textlabels_changes.labels = "more extreme: " + /*N2*/ ctx[5];
-    			textlabels.$set(textlabels_changes);
-    		},
-    		i: function intro(local) {
-    			if (current) return;
-
-    			for (let i = 0; i < each_value_2.length; i += 1) {
-    				transition_in(each_blocks[i]);
-    			}
-
-    			transition_in(textlabels.$$.fragment, local);
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			each_blocks = each_blocks.filter(Boolean);
-
-    			for (let i = 0; i < each_blocks.length; i += 1) {
-    				transition_out(each_blocks[i]);
-    			}
-
-    			transition_out(textlabels.$$.fragment, local);
-    			current = false;
-    		},
-    		d: function destroy(detaching) {
-    			destroy_each(each_blocks, detaching);
-    			if (detaching) detach_dev(t);
-    			destroy_component(textlabels, detaching);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_default_slot_2.name,
-    		type: "slot",
-    		source: "(56:3) <Axes limX={[0, n + 1]} limY={limY}>",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (64:6) {#each outcomes1 as outcome, i}
-    function create_each_block_1(ctx) {
-    	let sampleseries;
-    	let current;
-
-    	sampleseries = new SampleSeries({
-    			props: {
-    				sample: /*outcome*/ ctx[18],
-    				yPos: /*i*/ ctx[20],
-    				markerSize: /*mSize*/ ctx[10]
-    			},
-    			$$inline: true
-    		});
-
-    	const block = {
-    		c: function create() {
-    			create_component(sampleseries.$$.fragment);
-    		},
-    		m: function mount(target, anchor) {
-    			mount_component(sampleseries, target, anchor);
-    			current = true;
-    		},
-    		p: function update(ctx, dirty) {
-    			const sampleseries_changes = {};
-    			if (dirty & /*outcomes1*/ 2) sampleseries_changes.sample = /*outcome*/ ctx[18];
-    			if (dirty & /*mSize*/ 1024) sampleseries_changes.markerSize = /*mSize*/ ctx[10];
-    			sampleseries.$set(sampleseries_changes);
-    		},
-    		i: function intro(local) {
-    			if (current) return;
-    			transition_in(sampleseries.$$.fragment, local);
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			transition_out(sampleseries.$$.fragment, local);
-    			current = false;
-    		},
-    		d: function destroy(detaching) {
-    			destroy_component(sampleseries, detaching);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_each_block_1.name,
-    		type: "each",
-    		source: "(64:6) {#each outcomes1 as outcome, i}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (63:3) <Axes limX={[0, n + 1]} limY={limY}>
-    function create_default_slot_1$1(ctx) {
-    	let t;
-    	let textlabels;
-    	let current;
-    	let each_value_1 = /*outcomes1*/ ctx[1];
-    	validate_each_argument(each_value_1);
-    	let each_blocks = [];
-
-    	for (let i = 0; i < each_value_1.length; i += 1) {
-    		each_blocks[i] = create_each_block_1(get_each_context_1(ctx, each_value_1, i));
-    	}
-
-    	const out = i => transition_out(each_blocks[i], 1, 1, () => {
-    		each_blocks[i] = null;
-    	});
-
-    	textlabels = new TextLabels({
-    			props: {
-    				textSize: 1.3,
-    				xValues: [/*n*/ ctx[7] / 2 + 0.5],
-    				yValues: /*mYPos*/ ctx[9],
-    				faceColor: /*colors*/ ctx[0][1],
-    				labels: "equally extreme: " + /*N1*/ ctx[4]
-    			},
-    			$$inline: true
-    		});
-
-    	const block = {
-    		c: function create() {
-    			for (let i = 0; i < each_blocks.length; i += 1) {
-    				each_blocks[i].c();
-    			}
-
-    			t = space();
-    			create_component(textlabels.$$.fragment);
-    		},
-    		m: function mount(target, anchor) {
-    			for (let i = 0; i < each_blocks.length; i += 1) {
-    				each_blocks[i].m(target, anchor);
-    			}
-
-    			insert_dev(target, t, anchor);
-    			mount_component(textlabels, target, anchor);
-    			current = true;
-    		},
-    		p: function update(ctx, dirty) {
-    			if (dirty & /*outcomes1, mSize*/ 1026) {
-    				each_value_1 = /*outcomes1*/ ctx[1];
-    				validate_each_argument(each_value_1);
-    				let i;
-
-    				for (i = 0; i < each_value_1.length; i += 1) {
-    					const child_ctx = get_each_context_1(ctx, each_value_1, i);
-
-    					if (each_blocks[i]) {
-    						each_blocks[i].p(child_ctx, dirty);
-    						transition_in(each_blocks[i], 1);
-    					} else {
-    						each_blocks[i] = create_each_block_1(child_ctx);
-    						each_blocks[i].c();
-    						transition_in(each_blocks[i], 1);
-    						each_blocks[i].m(t.parentNode, t);
-    					}
-    				}
-
-    				group_outros();
-
-    				for (i = each_value_1.length; i < each_blocks.length; i += 1) {
-    					out(i);
-    				}
-
-    				check_outros();
-    			}
-
-    			const textlabels_changes = {};
-    			if (dirty & /*n*/ 128) textlabels_changes.xValues = [/*n*/ ctx[7] / 2 + 0.5];
-    			if (dirty & /*mYPos*/ 512) textlabels_changes.yValues = /*mYPos*/ ctx[9];
-    			if (dirty & /*colors*/ 1) textlabels_changes.faceColor = /*colors*/ ctx[0][1];
-    			if (dirty & /*N1*/ 16) textlabels_changes.labels = "equally extreme: " + /*N1*/ ctx[4];
-    			textlabels.$set(textlabels_changes);
-    		},
-    		i: function intro(local) {
-    			if (current) return;
-
-    			for (let i = 0; i < each_value_1.length; i += 1) {
-    				transition_in(each_blocks[i]);
-    			}
-
-    			transition_in(textlabels.$$.fragment, local);
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			each_blocks = each_blocks.filter(Boolean);
-
-    			for (let i = 0; i < each_blocks.length; i += 1) {
-    				transition_out(each_blocks[i]);
-    			}
-
-    			transition_out(textlabels.$$.fragment, local);
-    			current = false;
-    		},
-    		d: function destroy(detaching) {
-    			destroy_each(each_blocks, detaching);
-    			if (detaching) detach_dev(t);
-    			destroy_component(textlabels, detaching);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_default_slot_1$1.name,
-    		type: "slot",
-    		source: "(63:3) <Axes limX={[0, n + 1]} limY={limY}>",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (71:6) {#each outcomes3 as outcome, i}
+    // (19:3) {#each outcomes as outcome, i}
     function create_each_block(ctx) {
     	let sampleseries;
     	let current;
 
     	sampleseries = new SampleSeries({
     			props: {
-    				sample: /*outcome*/ ctx[18],
-    				yPos: /*i*/ ctx[20],
-    				markerSize: /*mSize*/ ctx[10]
+    				sample: /*outcome*/ ctx[7],
+    				yPos: /*i*/ ctx[9],
+    				markerSize: /*mSize*/ ctx[0]
     			},
     			$$inline: true
     		});
@@ -5536,8 +5179,8 @@ var app = (function () {
     		},
     		p: function update(ctx, dirty) {
     			const sampleseries_changes = {};
-    			if (dirty & /*outcomes3*/ 8) sampleseries_changes.sample = /*outcome*/ ctx[18];
-    			if (dirty & /*mSize*/ 1024) sampleseries_changes.markerSize = /*mSize*/ ctx[10];
+    			if (dirty & /*outcomes*/ 2) sampleseries_changes.sample = /*outcome*/ ctx[7];
+    			if (dirty & /*mSize*/ 1) sampleseries_changes.markerSize = /*mSize*/ ctx[0];
     			sampleseries.$set(sampleseries_changes);
     		},
     		i: function intro(local) {
@@ -5558,19 +5201,19 @@ var app = (function () {
     		block,
     		id: create_each_block.name,
     		type: "each",
-    		source: "(71:6) {#each outcomes3 as outcome, i}",
+    		source: "(19:3) {#each outcomes as outcome, i}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (70:3) <Axes limX={[0, n + 1]} limY={limY}>
+    // (18:0) <Axes limX={[0, sampSize + 1]} limY={limY}>
     function create_default_slot$2(ctx) {
     	let t;
     	let textlabels;
     	let current;
-    	let each_value = /*outcomes3*/ ctx[3];
+    	let each_value = /*outcomes*/ ctx[1];
     	validate_each_argument(each_value);
     	let each_blocks = [];
 
@@ -5584,11 +5227,15 @@ var app = (function () {
 
     	textlabels = new TextLabels({
     			props: {
-    				textSize: 1.3,
-    				xValues: [/*n*/ ctx[7] / 2 + 0.5],
-    				yValues: /*mYPos*/ ctx[9],
-    				faceColor: /*colors*/ ctx[0][2],
-    				labels: "less extreme: " + /*N3*/ ctx[6]
+    				textSize: 1 + (/*mSize*/ ctx[0] + 1) / 10,
+    				xValues: [/*sampSize*/ ctx[3] / 2 + 0.5],
+    				yValues: /*mYPos*/ ctx[6],
+    				labels: formatLabels([
+    					{
+    						name: /*name*/ ctx[2],
+    						value: /*N*/ ctx[4]
+    					}
+    				])
     			},
     			$$inline: true
     		});
@@ -5612,8 +5259,8 @@ var app = (function () {
     			current = true;
     		},
     		p: function update(ctx, dirty) {
-    			if (dirty & /*outcomes3, mSize*/ 1032) {
-    				each_value = /*outcomes3*/ ctx[3];
+    			if (dirty & /*outcomes, mSize*/ 3) {
+    				each_value = /*outcomes*/ ctx[1];
     				validate_each_argument(each_value);
     				let i;
 
@@ -5641,10 +5288,17 @@ var app = (function () {
     			}
 
     			const textlabels_changes = {};
-    			if (dirty & /*n*/ 128) textlabels_changes.xValues = [/*n*/ ctx[7] / 2 + 0.5];
-    			if (dirty & /*mYPos*/ 512) textlabels_changes.yValues = /*mYPos*/ ctx[9];
-    			if (dirty & /*colors*/ 1) textlabels_changes.faceColor = /*colors*/ ctx[0][2];
-    			if (dirty & /*N3*/ 64) textlabels_changes.labels = "less extreme: " + /*N3*/ ctx[6];
+    			if (dirty & /*mSize*/ 1) textlabels_changes.textSize = 1 + (/*mSize*/ ctx[0] + 1) / 10;
+    			if (dirty & /*sampSize*/ 8) textlabels_changes.xValues = [/*sampSize*/ ctx[3] / 2 + 0.5];
+    			if (dirty & /*mYPos*/ 64) textlabels_changes.yValues = /*mYPos*/ ctx[6];
+
+    			if (dirty & /*name, N*/ 20) textlabels_changes.labels = formatLabels([
+    				{
+    					name: /*name*/ ctx[2],
+    					value: /*N*/ ctx[4]
+    				}
+    			]);
+
     			textlabels.$set(textlabels_changes);
     		},
     		i: function intro(local) {
@@ -5678,45 +5332,21 @@ var app = (function () {
     		block,
     		id: create_default_slot$2.name,
     		type: "slot",
-    		source: "(70:3) <Axes limX={[0, n + 1]} limY={limY}>",
+    		source: "(18:0) <Axes limX={[0, sampSize + 1]} limY={limY}>",
     		ctx
     	});
 
     	return block;
     }
 
-    function create_fragment$2(ctx) {
-    	let axes0;
-    	let t0;
-    	let axes1;
-    	let t1;
-    	let axes2;
+    function create_fragment$3(ctx) {
+    	let axes;
     	let current;
 
-    	axes0 = new Axes({
+    	axes = new Axes({
     			props: {
-    				limX: [0, /*n*/ ctx[7] + 1],
-    				limY: /*limY*/ ctx[8],
-    				$$slots: { default: [create_default_slot_2] },
-    				$$scope: { ctx }
-    			},
-    			$$inline: true
-    		});
-
-    	axes1 = new Axes({
-    			props: {
-    				limX: [0, /*n*/ ctx[7] + 1],
-    				limY: /*limY*/ ctx[8],
-    				$$slots: { default: [create_default_slot_1$1] },
-    				$$scope: { ctx }
-    			},
-    			$$inline: true
-    		});
-
-    	axes2 = new Axes({
-    			props: {
-    				limX: [0, /*n*/ ctx[7] + 1],
-    				limY: /*limY*/ ctx[8],
+    				limX: [0, /*sampSize*/ ctx[3] + 1],
+    				limY: /*limY*/ ctx[5],
     				$$slots: { default: [create_default_slot$2] },
     				$$scope: { ctx }
     			},
@@ -5725,71 +5355,281 @@ var app = (function () {
 
     	const block = {
     		c: function create() {
-    			create_component(axes0.$$.fragment);
-    			t0 = space();
-    			create_component(axes1.$$.fragment);
-    			t1 = space();
-    			create_component(axes2.$$.fragment);
+    			create_component(axes.$$.fragment);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
     		},
     		m: function mount(target, anchor) {
-    			mount_component(axes0, target, anchor);
-    			insert_dev(target, t0, anchor);
-    			mount_component(axes1, target, anchor);
-    			insert_dev(target, t1, anchor);
-    			mount_component(axes2, target, anchor);
+    			mount_component(axes, target, anchor);
     			current = true;
     		},
     		p: function update(ctx, [dirty]) {
-    			const axes0_changes = {};
-    			if (dirty & /*n*/ 128) axes0_changes.limX = [0, /*n*/ ctx[7] + 1];
-    			if (dirty & /*limY*/ 256) axes0_changes.limY = /*limY*/ ctx[8];
+    			const axes_changes = {};
+    			if (dirty & /*sampSize*/ 8) axes_changes.limX = [0, /*sampSize*/ ctx[3] + 1];
+    			if (dirty & /*limY*/ 32) axes_changes.limY = /*limY*/ ctx[5];
 
-    			if (dirty & /*$$scope, n, mYPos, colors, N2, outcomes2, mSize*/ 8390309) {
-    				axes0_changes.$$scope = { dirty, ctx };
+    			if (dirty & /*$$scope, mSize, sampSize, mYPos, name, N, outcomes*/ 1119) {
+    				axes_changes.$$scope = { dirty, ctx };
     			}
 
-    			axes0.$set(axes0_changes);
-    			const axes1_changes = {};
-    			if (dirty & /*n*/ 128) axes1_changes.limX = [0, /*n*/ ctx[7] + 1];
-    			if (dirty & /*limY*/ 256) axes1_changes.limY = /*limY*/ ctx[8];
-
-    			if (dirty & /*$$scope, n, mYPos, colors, N1, outcomes1, mSize*/ 8390291) {
-    				axes1_changes.$$scope = { dirty, ctx };
-    			}
-
-    			axes1.$set(axes1_changes);
-    			const axes2_changes = {};
-    			if (dirty & /*n*/ 128) axes2_changes.limX = [0, /*n*/ ctx[7] + 1];
-    			if (dirty & /*limY*/ 256) axes2_changes.limY = /*limY*/ ctx[8];
-
-    			if (dirty & /*$$scope, n, mYPos, colors, N3, outcomes3, mSize*/ 8390345) {
-    				axes2_changes.$$scope = { dirty, ctx };
-    			}
-
-    			axes2.$set(axes2_changes);
+    			axes.$set(axes_changes);
     		},
     		i: function intro(local) {
     			if (current) return;
-    			transition_in(axes0.$$.fragment, local);
-    			transition_in(axes1.$$.fragment, local);
-    			transition_in(axes2.$$.fragment, local);
+    			transition_in(axes.$$.fragment, local);
     			current = true;
     		},
     		o: function outro(local) {
-    			transition_out(axes0.$$.fragment, local);
-    			transition_out(axes1.$$.fragment, local);
-    			transition_out(axes2.$$.fragment, local);
+    			transition_out(axes.$$.fragment, local);
     			current = false;
     		},
     		d: function destroy(detaching) {
-    			destroy_component(axes0, detaching);
+    			destroy_component(axes, detaching);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_fragment$3.name,
+    		type: "component",
+    		source: "",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    function instance$3($$self, $$props, $$invalidate) {
+    	let N;
+    	let limY;
+    	let mYPos;
+    	let { $$slots: slots = {}, $$scope } = $$props;
+    	validate_slots("OutcomesColumn", slots, []);
+    	let { outcomes } = $$props;
+    	let { name = "xxx" } = $$props;
+    	let { sampSize } = $$props;
+    	let { mSize } = $$props;
+    	const writable_props = ["outcomes", "name", "sampSize", "mSize"];
+
+    	Object.keys($$props).forEach(key => {
+    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== "$$") console.warn(`<OutcomesColumn> was created with unknown prop '${key}'`);
+    	});
+
+    	$$self.$$set = $$props => {
+    		if ("outcomes" in $$props) $$invalidate(1, outcomes = $$props.outcomes);
+    		if ("name" in $$props) $$invalidate(2, name = $$props.name);
+    		if ("sampSize" in $$props) $$invalidate(3, sampSize = $$props.sampSize);
+    		if ("mSize" in $$props) $$invalidate(0, mSize = $$props.mSize);
+    	};
+
+    	$$self.$capture_state = () => ({
+    		Axes,
+    		TextLabels,
+    		formatLabels,
+    		SampleSeries,
+    		outcomes,
+    		name,
+    		sampSize,
+    		mSize,
+    		N,
+    		limY,
+    		mYPos
+    	});
+
+    	$$self.$inject_state = $$props => {
+    		if ("outcomes" in $$props) $$invalidate(1, outcomes = $$props.outcomes);
+    		if ("name" in $$props) $$invalidate(2, name = $$props.name);
+    		if ("sampSize" in $$props) $$invalidate(3, sampSize = $$props.sampSize);
+    		if ("mSize" in $$props) $$invalidate(0, mSize = $$props.mSize);
+    		if ("N" in $$props) $$invalidate(4, N = $$props.N);
+    		if ("limY" in $$props) $$invalidate(5, limY = $$props.limY);
+    		if ("mYPos" in $$props) $$invalidate(6, mYPos = $$props.mYPos);
+    	};
+
+    	if ($$props && "$$inject" in $$props) {
+    		$$self.$inject_state($$props.$$inject);
+    	}
+
+    	$$self.$$.update = () => {
+    		if ($$self.$$.dirty & /*outcomes*/ 2) {
+    			$$invalidate(4, N = outcomes.length);
+    		}
+
+    		if ($$self.$$.dirty & /*sampSize*/ 8) {
+    			$$invalidate(5, limY = sampSize == 4
+    			? [-1.5, 2 ** sampSize + 1]
+    			: [-4.5, 2 ** sampSize + 0.5]);
+    		}
+
+    		if ($$self.$$.dirty & /*sampSize*/ 8) {
+    			$$invalidate(6, mYPos = sampSize == 4 ? [-1] : [-2]);
+    		}
+
+    		if ($$self.$$.dirty & /*sampSize*/ 8) {
+    			$$invalidate(0, mSize = sampSize == 4 ? 2 : 1);
+    		}
+    	};
+
+    	return [mSize, outcomes, name, sampSize, N, limY, mYPos];
+    }
+
+    class OutcomesColumn extends SvelteComponentDev {
+    	constructor(options) {
+    		super(options);
+
+    		init(this, options, instance$3, create_fragment$3, safe_not_equal, {
+    			outcomes: 1,
+    			name: 2,
+    			sampSize: 3,
+    			mSize: 0
+    		});
+
+    		dispatch_dev("SvelteRegisterComponent", {
+    			component: this,
+    			tagName: "OutcomesColumn",
+    			options,
+    			id: create_fragment$3.name
+    		});
+
+    		const { ctx } = this.$$;
+    		const props = options.props || {};
+
+    		if (/*outcomes*/ ctx[1] === undefined && !("outcomes" in props)) {
+    			console.warn("<OutcomesColumn> was created without expected prop 'outcomes'");
+    		}
+
+    		if (/*sampSize*/ ctx[3] === undefined && !("sampSize" in props)) {
+    			console.warn("<OutcomesColumn> was created without expected prop 'sampSize'");
+    		}
+
+    		if (/*mSize*/ ctx[0] === undefined && !("mSize" in props)) {
+    			console.warn("<OutcomesColumn> was created without expected prop 'mSize'");
+    		}
+    	}
+
+    	get outcomes() {
+    		throw new Error("<OutcomesColumn>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set outcomes(value) {
+    		throw new Error("<OutcomesColumn>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get name() {
+    		throw new Error("<OutcomesColumn>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set name(value) {
+    		throw new Error("<OutcomesColumn>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get sampSize() {
+    		throw new Error("<OutcomesColumn>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set sampSize(value) {
+    		throw new Error("<OutcomesColumn>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get mSize() {
+    		throw new Error("<OutcomesColumn>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set mSize(value) {
+    		throw new Error("<OutcomesColumn>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+    }
+
+    /* src/OutcomesPlot.svelte generated by Svelte v3.38.2 */
+
+    function create_fragment$2(ctx) {
+    	let outcomescolumn0;
+    	let t0;
+    	let outcomescolumn1;
+    	let t1;
+    	let outcomescolumn2;
+    	let current;
+
+    	outcomescolumn0 = new OutcomesColumn({
+    			props: {
+    				outcomes: /*outcomes2*/ ctx[1],
+    				sampSize: /*n*/ ctx[3],
+    				name: "more extreme"
+    			},
+    			$$inline: true
+    		});
+
+    	outcomescolumn1 = new OutcomesColumn({
+    			props: {
+    				outcomes: /*outcomes1*/ ctx[0],
+    				sampSize: /*n*/ ctx[3],
+    				name: "equally extreme"
+    			},
+    			$$inline: true
+    		});
+
+    	outcomescolumn2 = new OutcomesColumn({
+    			props: {
+    				outcomes: /*outcomes3*/ ctx[2],
+    				sampSize: /*n*/ ctx[3],
+    				name: "less extreme"
+    			},
+    			$$inline: true
+    		});
+
+    	const block = {
+    		c: function create() {
+    			create_component(outcomescolumn0.$$.fragment);
+    			t0 = space();
+    			create_component(outcomescolumn1.$$.fragment);
+    			t1 = space();
+    			create_component(outcomescolumn2.$$.fragment);
+    		},
+    		l: function claim(nodes) {
+    			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
+    		},
+    		m: function mount(target, anchor) {
+    			mount_component(outcomescolumn0, target, anchor);
+    			insert_dev(target, t0, anchor);
+    			mount_component(outcomescolumn1, target, anchor);
+    			insert_dev(target, t1, anchor);
+    			mount_component(outcomescolumn2, target, anchor);
+    			current = true;
+    		},
+    		p: function update(ctx, [dirty]) {
+    			const outcomescolumn0_changes = {};
+    			if (dirty & /*outcomes2*/ 2) outcomescolumn0_changes.outcomes = /*outcomes2*/ ctx[1];
+    			if (dirty & /*n*/ 8) outcomescolumn0_changes.sampSize = /*n*/ ctx[3];
+    			outcomescolumn0.$set(outcomescolumn0_changes);
+    			const outcomescolumn1_changes = {};
+    			if (dirty & /*outcomes1*/ 1) outcomescolumn1_changes.outcomes = /*outcomes1*/ ctx[0];
+    			if (dirty & /*n*/ 8) outcomescolumn1_changes.sampSize = /*n*/ ctx[3];
+    			outcomescolumn1.$set(outcomescolumn1_changes);
+    			const outcomescolumn2_changes = {};
+    			if (dirty & /*outcomes3*/ 4) outcomescolumn2_changes.outcomes = /*outcomes3*/ ctx[2];
+    			if (dirty & /*n*/ 8) outcomescolumn2_changes.sampSize = /*n*/ ctx[3];
+    			outcomescolumn2.$set(outcomescolumn2_changes);
+    		},
+    		i: function intro(local) {
+    			if (current) return;
+    			transition_in(outcomescolumn0.$$.fragment, local);
+    			transition_in(outcomescolumn1.$$.fragment, local);
+    			transition_in(outcomescolumn2.$$.fragment, local);
+    			current = true;
+    		},
+    		o: function outro(local) {
+    			transition_out(outcomescolumn0.$$.fragment, local);
+    			transition_out(outcomescolumn1.$$.fragment, local);
+    			transition_out(outcomescolumn2.$$.fragment, local);
+    			current = false;
+    		},
+    		d: function destroy(detaching) {
+    			destroy_component(outcomescolumn0, detaching);
     			if (detaching) detach_dev(t0);
-    			destroy_component(axes1, detaching);
+    			destroy_component(outcomescolumn1, detaching);
     			if (detaching) detach_dev(t1);
-    			destroy_component(axes2, detaching);
+    			destroy_component(outcomescolumn2, detaching);
     		}
     	};
 
@@ -5809,15 +5649,11 @@ var app = (function () {
     	let nH;
     	let nT;
     	let N;
-    	let limY;
-    	let mYPos;
-    	let mSize;
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots("OutcomesPlot", slots, []);
     	let { sample } = $$props;
     	let { tail } = $$props;
     	let { value } = $$props;
-    	let { colors } = $$props;
 
     	// create all possible outcomes for given sample size
     	let outcomes = [];
@@ -5829,30 +5665,26 @@ var app = (function () {
     	let outcomes1 = [], outcomes2 = [], outcomes3 = [];
 
     	let N1 = 0, N2 = 0, N3 = 0;
-    	const writable_props = ["sample", "tail", "value", "colors"];
+    	const writable_props = ["sample", "tail", "value"];
 
     	Object.keys($$props).forEach(key => {
     		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== "$$") console.warn(`<OutcomesPlot> was created with unknown prop '${key}'`);
     	});
 
     	$$self.$$set = $$props => {
-    		if ("sample" in $$props) $$invalidate(12, sample = $$props.sample);
-    		if ("tail" in $$props) $$invalidate(13, tail = $$props.tail);
-    		if ("value" in $$props) $$invalidate(11, value = $$props.value);
-    		if ("colors" in $$props) $$invalidate(0, colors = $$props.colors);
+    		if ("sample" in $$props) $$invalidate(5, sample = $$props.sample);
+    		if ("tail" in $$props) $$invalidate(6, tail = $$props.tail);
+    		if ("value" in $$props) $$invalidate(4, value = $$props.value);
     	};
 
     	$$self.$capture_state = () => ({
     		seq,
     		sum,
     		min,
-    		Axes,
-    		TextLabels,
-    		SampleSeries,
+    		OutcomesColumn,
     		sample,
     		tail,
     		value,
-    		colors,
     		outcomes,
     		outcomes1,
     		outcomes2,
@@ -5863,31 +5695,24 @@ var app = (function () {
     		n,
     		nH,
     		nT,
-    		N,
-    		limY,
-    		mYPos,
-    		mSize
+    		N
     	});
 
     	$$self.$inject_state = $$props => {
-    		if ("sample" in $$props) $$invalidate(12, sample = $$props.sample);
-    		if ("tail" in $$props) $$invalidate(13, tail = $$props.tail);
-    		if ("value" in $$props) $$invalidate(11, value = $$props.value);
-    		if ("colors" in $$props) $$invalidate(0, colors = $$props.colors);
-    		if ("outcomes" in $$props) $$invalidate(14, outcomes = $$props.outcomes);
-    		if ("outcomes1" in $$props) $$invalidate(1, outcomes1 = $$props.outcomes1);
-    		if ("outcomes2" in $$props) $$invalidate(2, outcomes2 = $$props.outcomes2);
-    		if ("outcomes3" in $$props) $$invalidate(3, outcomes3 = $$props.outcomes3);
-    		if ("N1" in $$props) $$invalidate(4, N1 = $$props.N1);
-    		if ("N2" in $$props) $$invalidate(5, N2 = $$props.N2);
-    		if ("N3" in $$props) $$invalidate(6, N3 = $$props.N3);
-    		if ("n" in $$props) $$invalidate(7, n = $$props.n);
-    		if ("nH" in $$props) $$invalidate(15, nH = $$props.nH);
-    		if ("nT" in $$props) $$invalidate(16, nT = $$props.nT);
-    		if ("N" in $$props) $$invalidate(17, N = $$props.N);
-    		if ("limY" in $$props) $$invalidate(8, limY = $$props.limY);
-    		if ("mYPos" in $$props) $$invalidate(9, mYPos = $$props.mYPos);
-    		if ("mSize" in $$props) $$invalidate(10, mSize = $$props.mSize);
+    		if ("sample" in $$props) $$invalidate(5, sample = $$props.sample);
+    		if ("tail" in $$props) $$invalidate(6, tail = $$props.tail);
+    		if ("value" in $$props) $$invalidate(4, value = $$props.value);
+    		if ("outcomes" in $$props) $$invalidate(7, outcomes = $$props.outcomes);
+    		if ("outcomes1" in $$props) $$invalidate(0, outcomes1 = $$props.outcomes1);
+    		if ("outcomes2" in $$props) $$invalidate(1, outcomes2 = $$props.outcomes2);
+    		if ("outcomes3" in $$props) $$invalidate(2, outcomes3 = $$props.outcomes3);
+    		if ("N1" in $$props) $$invalidate(8, N1 = $$props.N1);
+    		if ("N2" in $$props) $$invalidate(9, N2 = $$props.N2);
+    		if ("N3" in $$props) $$invalidate(10, N3 = $$props.N3);
+    		if ("n" in $$props) $$invalidate(3, n = $$props.n);
+    		if ("nH" in $$props) $$invalidate(11, nH = $$props.nH);
+    		if ("nT" in $$props) $$invalidate(12, nT = $$props.nT);
+    		if ("N" in $$props) N = $$props.N;
     	};
 
     	if ($$props && "$$inject" in $$props) {
@@ -5895,95 +5720,72 @@ var app = (function () {
     	}
 
     	$$self.$$.update = () => {
-    		if ($$self.$$.dirty & /*sample*/ 4096) {
+    		if ($$self.$$.dirty & /*sample*/ 32) {
     			// sample size, number of heads and tails
-    			$$invalidate(7, n = sample.length);
+    			$$invalidate(3, n = sample.length);
     		}
 
-    		if ($$self.$$.dirty & /*sample*/ 4096) {
-    			$$invalidate(15, nH = sum(sample));
+    		if ($$self.$$.dirty & /*sample*/ 32) {
+    			$$invalidate(11, nH = sum(sample));
     		}
 
-    		if ($$self.$$.dirty & /*n, nH*/ 32896) {
-    			$$invalidate(16, nT = n - nH);
+    		if ($$self.$$.dirty & /*n, nH*/ 2056) {
+    			$$invalidate(12, nT = n - nH);
     		}
 
-    		if ($$self.$$.dirty & /*n*/ 128) {
-    			$$invalidate(14, outcomes = seq(0, 2 ** n - 1).map(v => [...(v >>> 0).toString(2).padStart(n, "0")].map(v => v === "1")));
+    		if ($$self.$$.dirty & /*n*/ 8) {
+    			$$invalidate(7, outcomes = seq(0, 2 ** n - 1).map(v => [...(v >>> 0).toString(2).padStart(n, "0")].map(v => v === "1")));
     		}
 
-    		if ($$self.$$.dirty & /*outcomes*/ 16384) {
-    			$$invalidate(17, N = outcomes.length);
+    		if ($$self.$$.dirty & /*outcomes*/ 128) {
+    			N = outcomes.length;
     		}
 
-    		if ($$self.$$.dirty & /*tail, outcomes, nH, nT, outcomes1, outcomes2, outcomes3, N1, N2, N3*/ 123006) {
+    		if ($$self.$$.dirty & /*tail, outcomes, nH, nT, outcomes1, outcomes2, outcomes3, N1, N2, N3*/ 8135) {
     			{
     				if (tail == "left") {
-    					$$invalidate(1, outcomes1 = outcomes.filter(v => sum(v) == nH));
-    					$$invalidate(2, outcomes2 = outcomes.filter(v => sum(v) < nH));
-    					$$invalidate(3, outcomes3 = outcomes.filter(v => sum(v) > nH));
+    					$$invalidate(0, outcomes1 = outcomes.filter(v => sum(v) == nH));
+    					$$invalidate(1, outcomes2 = outcomes.filter(v => sum(v) < nH));
+    					$$invalidate(2, outcomes3 = outcomes.filter(v => sum(v) > nH));
     				} else if (tail == "right") {
-    					$$invalidate(1, outcomes1 = outcomes.filter(v => sum(v) == nH));
-    					$$invalidate(2, outcomes2 = outcomes.filter(v => sum(v) > nH));
-    					$$invalidate(3, outcomes3 = outcomes.filter(v => sum(v) < nH));
+    					$$invalidate(0, outcomes1 = outcomes.filter(v => sum(v) == nH));
+    					$$invalidate(1, outcomes2 = outcomes.filter(v => sum(v) > nH));
+    					$$invalidate(2, outcomes3 = outcomes.filter(v => sum(v) < nH));
     				} else {
-    					$$invalidate(1, outcomes1 = outcomes.filter(v => sum(v) == min([nH, nT]) | nH + nT - sum(v) == min([nH, nT])));
-    					$$invalidate(2, outcomes2 = outcomes.filter(v => sum(v) < min([nH, nT]) | nH + nT - sum(v) < min([nH, nT])));
-    					$$invalidate(3, outcomes3 = outcomes.filter(v => !(sum(v) <= min([nH, nT]) | nH + nT - sum(v) <= min([nH, nT]))));
+    					$$invalidate(0, outcomes1 = outcomes.filter(v => sum(v) == min([nH, nT]) | nH + nT - sum(v) == min([nH, nT])));
+    					$$invalidate(1, outcomes2 = outcomes.filter(v => sum(v) < min([nH, nT]) | nH + nT - sum(v) < min([nH, nT])));
+    					$$invalidate(2, outcomes3 = outcomes.filter(v => !(sum(v) <= min([nH, nT]) | nH + nT - sum(v) <= min([nH, nT]))));
     				}
 
-    				$$invalidate(4, N1 = outcomes1.length);
-    				$$invalidate(5, N2 = outcomes2.length);
-    				$$invalidate(6, N3 = outcomes3.length);
-    				$$invalidate(11, value = [N1, N2, N3]);
+    				$$invalidate(8, N1 = outcomes1.length);
+    				$$invalidate(9, N2 = outcomes2.length);
+    				$$invalidate(10, N3 = outcomes3.length);
+    				$$invalidate(4, value = [N1, N2, N3]);
     			}
-    		}
-
-    		if ($$self.$$.dirty & /*n, N*/ 131200) {
-    			$$invalidate(8, limY = n == 4 ? [-1.5, N + 1] : [-4.5, N + 0.5]);
-    		}
-
-    		if ($$self.$$.dirty & /*n*/ 128) {
-    			$$invalidate(9, mYPos = n == 4 ? [-1] : [-2]);
-    		}
-
-    		if ($$self.$$.dirty & /*n*/ 128) {
-    			$$invalidate(10, mSize = n == 4 ? 2 : 1);
     		}
     	};
 
     	return [
-    		colors,
     		outcomes1,
     		outcomes2,
     		outcomes3,
-    		N1,
-    		N2,
-    		N3,
     		n,
-    		limY,
-    		mYPos,
-    		mSize,
     		value,
     		sample,
     		tail,
     		outcomes,
+    		N1,
+    		N2,
+    		N3,
     		nH,
-    		nT,
-    		N
+    		nT
     	];
     }
 
     class OutcomesPlot extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-
-    		init(this, options, instance$2, create_fragment$2, safe_not_equal, {
-    			sample: 12,
-    			tail: 13,
-    			value: 11,
-    			colors: 0
-    		});
+    		init(this, options, instance$2, create_fragment$2, safe_not_equal, { sample: 5, tail: 6, value: 4 });
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
@@ -5995,20 +5797,16 @@ var app = (function () {
     		const { ctx } = this.$$;
     		const props = options.props || {};
 
-    		if (/*sample*/ ctx[12] === undefined && !("sample" in props)) {
+    		if (/*sample*/ ctx[5] === undefined && !("sample" in props)) {
     			console.warn("<OutcomesPlot> was created without expected prop 'sample'");
     		}
 
-    		if (/*tail*/ ctx[13] === undefined && !("tail" in props)) {
+    		if (/*tail*/ ctx[6] === undefined && !("tail" in props)) {
     			console.warn("<OutcomesPlot> was created without expected prop 'tail'");
     		}
 
-    		if (/*value*/ ctx[11] === undefined && !("value" in props)) {
+    		if (/*value*/ ctx[4] === undefined && !("value" in props)) {
     			console.warn("<OutcomesPlot> was created without expected prop 'value'");
-    		}
-
-    		if (/*colors*/ ctx[0] === undefined && !("colors" in props)) {
-    			console.warn("<OutcomesPlot> was created without expected prop 'colors'");
     		}
     	}
 
@@ -6033,14 +5831,6 @@ var app = (function () {
     	}
 
     	set value(value) {
-    		throw new Error("<OutcomesPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get colors() {
-    		throw new Error("<OutcomesPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set colors(value) {
     		throw new Error("<OutcomesPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
     }
@@ -6277,7 +6067,7 @@ var app = (function () {
     /* src/App.svelte generated by Svelte v3.38.2 */
     const file = "src/App.svelte";
 
-    // (78:9) <AppControlArea>
+    // (73:9) <AppControlArea>
     function create_default_slot_1(ctx) {
     	let appcontrolswitch0;
     	let updating_value;
@@ -6289,7 +6079,7 @@ var app = (function () {
     	let current;
 
     	function appcontrolswitch0_value_binding(value) {
-    		/*appcontrolswitch0_value_binding*/ ctx[10](value);
+    		/*appcontrolswitch0_value_binding*/ ctx[9](value);
     	}
 
     	let appcontrolswitch0_props = {
@@ -6310,7 +6100,7 @@ var app = (function () {
     	binding_callbacks.push(() => bind(appcontrolswitch0, "value", appcontrolswitch0_value_binding));
 
     	function appcontrolswitch1_value_binding(value) {
-    		/*appcontrolswitch1_value_binding*/ ctx[11](value);
+    		/*appcontrolswitch1_value_binding*/ ctx[10](value);
     	}
 
     	let appcontrolswitch1_props = {
@@ -6339,7 +6129,7 @@ var app = (function () {
     			$$inline: true
     		});
 
-    	appcontrolbutton.$on("click", /*click_handler*/ ctx[12]);
+    	appcontrolbutton.$on("click", /*click_handler*/ ctx[11]);
 
     	const block = {
     		c: function create() {
@@ -6403,14 +6193,14 @@ var app = (function () {
     		block,
     		id: create_default_slot_1.name,
     		type: "slot",
-    		source: "(78:9) <AppControlArea>",
+    		source: "(73:9) <AppControlArea>",
     		ctx
     	});
 
     	return block;
     }
 
-    // (50:0) <StatApp>
+    // (45:0) <StatApp>
     function create_default_slot(ctx) {
     	let div4;
     	let div0;
@@ -6428,13 +6218,12 @@ var app = (function () {
     	let current;
 
     	function outcomesplot_value_binding(value) {
-    		/*outcomesplot_value_binding*/ ctx[9](value);
+    		/*outcomesplot_value_binding*/ ctx[8](value);
     	}
 
     	let outcomesplot_props = {
     		sample: /*sample*/ ctx[1],
-    		tail: /*tail*/ ctx[2],
-    		colors: /*colors*/ ctx[7]
+    		tail: /*tail*/ ctx[2]
     	};
 
     	if (/*N*/ ctx[3] !== void 0) {
@@ -6498,15 +6287,15 @@ var app = (function () {
     			div3 = element("div");
     			create_component(appcontrolarea.$$.fragment);
     			attr_dev(div0, "class", "app-outcomes-plot-area svelte-1mxoi52");
-    			add_location(div0, file, 53, 6, 1843);
+    			add_location(div0, file, 48, 6, 1595);
     			attr_dev(div1, "class", "app-sample-plot-area svelte-1mxoi52");
-    			add_location(div1, file, 58, 6, 2007);
+    			add_location(div1, file, 53, 6, 1750);
     			attr_dev(div2, "class", "app-stattable-area svelte-1mxoi52");
-    			add_location(div2, file, 63, 6, 2126);
+    			add_location(div2, file, 58, 6, 1869);
     			attr_dev(div3, "class", "app-controls-area svelte-1mxoi52");
-    			add_location(div3, file, 76, 6, 2529);
+    			add_location(div3, file, 71, 6, 2272);
     			attr_dev(div4, "class", "app-layout svelte-1mxoi52");
-    			add_location(div4, file, 50, 3, 1756);
+    			add_location(div4, file, 45, 3, 1508);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div4, anchor);
@@ -6558,7 +6347,7 @@ var app = (function () {
     			datatable.$set(datatable_changes);
     			const appcontrolarea_changes = {};
 
-    			if (dirty & /*$$scope, sample, sampSize, tail*/ 16391) {
+    			if (dirty & /*$$scope, sample, sampSize, tail*/ 8199) {
     				appcontrolarea_changes.$$scope = { dirty, ctx };
     			}
 
@@ -6592,14 +6381,14 @@ var app = (function () {
     		block,
     		id: create_default_slot.name,
     		type: "slot",
-    		source: "(50:0) <StatApp>",
+    		source: "(45:0) <StatApp>",
     		ctx
     	});
 
     	return block;
     }
 
-    // (87:3) 
+    // (82:3) 
     function create_help_slot(ctx) {
     	let div;
     	let h2;
@@ -6668,21 +6457,21 @@ var app = (function () {
     			em6 = element("em");
     			em6.textContent = "N";
     			t22 = text(" and compute the p-value manually.");
-    			add_location(h2, file, 87, 6, 3005);
-    			add_location(p0, file, 88, 6, 3037);
-    			add_location(em0, file, 91, 9, 3147);
-    			add_location(p1, file, 91, 6, 3144);
-    			add_location(em1, file, 98, 15, 3450);
-    			add_location(em2, file, 99, 15, 3556);
-    			add_location(em3, file, 99, 93, 3634);
-    			add_location(strong, file, 101, 9, 3749);
-    			add_location(p2, file, 96, 6, 3329);
-    			add_location(em4, file, 108, 35, 4264);
-    			add_location(em5, file, 108, 48, 4277);
-    			add_location(em6, file, 108, 64, 4293);
-    			add_location(p3, file, 103, 6, 3800);
+    			add_location(h2, file, 82, 6, 2748);
+    			add_location(p0, file, 83, 6, 2780);
+    			add_location(em0, file, 86, 9, 2890);
+    			add_location(p1, file, 86, 6, 2887);
+    			add_location(em1, file, 93, 15, 3193);
+    			add_location(em2, file, 94, 15, 3299);
+    			add_location(em3, file, 94, 93, 3377);
+    			add_location(strong, file, 96, 9, 3492);
+    			add_location(p2, file, 91, 6, 3072);
+    			add_location(em4, file, 103, 35, 4007);
+    			add_location(em5, file, 103, 48, 4020);
+    			add_location(em6, file, 103, 64, 4036);
+    			add_location(p3, file, 98, 6, 3543);
     			attr_dev(div, "slot", "help");
-    			add_location(div, file, 86, 3, 2981);
+    			add_location(div, file, 81, 3, 2724);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -6722,7 +6511,7 @@ var app = (function () {
     		block,
     		id: create_help_slot.name,
     		type: "slot",
-    		source: "(87:3) ",
+    		source: "(82:3) ",
     		ctx
     	});
 
@@ -6758,7 +6547,7 @@ var app = (function () {
     		p: function update(ctx, [dirty]) {
     			const statapp_changes = {};
 
-    			if (dirty & /*$$scope, sample, sampSize, tail, h0Str, sampPropStr, pValStr, N*/ 16511) {
+    			if (dirty & /*$$scope, sample, sampSize, tail, h0Str, sampPropStr, pValStr, N*/ 8319) {
     				statapp_changes.$$scope = { dirty, ctx };
     			}
 
@@ -6796,7 +6585,6 @@ var app = (function () {
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots("App", slots, []);
     	const signs = { "both": "=", "left": "≥", "right": "≤" };
-    	const colors = ["#ff2400", "#66023c", "#b7420e"];
 
     	// variable parameters
     	let sampSize = 4;
@@ -6847,7 +6635,6 @@ var app = (function () {
     		OutcomesPlot,
     		SamplePlot,
     		signs,
-    		colors,
     		sampSize,
     		sample,
     		tail,
@@ -6880,7 +6667,7 @@ var app = (function () {
 
     		if ($$self.$$.dirty & /*tail*/ 4) {
     			// strings for statistics table
-    			$$invalidate(4, h0Str = `π(o) ${signs[tail]} 0.5`);
+    			$$invalidate(4, h0Str = `π(<span style="color:#336688">o</span>) ${signs[tail]} 0.5`);
     		}
 
     		if ($$self.$$.dirty & /*sample*/ 2) {
@@ -6890,11 +6677,7 @@ var app = (function () {
     		if ($$self.$$.dirty & /*N*/ 8) {
     			$$invalidate(6, pValStr = N.length == 3
     			? `
-      (<span style="color:${colors[0]}">${N[1]}</span> + <span style="color:${colors[1]}">${N[0]}</span>) /
-      (<span style="color:${colors[0]}">${N[1]}</span> +
-         <span style="color:${colors[1]}">${N[0]}</span> +
-         <span style="color:${colors[2]}">${N[2]}</span>)
-      = ${(sum(subset(N, [1, 2])) / sum(N)).toFixed(3)}`
+      (${N[1]} + ${N[0]}) / (${N[1]} + ${N[0]} + ${N[2]}) = ${(sum(subset(N, [1, 2])) / sum(N)).toFixed(3)}`
     			: "");
     		}
     	};
@@ -6907,7 +6690,6 @@ var app = (function () {
     		h0Str,
     		sampPropStr,
     		pValStr,
-    		colors,
     		takeNewSample,
     		outcomesplot_value_binding,
     		appcontrolswitch0_value_binding,

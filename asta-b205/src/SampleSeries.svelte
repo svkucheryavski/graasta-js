@@ -2,11 +2,15 @@
    import {seq, rep, sum} from "stat-js"
    import {ScatterSeries} from "svelte-plots-basic"
 
+   import { colors } from "../../shared/graasta.js";
+
    export let yPos = 0;
    export let sample = [];
    export let markerSize = 5;
-   export let lineColor = "#606060";
-   export let bgColor = "#f0f0f0";
+   export let lineColors = colors.plots.SAMPLES;
+   export let bgColors = colors.plots.POPULATIONS;
+
+   const borderWidth = 1.5;
 
    // sample size and coordinates for its elements
    $: n = sample.length;
@@ -26,10 +30,10 @@
 </script>
 
 {#if nT > 0}
-   <ScatterSeries xValues={xT} yValues={yT} {markerSize} faceColor={bgColor} borderColor={lineColor} />
+   <ScatterSeries xValues={xT} yValues={yT} {markerSize} {borderWidth} faceColor={bgColors[0]} borderColor={lineColors[0]} />
 {/if}
 
 {#if nH > 0}
-   <ScatterSeries xValues={xH} yValues={yH} {markerSize} faceColor={lineColor} borderColor={lineColor} />
+   <ScatterSeries xValues={xH} yValues={yH} {markerSize} {borderWidth} faceColor={bgColors[1]} borderColor={lineColors[1]} />
 {/if}
 
