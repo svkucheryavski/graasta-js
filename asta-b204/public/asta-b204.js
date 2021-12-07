@@ -800,6 +800,80 @@ var app = (function () {
     }
 
     /**
+     * Inverse cumulative distribution function for normal distribution
+     * @param {number|number[]} p - vector of probabilities or a single probability value
+     * @param {number} mu - average value of the population
+     * @param {number} sigma - standard deviation of the population
+     * @returns {number|number[]} vector with quantiles or single quantile value
+     */
+    function qnorm(p, mu = 0, sigma = 1) {
+
+       if (Array.isArray(p)) {
+          return p.map(v => qnorm(v, mu, sigma));
+       }
+
+       if (mu !== 0 || sigma !== 1) {
+          return qnorm(p) * sigma + mu;
+       }
+
+       if (p < 0 || p > 1) {
+          throw Error("Parameter 'p' must be between 0 and 1.");
+       }
+
+       if (p < 0.0000000001) return -Infinity;
+       if (p > 0.9999999999) return +Infinity;
+
+       const SP1 = 0.425;
+       const SP2 = 5.0;
+       const C1 = 0.180625;
+       const C2 = 1.6;
+
+       const a0 = 3.3871327179;
+       const a1 = 5.0434271938 * 10;
+       const a2 = 1.5929113202 * 100;
+       const a3 = 5.9109374720 * 10;
+       const b1 = 1.7895169469 * 10;
+       const b2 = 7.8757757664 * 10;
+       const b3 = 6.7187563600 * 10;
+
+       const c0 = 1.4234372777;
+       const c1 = 2.7568153900;
+       const c2 = 1.3067284816;
+       const c3 = 1.7023821103 * 0.1;
+       const d1 = 7.3700164250 * 0.1;
+       const d2 = 1.2021132975 * 0.1;
+
+       const e0 = 6.6579051150;
+       const e1 = 3.0812263860;
+       const e2 = 4.2868294337 * 0.1;
+       const e3 = 1.7337203997 * 0.01;
+       const f1 = 2.4197894225 * 0.1;
+       const f2 = 1.2258202635 * 0.01;
+
+       const q = p - 0.5;
+       let r;
+
+       if (Math.abs(q) <= SP1) {
+          r = C1 - q * q;
+          return q * (((a3 * r + a2) * r + a1) *r + a0) / (((b3 * r + b2) * r + b1) * r + 1.0);
+       }
+
+       r = q < 0 ? p : 1 - p;
+       r = Math.sqrt(-Math.log(r));
+       let res;
+
+       if (r <= SP2) {
+          r = r - C2;
+          res = (((c3 * r + c2) * r + c1) * r + c0) / ((d2 * r + d1) * r + 1.0);
+       } else {
+          r = r - SP2;
+          res = (((e3 * r + e2) * r + e1) + e0) / ((f2 * r + f1) * r + 1.0);
+       }
+
+       return q < 0 ? -res : res;
+    }
+
+    /**
      * Probability density function for Student's t-distribution
      * @param {number|number[]} t - t-value or a vector of t-values
      * @param {number} dof - degrees of freedom
@@ -817,6 +891,80 @@ var app = (function () {
        const pow = -0.5 * (dof + 1);
        const A = 1 / (Math.sqrt(dof) * beta(0.5, dof/2));
        return (A * Math.pow((1 + t * t / dof), pow));
+    }
+
+
+    /**
+     * Inverse cumulative distribution function for Student's t-distribution
+     * @param {number|number[]} p - probability or vector with probabilities
+     * @param {number} dof - degrees of freedom
+     */
+    function qt(p, dof) {
+
+       if (dof === undefined || dof === null || dof < 1) {
+          throw Error("Parameter 'dof' (degrees of freedom) must be an integer number >= 1.");
+       }
+
+       if (p < 0 || p > 1) {
+          throw Error("Parameter 'p' must be between 0 and 1.");
+       }
+
+       if (Array.isArray(p)) {
+          return p.map(v => qt(v, dof));
+       }
+
+       if (p < 0.0000000001) return -Infinity;
+       if (p > 0.9999999999) return +Infinity;
+
+
+       // simple cases — exact solutions
+       if (dof === 1) {
+          return Math.tan(Math.PI * (p - 0.5));
+       }
+
+       if (dof === 2) {
+          return 2 * (p - 0.5) * Math.sqrt(2 / (4 * p * (1 - p)));
+       }
+
+       // approximation
+
+       let sign = -1;
+       if (p >= 0.5){
+          sign = +1 ;
+          p = 2 * (1 - p);
+       } else {
+          sign = -1;
+          p = 2 * p;
+       }
+
+       const a = 1.0 / (dof - 0.5);
+       const b = 48.0 / (a ** 2);
+       let c = ((20700 * a / b - 98) * a - 16) * a + 96.36;
+       const d = ((94.5 / (b + c) - 3.0)/b + 1.0) * Math.sqrt(a * Math.PI / 2) * dof;
+
+       let x = d * p;
+       let y = x ** (2.0/dof);
+
+       if (y > 0.05 + a) {
+
+          // asymptotic inverse expansion about normal
+          x = qnorm(p * 0.5);
+          y = x ** 2;
+
+          if (dof < 5) {
+             c = c + 0.3 * (dof - 4.5) * (x + 0.6);
+          }
+
+          c = (((0.05 * d * x - 5.0) * x - 7.0) * x - 2.0) * x + b + c;
+          y = (((((0.4 * y + 6.3) * y + 36.0) * y + 94.5) / c - y - 3.0)/b + 1.0) * x;
+          y = a * (y ** 2);
+          y = y > 0.002 ? Math.exp(y) - 1.0 : 0.5 * (y ** 2) + y;
+       } else {
+          y = ((1.0 / (((dof + 6.0)/(dof * y) - 0.089 * d - 0.822) * (dof + 2.0) * 3.0) + 0.5/(dof + 4.0)) * y - 1.0) *
+             (dof + 1.0)/(dof + 2.0) + 1.0/y;
+       }
+
+       return sign * Math.sqrt(dof * y);
     }
 
 
@@ -852,41 +1000,6 @@ var app = (function () {
        }
 
        return x;
-    }
-
-
-    /**
-     * Create a subset of vectors based on a vector of indices
-     * @param {number[]} x - a vector with values
-     * @param {number[]} indices - a vector with element indices (first index is 1 not 0!)
-     */
-    function subset(x, indices) {
-
-       if (!Array.isArray(x)) x = [x];
-       if (!Array.isArray(indices)) indices = [indices];
-
-       if (max(indices) > x.length || min(indices) < 1) {
-          throw new Error("Parameter 'indices' must have values between 1 and 'x.length'.");
-       }
-
-       const n = indices.length;
-       let out = Array(n);
-       for (let i = 0; i < n; i++) {
-          out[i] = x[indices[i] - 1];
-       }
-
-       return out;
-    }
-
-
-    /**
-     * Finds index of value in x which is closest to the value a
-     * @param {number[]} x - a vector with values
-     * @param {number}  a - a value
-     */
-    function closestIndex(x, a) {
-       const c = x.reduce((prev, curr) => Math.abs(curr - a) < Math.abs(prev - a) ? curr : prev);
-       return x.indexOf(c);
     }
 
 
@@ -944,12 +1057,12 @@ var app = (function () {
     }
 
     /* ../shared/StatApp.svelte generated by Svelte v3.38.2 */
-    const file$d = "../shared/StatApp.svelte";
+    const file$e = "../shared/StatApp.svelte";
     const get_help_slot_changes = dirty => ({});
     const get_help_slot_context = ctx => ({});
 
-    // (41:3) {:else}
-    function create_else_block(ctx) {
+    // (40:3) {#if showHelp}
+    function create_if_block$8(ctx) {
     	let div;
     	let current;
     	const help_slot_template = /*#slots*/ ctx[5].help;
@@ -959,8 +1072,8 @@ var app = (function () {
     		c: function create() {
     			div = element("div");
     			if (help_slot) help_slot.c();
-    			attr_dev(div, "class", "helptext svelte-d5wxow");
-    			add_location(div, file$d, 41, 3, 905);
+    			attr_dev(div, "class", "helptext svelte-coelov");
+    			add_location(div, file$e, 40, 3, 893);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -995,103 +1108,52 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_else_block.name,
-    		type: "else",
-    		source: "(41:3) {:else}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (36:3) {#if !showHelp}
-    function create_if_block$7(ctx) {
-    	let div;
-    	let current;
-    	const default_slot_template = /*#slots*/ ctx[5].default;
-    	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[4], null);
-
-    	const block = {
-    		c: function create() {
-    			div = element("div");
-    			if (default_slot) default_slot.c();
-    			attr_dev(div, "class", "content svelte-d5wxow");
-    			add_location(div, file$d, 36, 3, 841);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, div, anchor);
-
-    			if (default_slot) {
-    				default_slot.m(div, null);
-    			}
-
-    			current = true;
-    		},
-    		p: function update(ctx, dirty) {
-    			if (default_slot) {
-    				if (default_slot.p && (!current || dirty & /*$$scope*/ 16)) {
-    					update_slot(default_slot, default_slot_template, ctx, /*$$scope*/ ctx[4], dirty, null, null);
-    				}
-    			}
-    		},
-    		i: function intro(local) {
-    			if (current) return;
-    			transition_in(default_slot, local);
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			transition_out(default_slot, local);
-    			current = false;
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(div);
-    			if (default_slot) default_slot.d(detaching);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_if_block$7.name,
+    		id: create_if_block$8.name,
     		type: "if",
-    		source: "(36:3) {#if !showHelp}",
+    		source: "(40:3) {#if showHelp}",
     		ctx
     	});
 
     	return block;
     }
 
-    function create_fragment$g(ctx) {
+    function create_fragment$h(ctx) {
     	let main;
-    	let current_block_type_index;
-    	let if_block;
+    	let div;
+    	let t;
     	let main_class_value;
     	let current;
     	let mounted;
     	let dispose;
-    	const if_block_creators = [create_if_block$7, create_else_block];
-    	const if_blocks = [];
-
-    	function select_block_type(ctx, dirty) {
-    		if (!/*showHelp*/ ctx[0]) return 0;
-    		return 1;
-    	}
-
-    	current_block_type_index = select_block_type(ctx);
-    	if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
+    	const default_slot_template = /*#slots*/ ctx[5].default;
+    	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[4], null);
+    	let if_block = /*showHelp*/ ctx[0] && create_if_block$8(ctx);
 
     	const block = {
     		c: function create() {
     			main = element("main");
-    			if_block.c();
-    			attr_dev(main, "class", main_class_value = "mdatools-app mdatools-app_" + /*scale*/ ctx[1] + " svelte-d5wxow");
-    			add_location(main, file$d, 33, 0, 744);
+    			div = element("div");
+    			if (default_slot) default_slot.c();
+    			t = space();
+    			if (if_block) if_block.c();
+    			attr_dev(div, "class", "content svelte-coelov");
+    			add_location(div, file$e, 35, 3, 822);
+    			attr_dev(main, "class", main_class_value = "mdatools-app mdatools-app_" + /*scale*/ ctx[1] + " svelte-coelov");
+    			add_location(main, file$e, 33, 0, 744);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, main, anchor);
-    			if_blocks[current_block_type_index].m(main, null);
+    			append_dev(main, div);
+
+    			if (default_slot) {
+    				default_slot.m(div, null);
+    			}
+
+    			append_dev(main, t);
+    			if (if_block) if_block.m(main, null);
     			/*main_binding*/ ctx[6](main);
     			current = true;
 
@@ -1101,48 +1163,54 @@ var app = (function () {
     			}
     		},
     		p: function update(ctx, [dirty]) {
-    			let previous_block_index = current_block_type_index;
-    			current_block_type_index = select_block_type(ctx);
+    			if (default_slot) {
+    				if (default_slot.p && (!current || dirty & /*$$scope*/ 16)) {
+    					update_slot(default_slot, default_slot_template, ctx, /*$$scope*/ ctx[4], dirty, null, null);
+    				}
+    			}
 
-    			if (current_block_type_index === previous_block_index) {
-    				if_blocks[current_block_type_index].p(ctx, dirty);
-    			} else {
+    			if (/*showHelp*/ ctx[0]) {
+    				if (if_block) {
+    					if_block.p(ctx, dirty);
+
+    					if (dirty & /*showHelp*/ 1) {
+    						transition_in(if_block, 1);
+    					}
+    				} else {
+    					if_block = create_if_block$8(ctx);
+    					if_block.c();
+    					transition_in(if_block, 1);
+    					if_block.m(main, null);
+    				}
+    			} else if (if_block) {
     				group_outros();
 
-    				transition_out(if_blocks[previous_block_index], 1, 1, () => {
-    					if_blocks[previous_block_index] = null;
+    				transition_out(if_block, 1, 1, () => {
+    					if_block = null;
     				});
 
     				check_outros();
-    				if_block = if_blocks[current_block_type_index];
-
-    				if (!if_block) {
-    					if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
-    					if_block.c();
-    				} else {
-    					if_block.p(ctx, dirty);
-    				}
-
-    				transition_in(if_block, 1);
-    				if_block.m(main, null);
     			}
 
-    			if (!current || dirty & /*scale*/ 2 && main_class_value !== (main_class_value = "mdatools-app mdatools-app_" + /*scale*/ ctx[1] + " svelte-d5wxow")) {
+    			if (!current || dirty & /*scale*/ 2 && main_class_value !== (main_class_value = "mdatools-app mdatools-app_" + /*scale*/ ctx[1] + " svelte-coelov")) {
     				attr_dev(main, "class", main_class_value);
     			}
     		},
     		i: function intro(local) {
     			if (current) return;
+    			transition_in(default_slot, local);
     			transition_in(if_block);
     			current = true;
     		},
     		o: function outro(local) {
+    			transition_out(default_slot, local);
     			transition_out(if_block);
     			current = false;
     		},
     		d: function destroy(detaching) {
     			if (detaching) detach_dev(main);
-    			if_blocks[current_block_type_index].d();
+    			if (default_slot) default_slot.d(detaching);
+    			if (if_block) if_block.d();
     			/*main_binding*/ ctx[6](null);
     			mounted = false;
     			dispose();
@@ -1151,7 +1219,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$g.name,
+    		id: create_fragment$h.name,
     		type: "component",
     		source: "",
     		ctx
@@ -1160,7 +1228,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$g($$self, $$props, $$invalidate) {
+    function instance$h($$self, $$props, $$invalidate) {
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots("StatApp", slots, ['default','help']);
     	let showHelp = false;
@@ -1235,23 +1303,50 @@ var app = (function () {
     class StatApp extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$g, create_fragment$g, safe_not_equal, {});
+    		init(this, options, instance$h, create_fragment$h, safe_not_equal, {});
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "StatApp",
     			options,
-    			id: create_fragment$g.name
+    			id: create_fragment$h.name
     		});
     	}
     }
 
+    let colors = {
+       plots: {
+          // population colors
+          POPULATIONS_PALE: ["#33668820", "#ff990020"],
+          POPULATIONS: ["#33668850", "#ff990050"],
+          SAMPLES: ["#336688", "#ff9900"],
+
+          // statistics on plot legend
+          STAT_NAME: "#808080",
+          STAT_VALUE: "#202020"
+       }
+    };
+
+
+    function formatLabels(labels) {
+
+       if (!Array.isArray(labels)) labels = [labels];
+       let labelsStr = Array(length = labels.length);
+
+
+       for (let i = 0; i < labels.length; i++) {
+          labelsStr[i] =    "<tspan fill=" + colors.plots.STAT_NAME + ">" + labels[i].name + ":</tspan> " + labels[i].value;
+       }
+
+       return labelsStr;
+    }
+
     /* ../shared/controls/AppControlArea.svelte generated by Svelte v3.38.2 */
 
-    const file$c = "../shared/controls/AppControlArea.svelte";
+    const file$d = "../shared/controls/AppControlArea.svelte";
 
     // (7:3) {#if errormsg}
-    function create_if_block$6(ctx) {
+    function create_if_block$7(ctx) {
     	let div;
     	let t;
 
@@ -1260,7 +1355,7 @@ var app = (function () {
     			div = element("div");
     			t = text(/*errormsg*/ ctx[0]);
     			attr_dev(div, "class", "app-control-error svelte-8w06qs");
-    			add_location(div, file$c, 6, 17, 126);
+    			add_location(div, file$d, 6, 17, 126);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -1276,7 +1371,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block$6.name,
+    		id: create_if_block$7.name,
     		type: "if",
     		source: "(7:3) {#if errormsg}",
     		ctx
@@ -1285,13 +1380,13 @@ var app = (function () {
     	return block;
     }
 
-    function create_fragment$f(ctx) {
+    function create_fragment$g(ctx) {
     	let fieldset;
     	let t;
     	let current;
     	const default_slot_template = /*#slots*/ ctx[2].default;
     	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[1], null);
-    	let if_block = /*errormsg*/ ctx[0] && create_if_block$6(ctx);
+    	let if_block = /*errormsg*/ ctx[0] && create_if_block$7(ctx);
 
     	const block = {
     		c: function create() {
@@ -1300,7 +1395,7 @@ var app = (function () {
     			t = space();
     			if (if_block) if_block.c();
     			attr_dev(fieldset, "class", "app-control-area svelte-8w06qs");
-    			add_location(fieldset, file$c, 4, 0, 56);
+    			add_location(fieldset, file$d, 4, 0, 56);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -1327,7 +1422,7 @@ var app = (function () {
     				if (if_block) {
     					if_block.p(ctx, dirty);
     				} else {
-    					if_block = create_if_block$6(ctx);
+    					if_block = create_if_block$7(ctx);
     					if_block.c();
     					if_block.m(fieldset, null);
     				}
@@ -1354,7 +1449,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$f.name,
+    		id: create_fragment$g.name,
     		type: "component",
     		source: "",
     		ctx
@@ -1363,7 +1458,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$f($$self, $$props, $$invalidate) {
+    function instance$g($$self, $$props, $$invalidate) {
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots("AppControlArea", slots, ['default']);
     	let { errormsg = undefined } = $$props;
@@ -1394,13 +1489,13 @@ var app = (function () {
     class AppControlArea extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$f, create_fragment$f, safe_not_equal, { errormsg: 0 });
+    		init(this, options, instance$g, create_fragment$g, safe_not_equal, { errormsg: 0 });
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "AppControlArea",
     			options,
-    			id: create_fragment$f.name
+    			id: create_fragment$g.name
     		});
     	}
 
@@ -1415,9 +1510,9 @@ var app = (function () {
 
     /* ../shared/controls/AppControl.svelte generated by Svelte v3.38.2 */
 
-    const file$b = "../shared/controls/AppControl.svelte";
+    const file$c = "../shared/controls/AppControl.svelte";
 
-    function create_fragment$e(ctx) {
+    function create_fragment$f(ctx) {
     	let div;
     	let label_1;
     	let t;
@@ -1433,9 +1528,9 @@ var app = (function () {
     			if (default_slot) default_slot.c();
     			attr_dev(label_1, "for", /*id*/ ctx[0]);
     			attr_dev(label_1, "class", "svelte-u0fryu");
-    			add_location(label_1, file$b, 6, 3, 88);
+    			add_location(label_1, file$c, 6, 3, 88);
     			attr_dev(div, "class", "app-control svelte-u0fryu");
-    			add_location(div, file$b, 5, 0, 59);
+    			add_location(div, file$c, 5, 0, 59);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -1481,7 +1576,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$e.name,
+    		id: create_fragment$f.name,
     		type: "component",
     		source: "",
     		ctx
@@ -1490,7 +1585,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$e($$self, $$props, $$invalidate) {
+    function instance$f($$self, $$props, $$invalidate) {
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots("AppControl", slots, ['default']);
     	let { id } = $$props;
@@ -1524,13 +1619,13 @@ var app = (function () {
     class AppControl extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$e, create_fragment$e, safe_not_equal, { id: 0, label: 1 });
+    		init(this, options, instance$f, create_fragment$f, safe_not_equal, { id: 0, label: 1 });
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "AppControl",
     			options,
-    			id: create_fragment$e.name
+    			id: create_fragment$f.name
     		});
 
     		const { ctx } = this.$$;
@@ -1563,7 +1658,7 @@ var app = (function () {
     }
 
     /* ../shared/controls/AppControlButton.svelte generated by Svelte v3.38.2 */
-    const file$a = "../shared/controls/AppControlButton.svelte";
+    const file$b = "../shared/controls/AppControlButton.svelte";
 
     // (9:0) <AppControl id={id} label={label} >
     function create_default_slot$5(ctx) {
@@ -1577,7 +1672,7 @@ var app = (function () {
     			button = element("button");
     			t = text(/*text*/ ctx[2]);
     			attr_dev(button, "class", "svelte-16fv6fd");
-    			add_location(button, file$a, 9, 3, 168);
+    			add_location(button, file$b, 9, 3, 168);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, button, anchor);
@@ -1609,7 +1704,7 @@ var app = (function () {
     	return block;
     }
 
-    function create_fragment$d(ctx) {
+    function create_fragment$e(ctx) {
     	let appcontrol;
     	let current;
 
@@ -1661,7 +1756,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$d.name,
+    		id: create_fragment$e.name,
     		type: "component",
     		source: "",
     		ctx
@@ -1670,7 +1765,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$d($$self, $$props, $$invalidate) {
+    function instance$e($$self, $$props, $$invalidate) {
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots("AppControlButton", slots, []);
     	let { id } = $$props;
@@ -1710,13 +1805,13 @@ var app = (function () {
     class AppControlButton extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$d, create_fragment$d, safe_not_equal, { id: 0, label: 1, text: 2 });
+    		init(this, options, instance$e, create_fragment$e, safe_not_equal, { id: 0, label: 1, text: 2 });
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "AppControlButton",
     			options,
-    			id: create_fragment$d.name
+    			id: create_fragment$e.name
     		});
 
     		const { ctx } = this.$$;
@@ -1771,7 +1866,7 @@ var app = (function () {
     }
 
     /* ../shared/controls/AppControlSwitch.svelte generated by Svelte v3.38.2 */
-    const file$9 = "../shared/controls/AppControlSwitch.svelte";
+    const file$a = "../shared/controls/AppControlSwitch.svelte";
 
     function get_each_context$3(ctx, list, i) {
     	const child_ctx = ctx.slice();
@@ -1799,7 +1894,7 @@ var app = (function () {
     			t = text(t_value);
     			attr_dev(div, "class", "option svelte-yqpg3s");
     			toggle_class(div, "selected", /*option*/ ctx[6] == /*value*/ ctx[0]);
-    			add_location(div, file$9, 14, 6, 321);
+    			add_location(div, file$a, 14, 6, 321);
     			this.first = div;
     		},
     		m: function mount(target, anchor) {
@@ -1868,10 +1963,10 @@ var app = (function () {
     			t = space();
     			input = element("input");
     			attr_dev(div, "class", "selector svelte-yqpg3s");
-    			add_location(div, file$9, 12, 3, 251);
+    			add_location(div, file$a, 12, 3, 251);
     			attr_dev(input, "name", /*id*/ ctx[1]);
     			attr_dev(input, "class", "svelte-yqpg3s");
-    			add_location(input, file$9, 18, 3, 447);
+    			add_location(input, file$a, 18, 3, 447);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -1930,7 +2025,7 @@ var app = (function () {
     	return block;
     }
 
-    function create_fragment$c(ctx) {
+    function create_fragment$d(ctx) {
     	let appcontrol;
     	let current;
 
@@ -1982,7 +2077,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$c.name,
+    		id: create_fragment$d.name,
     		type: "component",
     		source: "",
     		ctx
@@ -1991,7 +2086,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$c($$self, $$props, $$invalidate) {
+    function instance$d($$self, $$props, $$invalidate) {
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots("AppControlSwitch", slots, []);
     	let { id } = $$props;
@@ -2044,13 +2139,13 @@ var app = (function () {
     class AppControlSwitch extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$c, create_fragment$c, safe_not_equal, { id: 1, label: 2, options: 3, value: 0 });
+    		init(this, options, instance$d, create_fragment$d, safe_not_equal, { id: 1, label: 2, options: 3, value: 0 });
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "AppControlSwitch",
     			options,
-    			id: create_fragment$c.name
+    			id: create_fragment$d.name
     		});
 
     		const { ctx } = this.$$;
@@ -2103,7 +2198,7 @@ var app = (function () {
     }
 
     /* ../shared/controls/AppControlRange.svelte generated by Svelte v3.38.2 */
-    const file$8 = "../shared/controls/AppControlRange.svelte";
+    const file$9 = "../shared/controls/AppControlRange.svelte";
 
     // (67:0) <AppControl id={id} label={label}>
     function create_default_slot$3(ctx) {
@@ -2129,17 +2224,17 @@ var app = (function () {
     			input = element("input");
     			attr_dev(div0, "class", "rangeSlider svelte-1n1k125");
     			set_style(div0, "width", /*width*/ ctx[9] + "%");
-    			add_location(div0, file$8, 75, 6, 2016);
+    			add_location(div0, file$9, 75, 6, 2016);
     			attr_dev(span, "class", "svelte-1n1k125");
-    			add_location(span, file$8, 76, 6, 2103);
+    			add_location(span, file$9, 76, 6, 2103);
     			attr_dev(div1, "class", "rangeSliderContainer svelte-1n1k125");
-    			add_location(div1, file$8, 67, 3, 1806);
+    			add_location(div1, file$9, 67, 3, 1806);
     			attr_dev(input, "type", "range");
     			attr_dev(input, "step", /*step*/ ctx[6]);
     			attr_dev(input, "min", /*min*/ ctx[3]);
     			attr_dev(input, "max", /*max*/ ctx[4]);
     			attr_dev(input, "class", "svelte-1n1k125");
-    			add_location(input, file$8, 78, 3, 2153);
+    			add_location(input, file$9, 78, 3, 2153);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div1, anchor);
@@ -2211,7 +2306,7 @@ var app = (function () {
     	return block;
     }
 
-    function create_fragment$b(ctx) {
+    function create_fragment$c(ctx) {
     	let appcontrol;
     	let current;
 
@@ -2263,7 +2358,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$b.name,
+    		id: create_fragment$c.name,
     		type: "component",
     		source: "",
     		ctx
@@ -2272,7 +2367,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$b($$self, $$props, $$invalidate) {
+    function instance$c($$self, $$props, $$invalidate) {
     	let width;
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots("AppControlRange", slots, []);
@@ -2439,7 +2534,7 @@ var app = (function () {
     	constructor(options) {
     		super(options);
 
-    		init(this, options, instance$b, create_fragment$b, safe_not_equal, {
+    		init(this, options, instance$c, create_fragment$c, safe_not_equal, {
     			id: 1,
     			label: 2,
     			value: 0,
@@ -2453,7 +2548,7 @@ var app = (function () {
     			component: this,
     			tagName: "AppControlRange",
     			options,
-    			id: create_fragment$b.name
+    			id: create_fragment$c.name
     		});
 
     		const { ctx } = this.$$;
@@ -2590,7 +2685,7 @@ var app = (function () {
     }
 
     /* ../../svelte-plots-basic/src/Axes.svelte generated by Svelte v3.38.2 */
-    const file$7 = "../../svelte-plots-basic/src/Axes.svelte";
+    const file$8 = "../../svelte-plots-basic/src/Axes.svelte";
     const get_box_slot_changes = dirty => ({});
     const get_box_slot_context = ctx => ({});
     const get_yaxis_slot_changes = dirty => ({});
@@ -2606,7 +2701,7 @@ var app = (function () {
     		c: function create() {
     			div = element("div");
     			attr_dev(div, "class", "axes__title");
-    			add_location(div, file$7, 310, 21, 11963);
+    			add_location(div, file$8, 310, 21, 11963);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -2639,9 +2734,9 @@ var app = (function () {
     		c: function create() {
     			div = element("div");
     			span = element("span");
-    			add_location(span, file$7, 311, 48, 12061);
+    			add_location(span, file$8, 311, 48, 12061);
     			attr_dev(div, "class", "axes__ylabel");
-    			add_location(div, file$7, 311, 22, 12035);
+    			add_location(div, file$8, 311, 22, 12035);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -2675,9 +2770,9 @@ var app = (function () {
     		c: function create() {
     			div = element("div");
     			span = element("span");
-    			add_location(span, file$7, 312, 48, 12148);
+    			add_location(span, file$8, 312, 48, 12148);
     			attr_dev(div, "class", "axes__xlabel");
-    			add_location(div, file$7, 312, 22, 12122);
+    			add_location(div, file$8, 312, 22, 12122);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -2703,7 +2798,7 @@ var app = (function () {
     }
 
     // (341:3) {#if !$isOk}
-    function create_if_block$5(ctx) {
+    function create_if_block$6(ctx) {
     	let p;
     	let t0;
     	let br;
@@ -2715,9 +2810,9 @@ var app = (function () {
     			t0 = text("Axes component was not properly initialized. ");
     			br = element("br");
     			t1 = text("\n      Add plot series (check that coordinates are numeric) or define axes limits manually.");
-    			add_location(br, file$7, 342, 51, 12994);
+    			add_location(br, file$8, 342, 51, 12994);
     			attr_dev(p, "class", "message_error");
-    			add_location(p, file$7, 341, 3, 12917);
+    			add_location(p, file$8, 341, 3, 12917);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, p, anchor);
@@ -2732,7 +2827,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block$5.name,
+    		id: create_if_block$6.name,
     		type: "if",
     		source: "(341:3) {#if !$isOk}",
     		ctx
@@ -2741,7 +2836,7 @@ var app = (function () {
     	return block;
     }
 
-    function create_fragment$a(ctx) {
+    function create_fragment$b(ctx) {
     	let div1;
     	let t0;
     	let t1;
@@ -2770,7 +2865,7 @@ var app = (function () {
     	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[23], null);
     	const box_slot_template = /*#slots*/ ctx[24].box;
     	const box_slot = create_slot(box_slot_template, ctx, /*$$scope*/ ctx[23], get_box_slot_context);
-    	let if_block3 = !/*$isOk*/ ctx[3] && create_if_block$5(ctx);
+    	let if_block3 = !/*$isOk*/ ctx[3] && create_if_block$6(ctx);
 
     	const block = {
     		c: function create() {
@@ -2797,20 +2892,20 @@ var app = (function () {
     			attr_dev(rect, "y", rect_y_value = /*cpy*/ ctx[7][1]);
     			attr_dev(rect, "width", rect_width_value = /*cpx*/ ctx[6][1] - /*cpx*/ ctx[6][0]);
     			attr_dev(rect, "height", rect_height_value = /*cpy*/ ctx[7][0] - /*cpy*/ ctx[7][1]);
-    			add_location(rect, file$7, 321, 15, 12446);
+    			add_location(rect, file$8, 321, 15, 12446);
     			attr_dev(clipPath, "id", /*clipPathID*/ ctx[8]);
-    			add_location(clipPath, file$7, 320, 12, 12402);
-    			add_location(defs, file$7, 319, 9, 12383);
+    			add_location(clipPath, file$8, 320, 12, 12402);
+    			add_location(defs, file$8, 319, 9, 12383);
     			attr_dev(g, "clip-path", "url(#" + /*clipPathID*/ ctx[8] + ")");
-    			add_location(g, file$7, 330, 9, 12732);
+    			add_location(g, file$8, 330, 9, 12732);
     			attr_dev(svg, "preserveAspectRatio", "none");
     			attr_dev(svg, "class", "axes");
-    			add_location(svg, file$7, 316, 6, 12288);
+    			add_location(svg, file$8, 316, 6, 12288);
     			attr_dev(div0, "class", "axes-wrapper");
-    			add_location(div0, file$7, 315, 3, 12228);
+    			add_location(div0, file$8, 315, 3, 12228);
     			attr_dev(div1, "class", div1_class_value = "plot " + ("plot_" + /*$scale*/ ctx[4]));
     			toggle_class(div1, "plot_error", !/*$isOk*/ ctx[3]);
-    			add_location(div1, file$7, 307, 0, 11835);
+    			add_location(div1, file$8, 307, 0, 11835);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -2934,7 +3029,7 @@ var app = (function () {
 
     			if (!/*$isOk*/ ctx[3]) {
     				if (if_block3) ; else {
-    					if_block3 = create_if_block$5(ctx);
+    					if_block3 = create_if_block$6(ctx);
     					if_block3.c();
     					if_block3.m(div1, null);
     				}
@@ -2982,7 +3077,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$a.name,
+    		id: create_fragment$b.name,
     		type: "component",
     		source: "",
     		ctx
@@ -3016,7 +3111,7 @@ var app = (function () {
     	return "large";
     }
 
-    function instance$a($$self, $$props, $$invalidate) {
+    function instance$b($$self, $$props, $$invalidate) {
     	let margins;
     	let cpx;
     	let cpy;
@@ -3414,8 +3509,8 @@ var app = (function () {
     		init(
     			this,
     			options,
-    			instance$a,
-    			create_fragment$a,
+    			instance$b,
+    			create_fragment$b,
     			safe_not_equal,
     			{
     				limX: 15,
@@ -3432,7 +3527,7 @@ var app = (function () {
     			component: this,
     			tagName: "Axes",
     			options,
-    			id: create_fragment$a.name
+    			id: create_fragment$b.name
     		});
     	}
 
@@ -3500,7 +3595,7 @@ var app = (function () {
     };
 
     /* ../../svelte-plots-basic/src/XAxis.svelte generated by Svelte v3.38.2 */
-    const file$6 = "../../svelte-plots-basic/src/XAxis.svelte";
+    const file$7 = "../../svelte-plots-basic/src/XAxis.svelte";
 
     function get_each_context$2(ctx, list, i) {
     	const child_ctx = ctx.slice();
@@ -3510,7 +3605,7 @@ var app = (function () {
     }
 
     // (57:0) {#if $isOk && x !== undefined && y !== undefined }
-    function create_if_block$4(ctx) {
+    function create_if_block$5(ctx) {
     	let g;
     	let line;
     	let line_x__value;
@@ -3539,9 +3634,9 @@ var app = (function () {
     			attr_dev(line, "y1", line_y__value = /*y*/ ctx[1][0]);
     			attr_dev(line, "y2", line_y__value_1 = /*y*/ ctx[1][0]);
     			attr_dev(line, "style", /*axisLineStyleStr*/ ctx[7]);
-    			add_location(line, file$6, 63, 3, 2597);
+    			add_location(line, file$7, 63, 3, 2597);
     			attr_dev(g, "class", "mdaplot__axis mdaplot__xaxis");
-    			add_location(g, file$6, 57, 3, 2169);
+    			add_location(g, file$7, 57, 3, 2169);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, g, anchor);
@@ -3601,7 +3696,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block$4.name,
+    		id: create_if_block$5.name,
     		type: "if",
     		source: "(57:0) {#if $isOk && x !== undefined && y !== undefined }",
     		ctx
@@ -3639,13 +3734,13 @@ var app = (function () {
     			attr_dev(line0, "y1", line0_y__value = /*y*/ ctx[1][0]);
     			attr_dev(line0, "y2", line0_y__value_1 = /*y*/ ctx[1][1]);
     			attr_dev(line0, "style", /*gridLineStyleStr*/ ctx[8]);
-    			add_location(line0, file$6, 59, 6, 2243);
+    			add_location(line0, file$7, 59, 6, 2243);
     			attr_dev(line1, "x1", line1_x__value = /*tx*/ ctx[26]);
     			attr_dev(line1, "x2", line1_x__value_1 = /*tx*/ ctx[26]);
     			attr_dev(line1, "y1", line1_y__value = /*ticksY*/ ctx[5][0]);
     			attr_dev(line1, "y2", line1_y__value_1 = /*ticksY*/ ctx[5][1]);
     			attr_dev(line1, "style", /*axisLineStyleStr*/ ctx[7]);
-    			add_location(line1, file$6, 60, 6, 2334);
+    			add_location(line1, file$7, 60, 6, 2334);
     			attr_dev(text_1, "x", text_1_x_value = /*tx*/ ctx[26]);
     			attr_dev(text_1, "y", text_1_y_value = /*ticksY*/ ctx[5][1]);
     			attr_dev(text_1, "dx", "0");
@@ -3653,7 +3748,7 @@ var app = (function () {
     			attr_dev(text_1, "class", "mdaplot__axis-labels");
     			attr_dev(text_1, "dominant-baseline", "middle");
     			attr_dev(text_1, "text-anchor", "middle");
-    			add_location(text_1, file$6, 61, 6, 2435);
+    			add_location(text_1, file$7, 61, 6, 2435);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, line0, anchor);
@@ -3726,9 +3821,9 @@ var app = (function () {
     	return block;
     }
 
-    function create_fragment$9(ctx) {
+    function create_fragment$a(ctx) {
     	let if_block_anchor;
-    	let if_block = /*$isOk*/ ctx[6] && /*x*/ ctx[3] !== undefined && /*y*/ ctx[1] !== undefined && create_if_block$4(ctx);
+    	let if_block = /*$isOk*/ ctx[6] && /*x*/ ctx[3] !== undefined && /*y*/ ctx[1] !== undefined && create_if_block$5(ctx);
 
     	const block = {
     		c: function create() {
@@ -3747,7 +3842,7 @@ var app = (function () {
     				if (if_block) {
     					if_block.p(ctx, dirty);
     				} else {
-    					if_block = create_if_block$4(ctx);
+    					if_block = create_if_block$5(ctx);
     					if_block.c();
     					if_block.m(if_block_anchor.parentNode, if_block_anchor);
     				}
@@ -3766,7 +3861,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$9.name,
+    		id: create_fragment$a.name,
     		type: "component",
     		source: "",
     		ctx
@@ -3775,7 +3870,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$9($$self, $$props, $$invalidate) {
+    function instance$a($$self, $$props, $$invalidate) {
     	let x;
     	let y;
     	let dy;
@@ -3972,7 +4067,7 @@ var app = (function () {
     	constructor(options) {
     		super(options);
 
-    		init(this, options, instance$9, create_fragment$9, safe_not_equal, {
+    		init(this, options, instance$a, create_fragment$a, safe_not_equal, {
     			slot: 16,
     			ticks: 15,
     			tickLabels: 0,
@@ -3983,7 +4078,7 @@ var app = (function () {
     			component: this,
     			tagName: "XAxis",
     			options,
-    			id: create_fragment$9.name
+    			id: create_fragment$a.name
     		});
     	}
 
@@ -4021,7 +4116,7 @@ var app = (function () {
     }
 
     /* ../../svelte-plots-basic/src/Segments.svelte generated by Svelte v3.38.2 */
-    const file$5 = "../../svelte-plots-basic/src/Segments.svelte";
+    const file$6 = "../../svelte-plots-basic/src/Segments.svelte";
 
     function get_each_context$1(ctx, list, i) {
     	const child_ctx = ctx.slice();
@@ -4031,7 +4126,7 @@ var app = (function () {
     }
 
     // (41:0) {#if x1 !== undefined && y1 !== undefined}
-    function create_if_block$3(ctx) {
+    function create_if_block$4(ctx) {
     	let each_1_anchor;
     	let each_value = /*x1*/ ctx[0];
     	validate_each_argument(each_value);
@@ -4089,7 +4184,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block$3.name,
+    		id: create_if_block$4.name,
     		type: "if",
     		source: "(41:0) {#if x1 !== undefined && y1 !== undefined}",
     		ctx
@@ -4114,7 +4209,7 @@ var app = (function () {
     			attr_dev(line, "y1", line_y__value = /*y1*/ ctx[2][/*i*/ ctx[26]]);
     			attr_dev(line, "y2", line_y__value_1 = /*y2*/ ctx[3][/*i*/ ctx[26]]);
     			attr_dev(line, "style", /*lineStyleStr*/ ctx[4]);
-    			add_location(line, file$5, 42, 6, 1516);
+    			add_location(line, file$6, 42, 6, 1516);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, line, anchor);
@@ -4156,9 +4251,9 @@ var app = (function () {
     	return block;
     }
 
-    function create_fragment$8(ctx) {
+    function create_fragment$9(ctx) {
     	let if_block_anchor;
-    	let if_block = /*x1*/ ctx[0] !== undefined && /*y1*/ ctx[2] !== undefined && create_if_block$3(ctx);
+    	let if_block = /*x1*/ ctx[0] !== undefined && /*y1*/ ctx[2] !== undefined && create_if_block$4(ctx);
 
     	const block = {
     		c: function create() {
@@ -4177,7 +4272,7 @@ var app = (function () {
     				if (if_block) {
     					if_block.p(ctx, dirty);
     				} else {
-    					if_block = create_if_block$3(ctx);
+    					if_block = create_if_block$4(ctx);
     					if_block.c();
     					if_block.m(if_block_anchor.parentNode, if_block_anchor);
     				}
@@ -4196,7 +4291,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$8.name,
+    		id: create_fragment$9.name,
     		type: "component",
     		source: "",
     		ctx
@@ -4205,7 +4300,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$8($$self, $$props, $$invalidate) {
+    function instance$9($$self, $$props, $$invalidate) {
     	let x1;
     	let x2;
     	let y1;
@@ -4372,7 +4467,7 @@ var app = (function () {
     	constructor(options) {
     		super(options);
 
-    		init(this, options, instance$8, create_fragment$8, safe_not_equal, {
+    		init(this, options, instance$9, create_fragment$9, safe_not_equal, {
     			xStart: 10,
     			xEnd: 11,
     			yStart: 12,
@@ -4386,7 +4481,7 @@ var app = (function () {
     			component: this,
     			tagName: "Segments",
     			options,
-    			id: create_fragment$8.name
+    			id: create_fragment$9.name
     		});
 
     		const { ctx } = this.$$;
@@ -4467,7 +4562,7 @@ var app = (function () {
     }
 
     /* ../../svelte-plots-basic/src/TextLabels.svelte generated by Svelte v3.38.2 */
-    const file$4 = "../../svelte-plots-basic/src/TextLabels.svelte";
+    const file$5 = "../../svelte-plots-basic/src/TextLabels.svelte";
 
     function get_each_context(ctx, list, i) {
     	const child_ctx = ctx.slice();
@@ -4477,7 +4572,7 @@ var app = (function () {
     }
 
     // (56:0) {#if x !== undefined && y !== undefined}
-    function create_if_block$2(ctx) {
+    function create_if_block$3(ctx) {
     	let each_1_anchor;
     	let each_value = /*x*/ ctx[2];
     	validate_each_argument(each_value);
@@ -4535,7 +4630,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block$2.name,
+    		id: create_if_block$3.name,
     		type: "if",
     		source: "(56:0) {#if x !== undefined && y !== undefined}",
     		ctx
@@ -4562,7 +4657,7 @@ var app = (function () {
     			attr_dev(text_1, "dy", /*dy*/ ctx[5]);
     			attr_dev(text_1, "dominant-baseline", "middle");
     			attr_dev(text_1, "text-anchor", text_1_text_anchor_value = /*textAnchors*/ ctx[7][/*pos*/ ctx[1]]);
-    			add_location(text_1, file$4, 57, 6, 2089);
+    			add_location(text_1, file$5, 57, 6, 2089);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, text_1, anchor);
@@ -4610,9 +4705,9 @@ var app = (function () {
     	return block;
     }
 
-    function create_fragment$7(ctx) {
+    function create_fragment$8(ctx) {
     	let if_block_anchor;
-    	let if_block = /*x*/ ctx[2] !== undefined && /*y*/ ctx[3] !== undefined && create_if_block$2(ctx);
+    	let if_block = /*x*/ ctx[2] !== undefined && /*y*/ ctx[3] !== undefined && create_if_block$3(ctx);
 
     	const block = {
     		c: function create() {
@@ -4631,7 +4726,7 @@ var app = (function () {
     				if (if_block) {
     					if_block.p(ctx, dirty);
     				} else {
-    					if_block = create_if_block$2(ctx);
+    					if_block = create_if_block$3(ctx);
     					if_block.c();
     					if_block.m(if_block_anchor.parentNode, if_block_anchor);
     				}
@@ -4650,7 +4745,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$7.name,
+    		id: create_fragment$8.name,
     		type: "component",
     		source: "",
     		ctx
@@ -4659,7 +4754,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$7($$self, $$props, $$invalidate) {
+    function instance$8($$self, $$props, $$invalidate) {
     	let x;
     	let y;
     	let dx;
@@ -4857,7 +4952,7 @@ var app = (function () {
     	constructor(options) {
     		super(options);
 
-    		init(this, options, instance$7, create_fragment$7, safe_not_equal, {
+    		init(this, options, instance$8, create_fragment$8, safe_not_equal, {
     			xValues: 13,
     			yValues: 14,
     			labels: 0,
@@ -4872,7 +4967,7 @@ var app = (function () {
     			component: this,
     			tagName: "TextLabels",
     			options,
-    			id: create_fragment$7.name
+    			id: create_fragment$8.name
     		});
 
     		const { ctx } = this.$$;
@@ -4958,7 +5053,7 @@ var app = (function () {
 
     /* ../../svelte-plots-basic/src/TextLegend.svelte generated by Svelte v3.38.2 */
 
-    function create_fragment$6(ctx) {
+    function create_fragment$7(ctx) {
     	let textlabels;
     	let current;
 
@@ -5015,7 +5110,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$6.name,
+    		id: create_fragment$7.name,
     		type: "component",
     		source: "",
     		ctx
@@ -5024,7 +5119,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$6($$self, $$props, $$invalidate) {
+    function instance$7($$self, $$props, $$invalidate) {
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots("TextLegend", slots, []);
     	let { x } = $$props;
@@ -5134,7 +5229,7 @@ var app = (function () {
     	constructor(options) {
     		super(options);
 
-    		init(this, options, instance$6, create_fragment$6, safe_not_equal, {
+    		init(this, options, instance$7, create_fragment$7, safe_not_equal, {
     			x: 0,
     			y: 1,
     			dx: 8,
@@ -5151,7 +5246,7 @@ var app = (function () {
     			component: this,
     			tagName: "TextLegend",
     			options,
-    			id: create_fragment$6.name
+    			id: create_fragment$7.name
     		});
 
     		const { ctx } = this.$$;
@@ -5252,9 +5347,9 @@ var app = (function () {
     }
 
     /* ../../svelte-plots-basic/src/ScatterSeries.svelte generated by Svelte v3.38.2 */
-    const file$3 = "../../svelte-plots-basic/src/ScatterSeries.svelte";
+    const file$4 = "../../svelte-plots-basic/src/ScatterSeries.svelte";
 
-    function create_fragment$5(ctx) {
+    function create_fragment$6(ctx) {
     	let g;
     	let textlabels;
     	let current;
@@ -5278,7 +5373,7 @@ var app = (function () {
     			create_component(textlabels.$$.fragment);
     			attr_dev(g, "class", "series series_scatter");
     			attr_dev(g, "title", /*title*/ ctx[2]);
-    			add_location(g, file$3, 62, 0, 1797);
+    			add_location(g, file$4, 62, 0, 1797);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -5320,7 +5415,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$5.name,
+    		id: create_fragment$6.name,
     		type: "component",
     		source: "",
     		ctx
@@ -5329,7 +5424,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$5($$self, $$props, $$invalidate) {
+    function instance$6($$self, $$props, $$invalidate) {
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots("ScatterSeries", slots, []);
     	let { xValues } = $$props;
@@ -5466,7 +5561,7 @@ var app = (function () {
     	constructor(options) {
     		super(options);
 
-    		init(this, options, instance$5, create_fragment$5, safe_not_equal, {
+    		init(this, options, instance$6, create_fragment$6, safe_not_equal, {
     			xValues: 0,
     			yValues: 1,
     			marker: 8,
@@ -5481,7 +5576,7 @@ var app = (function () {
     			component: this,
     			tagName: "ScatterSeries",
     			options,
-    			id: create_fragment$5.name
+    			id: create_fragment$6.name
     		});
 
     		const { ctx } = this.$$;
@@ -5562,10 +5657,10 @@ var app = (function () {
     }
 
     /* ../../svelte-plots-basic/src/LineSeries.svelte generated by Svelte v3.38.2 */
-    const file$2 = "../../svelte-plots-basic/src/LineSeries.svelte";
+    const file$3 = "../../svelte-plots-basic/src/LineSeries.svelte";
 
     // (43:0) {#if p !== undefined}
-    function create_if_block$1(ctx) {
+    function create_if_block$2(ctx) {
     	let g;
     	let polyline;
 
@@ -5575,11 +5670,11 @@ var app = (function () {
     			polyline = svg_element("polyline");
     			attr_dev(polyline, "class", "line");
     			attr_dev(polyline, "points", /*p*/ ctx[1]);
-    			add_location(polyline, file$2, 44, 3, 1609);
+    			add_location(polyline, file$3, 44, 3, 1609);
     			attr_dev(g, "class", "series lineseries");
     			attr_dev(g, "style", /*lineStyleStr*/ ctx[2]);
     			attr_dev(g, "title", /*title*/ ctx[0]);
-    			add_location(g, file$2, 43, 3, 1537);
+    			add_location(g, file$3, 43, 3, 1537);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, g, anchor);
@@ -5605,7 +5700,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block$1.name,
+    		id: create_if_block$2.name,
     		type: "if",
     		source: "(43:0) {#if p !== undefined}",
     		ctx
@@ -5614,9 +5709,9 @@ var app = (function () {
     	return block;
     }
 
-    function create_fragment$4(ctx) {
+    function create_fragment$5(ctx) {
     	let if_block_anchor;
-    	let if_block = /*p*/ ctx[1] !== undefined && create_if_block$1(ctx);
+    	let if_block = /*p*/ ctx[1] !== undefined && create_if_block$2(ctx);
 
     	const block = {
     		c: function create() {
@@ -5635,7 +5730,7 @@ var app = (function () {
     				if (if_block) {
     					if_block.p(ctx, dirty);
     				} else {
-    					if_block = create_if_block$1(ctx);
+    					if_block = create_if_block$2(ctx);
     					if_block.c();
     					if_block.m(if_block_anchor.parentNode, if_block_anchor);
     				}
@@ -5654,7 +5749,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$4.name,
+    		id: create_fragment$5.name,
     		type: "component",
     		source: "",
     		ctx
@@ -5663,7 +5758,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$4($$self, $$props, $$invalidate) {
+    function instance$5($$self, $$props, $$invalidate) {
     	let x;
     	let y;
     	let p;
@@ -5825,7 +5920,7 @@ var app = (function () {
     	constructor(options) {
     		super(options);
 
-    		init(this, options, instance$4, create_fragment$4, safe_not_equal, {
+    		init(this, options, instance$5, create_fragment$5, safe_not_equal, {
     			xValues: 8,
     			yValues: 9,
     			title: 0,
@@ -5838,7 +5933,7 @@ var app = (function () {
     			component: this,
     			tagName: "LineSeries",
     			options,
-    			id: create_fragment$4.name
+    			id: create_fragment$5.name
     		});
 
     		const { ctx } = this.$$;
@@ -5903,10 +5998,10 @@ var app = (function () {
     }
 
     /* ../../svelte-plots-basic/src/AreaSeries.svelte generated by Svelte v3.38.2 */
-    const file$1 = "../../svelte-plots-basic/src/AreaSeries.svelte";
+    const file$2 = "../../svelte-plots-basic/src/AreaSeries.svelte";
 
     // (46:0) {#if p !== undefined}
-    function create_if_block(ctx) {
+    function create_if_block$1(ctx) {
     	let g;
     	let polygon;
     	let polygon_points_value;
@@ -5916,11 +6011,11 @@ var app = (function () {
     			g = svg_element("g");
     			polygon = svg_element("polygon");
     			attr_dev(polygon, "points", polygon_points_value = /*x*/ ctx[1][0] + "," + /*y0*/ ctx[2] + " " + /*p*/ ctx[3] + " " + /*x*/ ctx[1][/*x*/ ctx[1].length - 1] + "," + /*y0*/ ctx[2][0]);
-    			add_location(polygon, file$1, 47, 3, 1747);
+    			add_location(polygon, file$2, 47, 3, 1747);
     			attr_dev(g, "class", "series lineseries");
     			attr_dev(g, "style", /*areaStyleStr*/ ctx[4]);
     			attr_dev(g, "title", /*title*/ ctx[0]);
-    			add_location(g, file$1, 46, 3, 1675);
+    			add_location(g, file$2, 46, 3, 1675);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, g, anchor);
@@ -5946,7 +6041,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block.name,
+    		id: create_if_block$1.name,
     		type: "if",
     		source: "(46:0) {#if p !== undefined}",
     		ctx
@@ -5955,9 +6050,9 @@ var app = (function () {
     	return block;
     }
 
-    function create_fragment$3(ctx) {
+    function create_fragment$4(ctx) {
     	let if_block_anchor;
-    	let if_block = /*p*/ ctx[3] !== undefined && create_if_block(ctx);
+    	let if_block = /*p*/ ctx[3] !== undefined && create_if_block$1(ctx);
 
     	const block = {
     		c: function create() {
@@ -5976,7 +6071,7 @@ var app = (function () {
     				if (if_block) {
     					if_block.p(ctx, dirty);
     				} else {
-    					if_block = create_if_block(ctx);
+    					if_block = create_if_block$1(ctx);
     					if_block.c();
     					if_block.m(if_block_anchor.parentNode, if_block_anchor);
     				}
@@ -5995,7 +6090,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$3.name,
+    		id: create_fragment$4.name,
     		type: "component",
     		source: "",
     		ctx
@@ -6004,7 +6099,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$3($$self, $$props, $$invalidate) {
+    function instance$4($$self, $$props, $$invalidate) {
     	let y0;
     	let x;
     	let y;
@@ -6194,7 +6289,7 @@ var app = (function () {
     	constructor(options) {
     		super(options);
 
-    		init(this, options, instance$3, create_fragment$3, safe_not_equal, {
+    		init(this, options, instance$4, create_fragment$4, safe_not_equal, {
     			xValues: 10,
     			yValues: 11,
     			title: 0,
@@ -6209,7 +6304,7 @@ var app = (function () {
     			component: this,
     			tagName: "AreaSeries",
     			options,
-    			id: create_fragment$3.name
+    			id: create_fragment$4.name
     		});
 
     		const { ctx } = this.$$;
@@ -6289,36 +6384,50 @@ var app = (function () {
     	}
     }
 
-    /* src/PopulationPlot.svelte generated by Svelte v3.38.2 */
+    /* ../shared/plots/MeanPopulationPlot.svelte generated by Svelte v3.38.2 */
 
-    // (17:0) <Axes title={`Population: µ = ${popMean}, σ = ${popSD.toFixed(1)}`} xLabel={"Chloride in water, [mg/L]"} limX={[80, 120]} limY={mrange(popY, 0.01)}>
+    // (26:0) <Axes title={`Population: µ = ${popMean}, σ = ${popSD.toFixed(1)}`} xLabel={"Chloride in water, [mg/L]"} limX={[80, 120]} limY={mrange(popY, 0.01)}>
     function create_default_slot$2(ctx) {
     	let lineseries;
     	let t0;
     	let areaseries;
     	let t1;
-    	let scatterseries;
-    	let t2;
     	let segments0;
+    	let t2;
+    	let scatterseries;
     	let t3;
     	let segments1;
+    	let t4;
+    	let textlegend;
     	let current;
 
     	lineseries = new LineSeries({
     			props: {
-    				xValues: /*popX*/ ctx[4],
-    				yValues: /*popY*/ ctx[5],
-    				lineColor: /*colors*/ ctx[3][0]
+    				xValues: /*popX*/ ctx[6],
+    				yValues: /*popY*/ ctx[7],
+    				lineColor: /*popColor*/ ctx[3]
     			},
     			$$inline: true
     		});
 
     	areaseries = new AreaSeries({
     			props: {
-    				xValues: /*popX*/ ctx[4],
-    				yValues: /*popY*/ ctx[5],
+    				xValues: /*popX*/ ctx[6],
+    				yValues: /*popY*/ ctx[7],
     				lineColor: "transparent",
-    				fillColor: /*colors*/ ctx[3][0] + "30"
+    				fillColor: /*popAreaColor*/ ctx[4]
+    			},
+    			$$inline: true
+    		});
+
+    	segments0 = new Segments({
+    			props: {
+    				xStart: [/*sampMean*/ ctx[9]],
+    				xEnd: [/*sampMean*/ ctx[9]],
+    				yStart: [0],
+    				yEnd: [max(/*popY*/ ctx[7])],
+    				lineColor: /*sampColor*/ ctx[5],
+    				lineType: 3
     			},
     			$$inline: true
     		});
@@ -6326,35 +6435,35 @@ var app = (function () {
     	scatterseries = new ScatterSeries({
     			props: {
     				xValues: /*sample*/ ctx[2],
-    				yValues: /*sampY*/ ctx[6],
+    				yValues: /*sampY*/ ctx[8],
     				borderWidth: 2,
-    				markerSize: 1.2,
+    				markerSize: 1.25,
     				faceColor: "transparent",
-    				borderColor: /*colors*/ ctx[3][1]
-    			},
-    			$$inline: true
-    		});
-
-    	segments0 = new Segments({
-    			props: {
-    				xStart: [/*popMean*/ ctx[0]],
-    				xEnd: [/*popMean*/ ctx[0]],
-    				yStart: [0],
-    				yEnd: [max(/*popY*/ ctx[5])],
-    				lineColor: /*colors*/ ctx[3][0],
-    				lineType: 2
+    				borderColor: /*sampColor*/ ctx[5]
     			},
     			$$inline: true
     		});
 
     	segments1 = new Segments({
     			props: {
-    				xStart: [/*sampMean*/ ctx[7]],
-    				xEnd: [/*sampMean*/ ctx[7]],
+    				xStart: [/*popMean*/ ctx[0]],
+    				xEnd: [/*popMean*/ ctx[0]],
     				yStart: [0],
-    				yEnd: [max(/*popY*/ ctx[5])],
-    				lineColor: /*colors*/ ctx[3][1],
-    				lineType: 3
+    				yEnd: [max(/*popY*/ ctx[7])],
+    				lineColor: /*popColor*/ ctx[3],
+    				lineType: 2
+    			},
+    			$$inline: true
+    		});
+
+    	textlegend = new TextLegend({
+    			props: {
+    				textSize: 1.15,
+    				x: 90,
+    				y: max(/*popY*/ ctx[7]) * 0.4,
+    				pos: 2,
+    				dx: "1.25em",
+    				elements: /*labelsStr*/ ctx[10]
     			},
     			$$inline: true
     		});
@@ -6365,68 +6474,78 @@ var app = (function () {
     			t0 = space();
     			create_component(areaseries.$$.fragment);
     			t1 = space();
-    			create_component(scatterseries.$$.fragment);
-    			t2 = space();
     			create_component(segments0.$$.fragment);
+    			t2 = space();
+    			create_component(scatterseries.$$.fragment);
     			t3 = space();
     			create_component(segments1.$$.fragment);
+    			t4 = space();
+    			create_component(textlegend.$$.fragment);
     		},
     		m: function mount(target, anchor) {
     			mount_component(lineseries, target, anchor);
     			insert_dev(target, t0, anchor);
     			mount_component(areaseries, target, anchor);
     			insert_dev(target, t1, anchor);
-    			mount_component(scatterseries, target, anchor);
-    			insert_dev(target, t2, anchor);
     			mount_component(segments0, target, anchor);
+    			insert_dev(target, t2, anchor);
+    			mount_component(scatterseries, target, anchor);
     			insert_dev(target, t3, anchor);
     			mount_component(segments1, target, anchor);
+    			insert_dev(target, t4, anchor);
+    			mount_component(textlegend, target, anchor);
     			current = true;
     		},
     		p: function update(ctx, dirty) {
     			const lineseries_changes = {};
-    			if (dirty & /*popX*/ 16) lineseries_changes.xValues = /*popX*/ ctx[4];
-    			if (dirty & /*popY*/ 32) lineseries_changes.yValues = /*popY*/ ctx[5];
-    			if (dirty & /*colors*/ 8) lineseries_changes.lineColor = /*colors*/ ctx[3][0];
+    			if (dirty & /*popX*/ 64) lineseries_changes.xValues = /*popX*/ ctx[6];
+    			if (dirty & /*popY*/ 128) lineseries_changes.yValues = /*popY*/ ctx[7];
+    			if (dirty & /*popColor*/ 8) lineseries_changes.lineColor = /*popColor*/ ctx[3];
     			lineseries.$set(lineseries_changes);
     			const areaseries_changes = {};
-    			if (dirty & /*popX*/ 16) areaseries_changes.xValues = /*popX*/ ctx[4];
-    			if (dirty & /*popY*/ 32) areaseries_changes.yValues = /*popY*/ ctx[5];
-    			if (dirty & /*colors*/ 8) areaseries_changes.fillColor = /*colors*/ ctx[3][0] + "30";
+    			if (dirty & /*popX*/ 64) areaseries_changes.xValues = /*popX*/ ctx[6];
+    			if (dirty & /*popY*/ 128) areaseries_changes.yValues = /*popY*/ ctx[7];
+    			if (dirty & /*popAreaColor*/ 16) areaseries_changes.fillColor = /*popAreaColor*/ ctx[4];
     			areaseries.$set(areaseries_changes);
+    			const segments0_changes = {};
+    			if (dirty & /*sampMean*/ 512) segments0_changes.xStart = [/*sampMean*/ ctx[9]];
+    			if (dirty & /*sampMean*/ 512) segments0_changes.xEnd = [/*sampMean*/ ctx[9]];
+    			if (dirty & /*popY*/ 128) segments0_changes.yEnd = [max(/*popY*/ ctx[7])];
+    			if (dirty & /*sampColor*/ 32) segments0_changes.lineColor = /*sampColor*/ ctx[5];
+    			segments0.$set(segments0_changes);
     			const scatterseries_changes = {};
     			if (dirty & /*sample*/ 4) scatterseries_changes.xValues = /*sample*/ ctx[2];
-    			if (dirty & /*sampY*/ 64) scatterseries_changes.yValues = /*sampY*/ ctx[6];
-    			if (dirty & /*colors*/ 8) scatterseries_changes.borderColor = /*colors*/ ctx[3][1];
+    			if (dirty & /*sampY*/ 256) scatterseries_changes.yValues = /*sampY*/ ctx[8];
+    			if (dirty & /*sampColor*/ 32) scatterseries_changes.borderColor = /*sampColor*/ ctx[5];
     			scatterseries.$set(scatterseries_changes);
-    			const segments0_changes = {};
-    			if (dirty & /*popMean*/ 1) segments0_changes.xStart = [/*popMean*/ ctx[0]];
-    			if (dirty & /*popMean*/ 1) segments0_changes.xEnd = [/*popMean*/ ctx[0]];
-    			if (dirty & /*popY*/ 32) segments0_changes.yEnd = [max(/*popY*/ ctx[5])];
-    			if (dirty & /*colors*/ 8) segments0_changes.lineColor = /*colors*/ ctx[3][0];
-    			segments0.$set(segments0_changes);
     			const segments1_changes = {};
-    			if (dirty & /*sampMean*/ 128) segments1_changes.xStart = [/*sampMean*/ ctx[7]];
-    			if (dirty & /*sampMean*/ 128) segments1_changes.xEnd = [/*sampMean*/ ctx[7]];
-    			if (dirty & /*popY*/ 32) segments1_changes.yEnd = [max(/*popY*/ ctx[5])];
-    			if (dirty & /*colors*/ 8) segments1_changes.lineColor = /*colors*/ ctx[3][1];
+    			if (dirty & /*popMean*/ 1) segments1_changes.xStart = [/*popMean*/ ctx[0]];
+    			if (dirty & /*popMean*/ 1) segments1_changes.xEnd = [/*popMean*/ ctx[0]];
+    			if (dirty & /*popY*/ 128) segments1_changes.yEnd = [max(/*popY*/ ctx[7])];
+    			if (dirty & /*popColor*/ 8) segments1_changes.lineColor = /*popColor*/ ctx[3];
     			segments1.$set(segments1_changes);
+    			const textlegend_changes = {};
+    			if (dirty & /*popY*/ 128) textlegend_changes.y = max(/*popY*/ ctx[7]) * 0.4;
+    			if (dirty & /*labelsStr*/ 1024) textlegend_changes.elements = /*labelsStr*/ ctx[10];
+    			textlegend.$set(textlegend_changes);
     		},
     		i: function intro(local) {
     			if (current) return;
     			transition_in(lineseries.$$.fragment, local);
     			transition_in(areaseries.$$.fragment, local);
-    			transition_in(scatterseries.$$.fragment, local);
     			transition_in(segments0.$$.fragment, local);
+    			transition_in(scatterseries.$$.fragment, local);
     			transition_in(segments1.$$.fragment, local);
+    			transition_in(textlegend.$$.fragment, local);
     			current = true;
     		},
     		o: function outro(local) {
     			transition_out(lineseries.$$.fragment, local);
     			transition_out(areaseries.$$.fragment, local);
-    			transition_out(scatterseries.$$.fragment, local);
     			transition_out(segments0.$$.fragment, local);
+    			transition_out(scatterseries.$$.fragment, local);
     			transition_out(segments1.$$.fragment, local);
+    			transition_out(textlegend.$$.fragment, local);
     			current = false;
     		},
     		d: function destroy(detaching) {
@@ -6434,11 +6553,13 @@ var app = (function () {
     			if (detaching) detach_dev(t0);
     			destroy_component(areaseries, detaching);
     			if (detaching) detach_dev(t1);
-    			destroy_component(scatterseries, detaching);
-    			if (detaching) detach_dev(t2);
     			destroy_component(segments0, detaching);
+    			if (detaching) detach_dev(t2);
+    			destroy_component(scatterseries, detaching);
     			if (detaching) detach_dev(t3);
     			destroy_component(segments1, detaching);
+    			if (detaching) detach_dev(t4);
+    			destroy_component(textlegend, detaching);
     		}
     	};
 
@@ -6446,14 +6567,14 @@ var app = (function () {
     		block,
     		id: create_default_slot$2.name,
     		type: "slot",
-    		source: "(17:0) <Axes title={`Population: µ = ${popMean}, σ = ${popSD.toFixed(1)}`} xLabel={\\\"Chloride in water, [mg/L]\\\"} limX={[80, 120]} limY={mrange(popY, 0.01)}>",
+    		source: "(26:0) <Axes title={`Population: µ = ${popMean}, σ = ${popSD.toFixed(1)}`} xLabel={\\\"Chloride in water, [mg/L]\\\"} limX={[80, 120]} limY={mrange(popY, 0.01)}>",
     		ctx
     	});
 
     	return block;
     }
 
-    // (19:3) 
+    // (28:3) 
     function create_xaxis_slot$1(ctx) {
     	let xaxis;
     	let current;
@@ -6486,14 +6607,14 @@ var app = (function () {
     		block,
     		id: create_xaxis_slot$1.name,
     		type: "slot",
-    		source: "(19:3) ",
+    		source: "(28:3) ",
     		ctx
     	});
 
     	return block;
     }
 
-    function create_fragment$2(ctx) {
+    function create_fragment$3(ctx) {
     	let axes;
     	let current;
 
@@ -6502,7 +6623,7 @@ var app = (function () {
     				title: `Population: µ = ${/*popMean*/ ctx[0]}, σ = ${/*popSD*/ ctx[1].toFixed(1)}`,
     				xLabel: "Chloride in water, [mg/L]",
     				limX: [80, 120],
-    				limY: mrange(/*popY*/ ctx[5], 0.01),
+    				limY: mrange(/*popY*/ ctx[7], 0.01),
     				$$slots: {
     					xaxis: [create_xaxis_slot$1],
     					default: [create_default_slot$2]
@@ -6526,9 +6647,9 @@ var app = (function () {
     		p: function update(ctx, [dirty]) {
     			const axes_changes = {};
     			if (dirty & /*popMean, popSD*/ 3) axes_changes.title = `Population: µ = ${/*popMean*/ ctx[0]}, σ = ${/*popSD*/ ctx[1].toFixed(1)}`;
-    			if (dirty & /*popY*/ 32) axes_changes.limY = mrange(/*popY*/ ctx[5], 0.01);
+    			if (dirty & /*popY*/ 128) axes_changes.limY = mrange(/*popY*/ ctx[7], 0.01);
 
-    			if (dirty & /*$$scope, sampMean, popY, colors, popMean, sample, sampY, popX*/ 509) {
+    			if (dirty & /*$$scope, popY, labelsStr, popMean, popColor, sample, sampY, sampColor, sampMean, popX, popAreaColor*/ 4093) {
     				axes_changes.$$scope = { dirty, ctx };
     			}
 
@@ -6550,7 +6671,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$2.name,
+    		id: create_fragment$3.name,
     		type: "component",
     		source: "",
     		ctx
@@ -6559,28 +6680,33 @@ var app = (function () {
     	return block;
     }
 
-    function instance$2($$self, $$props, $$invalidate) {
+    function instance$3($$self, $$props, $$invalidate) {
     	let popX;
     	let popY;
     	let sampY;
     	let sampMean;
+    	let labelsStr;
     	let { $$slots: slots = {}, $$scope } = $$props;
-    	validate_slots("PopulationPlot", slots, []);
+    	validate_slots("MeanPopulationPlot", slots, []);
     	let { popMean } = $$props;
     	let { popSD } = $$props;
     	let { sample } = $$props;
-    	let { colors } = $$props;
-    	const writable_props = ["popMean", "popSD", "sample", "colors"];
+    	let { popColor } = $$props;
+    	let { popAreaColor } = $$props;
+    	let { sampColor } = $$props;
+    	const writable_props = ["popMean", "popSD", "sample", "popColor", "popAreaColor", "sampColor"];
 
     	Object.keys($$props).forEach(key => {
-    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== "$$") console.warn(`<PopulationPlot> was created with unknown prop '${key}'`);
+    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== "$$") console.warn(`<MeanPopulationPlot> was created with unknown prop '${key}'`);
     	});
 
     	$$self.$$set = $$props => {
     		if ("popMean" in $$props) $$invalidate(0, popMean = $$props.popMean);
     		if ("popSD" in $$props) $$invalidate(1, popSD = $$props.popSD);
     		if ("sample" in $$props) $$invalidate(2, sample = $$props.sample);
-    		if ("colors" in $$props) $$invalidate(3, colors = $$props.colors);
+    		if ("popColor" in $$props) $$invalidate(3, popColor = $$props.popColor);
+    		if ("popAreaColor" in $$props) $$invalidate(4, popAreaColor = $$props.popAreaColor);
+    		if ("sampColor" in $$props) $$invalidate(5, sampColor = $$props.sampColor);
     	};
 
     	$$self.$capture_state = () => ({
@@ -6588,33 +6714,42 @@ var app = (function () {
     		dnorm,
     		rep,
     		mean,
+    		sd,
     		max,
     		mrange,
     		Axes,
     		XAxis,
     		LineSeries,
     		Segments,
+    		TextLegend,
     		ScatterSeries,
     		AreaSeries,
+    		formatLabels,
     		popMean,
     		popSD,
     		sample,
-    		colors,
+    		popColor,
+    		popAreaColor,
+    		sampColor,
     		popX,
     		popY,
     		sampY,
-    		sampMean
+    		sampMean,
+    		labelsStr
     	});
 
     	$$self.$inject_state = $$props => {
     		if ("popMean" in $$props) $$invalidate(0, popMean = $$props.popMean);
     		if ("popSD" in $$props) $$invalidate(1, popSD = $$props.popSD);
     		if ("sample" in $$props) $$invalidate(2, sample = $$props.sample);
-    		if ("colors" in $$props) $$invalidate(3, colors = $$props.colors);
-    		if ("popX" in $$props) $$invalidate(4, popX = $$props.popX);
-    		if ("popY" in $$props) $$invalidate(5, popY = $$props.popY);
-    		if ("sampY" in $$props) $$invalidate(6, sampY = $$props.sampY);
-    		if ("sampMean" in $$props) $$invalidate(7, sampMean = $$props.sampMean);
+    		if ("popColor" in $$props) $$invalidate(3, popColor = $$props.popColor);
+    		if ("popAreaColor" in $$props) $$invalidate(4, popAreaColor = $$props.popAreaColor);
+    		if ("sampColor" in $$props) $$invalidate(5, sampColor = $$props.sampColor);
+    		if ("popX" in $$props) $$invalidate(6, popX = $$props.popX);
+    		if ("popY" in $$props) $$invalidate(7, popY = $$props.popY);
+    		if ("sampY" in $$props) $$invalidate(8, sampY = $$props.sampY);
+    		if ("sampMean" in $$props) $$invalidate(9, sampMean = $$props.sampMean);
+    		if ("labelsStr" in $$props) $$invalidate(10, labelsStr = $$props.labelsStr);
     	};
 
     	if ($$props && "$$inject" in $$props) {
@@ -6624,99 +6759,253 @@ var app = (function () {
     	$$self.$$.update = () => {
     		if ($$self.$$.dirty & /*popMean, popSD*/ 3) {
     			// size of population and axes plus coordinates of the points
-    			$$invalidate(4, popX = seq(popMean - 3.5 * popSD, popMean + 3.5 * popSD, 100));
+    			$$invalidate(6, popX = seq(popMean - 3.5 * popSD, popMean + 3.5 * popSD, 100));
     		}
 
-    		if ($$self.$$.dirty & /*popX, popMean, popSD*/ 19) {
-    			$$invalidate(5, popY = dnorm(popX, popMean, popSD));
+    		if ($$self.$$.dirty & /*popX, popMean, popSD*/ 67) {
+    			$$invalidate(7, popY = dnorm(popX, popMean, popSD));
     		}
 
-    		if ($$self.$$.dirty & /*popY, sample*/ 36) {
-    			$$invalidate(6, sampY = rep(max(popY) * 0.05, sample.length));
+    		if ($$self.$$.dirty & /*popY, sample*/ 132) {
+    			$$invalidate(8, sampY = rep(max(popY) * 0.05, sample.length));
     		}
 
     		if ($$self.$$.dirty & /*sample*/ 4) {
-    			$$invalidate(7, sampMean = mean(sample));
+    			$$invalidate(9, sampMean = mean(sample));
+    		}
+
+    		if ($$self.$$.dirty & /*sample*/ 4) {
+    			// text values for stat table
+    			$$invalidate(10, labelsStr = formatLabels([
+    				{
+    					name: "Sample mean",
+    					value: mean(sample).toFixed(1)
+    				},
+    				{
+    					name: "Sample sd",
+    					value: sd(sample).toFixed(1)
+    				}
+    			]));
     		}
     	};
 
-    	return [popMean, popSD, sample, colors, popX, popY, sampY, sampMean];
+    	return [
+    		popMean,
+    		popSD,
+    		sample,
+    		popColor,
+    		popAreaColor,
+    		sampColor,
+    		popX,
+    		popY,
+    		sampY,
+    		sampMean,
+    		labelsStr
+    	];
     }
 
-    class PopulationPlot extends SvelteComponentDev {
+    class MeanPopulationPlot extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
 
-    		init(this, options, instance$2, create_fragment$2, safe_not_equal, {
+    		init(this, options, instance$3, create_fragment$3, safe_not_equal, {
     			popMean: 0,
     			popSD: 1,
     			sample: 2,
-    			colors: 3
+    			popColor: 3,
+    			popAreaColor: 4,
+    			sampColor: 5
     		});
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
-    			tagName: "PopulationPlot",
+    			tagName: "MeanPopulationPlot",
     			options,
-    			id: create_fragment$2.name
+    			id: create_fragment$3.name
     		});
 
     		const { ctx } = this.$$;
     		const props = options.props || {};
 
     		if (/*popMean*/ ctx[0] === undefined && !("popMean" in props)) {
-    			console.warn("<PopulationPlot> was created without expected prop 'popMean'");
+    			console.warn("<MeanPopulationPlot> was created without expected prop 'popMean'");
     		}
 
     		if (/*popSD*/ ctx[1] === undefined && !("popSD" in props)) {
-    			console.warn("<PopulationPlot> was created without expected prop 'popSD'");
+    			console.warn("<MeanPopulationPlot> was created without expected prop 'popSD'");
     		}
 
     		if (/*sample*/ ctx[2] === undefined && !("sample" in props)) {
-    			console.warn("<PopulationPlot> was created without expected prop 'sample'");
+    			console.warn("<MeanPopulationPlot> was created without expected prop 'sample'");
     		}
 
-    		if (/*colors*/ ctx[3] === undefined && !("colors" in props)) {
-    			console.warn("<PopulationPlot> was created without expected prop 'colors'");
+    		if (/*popColor*/ ctx[3] === undefined && !("popColor" in props)) {
+    			console.warn("<MeanPopulationPlot> was created without expected prop 'popColor'");
+    		}
+
+    		if (/*popAreaColor*/ ctx[4] === undefined && !("popAreaColor" in props)) {
+    			console.warn("<MeanPopulationPlot> was created without expected prop 'popAreaColor'");
+    		}
+
+    		if (/*sampColor*/ ctx[5] === undefined && !("sampColor" in props)) {
+    			console.warn("<MeanPopulationPlot> was created without expected prop 'sampColor'");
     		}
     	}
 
     	get popMean() {
-    		throw new Error("<PopulationPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    		throw new Error("<MeanPopulationPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
 
     	set popMean(value) {
-    		throw new Error("<PopulationPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    		throw new Error("<MeanPopulationPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
 
     	get popSD() {
-    		throw new Error("<PopulationPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    		throw new Error("<MeanPopulationPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
 
     	set popSD(value) {
-    		throw new Error("<PopulationPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    		throw new Error("<MeanPopulationPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
 
     	get sample() {
-    		throw new Error("<PopulationPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    		throw new Error("<MeanPopulationPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
 
     	set sample(value) {
-    		throw new Error("<PopulationPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    		throw new Error("<MeanPopulationPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
 
-    	get colors() {
-    		throw new Error("<PopulationPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	get popColor() {
+    		throw new Error("<MeanPopulationPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
 
-    	set colors(value) {
-    		throw new Error("<PopulationPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	set popColor(value) {
+    		throw new Error("<MeanPopulationPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get popAreaColor() {
+    		throw new Error("<MeanPopulationPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set popAreaColor(value) {
+    		throw new Error("<MeanPopulationPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get sampColor() {
+    		throw new Error("<MeanPopulationPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set sampColor(value) {
+    		throw new Error("<MeanPopulationPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
     }
 
-    /* src/CIPlot.svelte generated by Svelte v3.38.2 */
+    /* ../shared/plots/CIPlot.svelte generated by Svelte v3.38.2 */
+    const file$1 = "../shared/plots/CIPlot.svelte";
 
-    // (60:0) <Axes limX={[92, 108]} limY={[-0.005, max(f) * 1.70]} xLabel={"Estimated population mean, µ"}>
+    // (66:0) {:else}
+    function create_else_block(ctx) {
+    	let div;
+    	let t;
+
+    	const block = {
+    		c: function create() {
+    			div = element("div");
+    			t = text(/*errmsg*/ ctx[8]);
+    			attr_dev(div, "class", "error svelte-uext14");
+    			add_location(div, file$1, 66, 3, 2074);
+    		},
+    		m: function mount(target, anchor) {
+    			insert_dev(target, div, anchor);
+    			append_dev(div, t);
+    		},
+    		p: function update(ctx, dirty) {
+    			if (dirty & /*errmsg*/ 256) set_data_dev(t, /*errmsg*/ ctx[8]);
+    		},
+    		i: noop,
+    		o: noop,
+    		d: function destroy(detaching) {
+    			if (detaching) detach_dev(div);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_else_block.name,
+    		type: "else",
+    		source: "(66:0) {:else}",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    // (53:0) {#if errmsg === ""  }
+    function create_if_block(ctx) {
+    	let axes;
+    	let current;
+
+    	axes = new Axes({
+    			props: {
+    				limX: /*limX*/ ctx[5],
+    				limY: [-0.01, max(/*f*/ ctx[1]) * 1.5],
+    				xLabel: /*xLabel*/ ctx[9],
+    				$$slots: {
+    					xaxis: [create_xaxis_slot],
+    					default: [create_default_slot$1]
+    				},
+    				$$scope: { ctx }
+    			},
+    			$$inline: true
+    		});
+
+    	const block = {
+    		c: function create() {
+    			create_component(axes.$$.fragment);
+    		},
+    		m: function mount(target, anchor) {
+    			mount_component(axes, target, anchor);
+    			current = true;
+    		},
+    		p: function update(ctx, dirty) {
+    			const axes_changes = {};
+    			if (dirty & /*limX*/ 32) axes_changes.limX = /*limX*/ ctx[5];
+    			if (dirty & /*f*/ 2) axes_changes.limY = [-0.01, max(/*f*/ ctx[1]) * 1.5];
+    			if (dirty & /*xLabel*/ 512) axes_changes.xLabel = /*xLabel*/ ctx[9];
+
+    			if (dirty & /*$$scope, ciStat, f, lineColor, x, mainColor, cix, cif, labelsStr*/ 132319) {
+    				axes_changes.$$scope = { dirty, ctx };
+    			}
+
+    			axes.$set(axes_changes);
+    		},
+    		i: function intro(local) {
+    			if (current) return;
+    			transition_in(axes.$$.fragment, local);
+    			current = true;
+    		},
+    		o: function outro(local) {
+    			transition_out(axes.$$.fragment, local);
+    			current = false;
+    		},
+    		d: function destroy(detaching) {
+    			destroy_component(axes, detaching);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_if_block.name,
+    		type: "if",
+    		source: "(53:0) {#if errmsg === \\\"\\\"  }",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    // (54:3) <Axes {limX} limY={[-0.01, max(f) * 1.50]} {xLabel} >
     function create_default_slot$1(ctx) {
     	let textlegend;
     	let t0;
@@ -6731,45 +7020,40 @@ var app = (function () {
     			props: {
     				textSize: 1.15,
     				x: 90,
-    				y: max(/*f*/ ctx[4]) * 1.55,
+    				y: max(/*f*/ ctx[1]) * 1.4,
     				pos: 2,
     				dx: "1.25em",
-    				elements: [
-    					/*tableNSamplesInside*/ ctx[9],
-    					"95% CI: " + /*tableCI*/ ctx[8],
-    					"sample mean: " + /*sampMean*/ ctx[2].toFixed(1),
-    					"sample sd: " + /*sampSD*/ ctx[3].toFixed(2)
-    				]
+    				elements: /*labelsStr*/ ctx[10]
     			},
     			$$inline: true
     		});
 
     	areaseries = new AreaSeries({
     			props: {
-    				xValues: /*cix*/ ctx[6],
-    				yValues: /*cif*/ ctx[7],
-    				lineColor: /*colors*/ ctx[1][1] + "20",
-    				fillColor: /*colors*/ ctx[1][1] + "20"
+    				xValues: /*cix*/ ctx[2],
+    				yValues: /*cif*/ ctx[3],
+    				lineColor: /*mainColor*/ ctx[7] + "40",
+    				fillColor: /*mainColor*/ ctx[7] + "40"
     			},
     			$$inline: true
     		});
 
     	lineseries = new LineSeries({
     			props: {
-    				xValues: /*x*/ ctx[5],
-    				yValues: /*f*/ ctx[4],
-    				lineColor: /*colors*/ ctx[1][1] + "20"
+    				xValues: /*x*/ ctx[0],
+    				yValues: /*f*/ ctx[1],
+    				lineColor: /*mainColor*/ ctx[7] + "40"
     			},
     			$$inline: true
     		});
 
     	segments = new Segments({
     			props: {
-    				xStart: [/*popMean*/ ctx[0]],
-    				xEnd: [/*popMean*/ ctx[0]],
+    				xStart: [/*ciStat*/ ctx[4]],
+    				xEnd: [/*ciStat*/ ctx[4]],
     				yStart: [0],
-    				yEnd: [max(/*f*/ ctx[4])],
-    				lineColor: /*colors*/ ctx[1][0]
+    				yEnd: [max(/*f*/ ctx[1])],
+    				lineColor: /*lineColor*/ ctx[6]
     			},
     			$$inline: true
     		});
@@ -6796,32 +7080,25 @@ var app = (function () {
     		},
     		p: function update(ctx, dirty) {
     			const textlegend_changes = {};
-    			if (dirty & /*f*/ 16) textlegend_changes.y = max(/*f*/ ctx[4]) * 1.55;
-
-    			if (dirty & /*tableNSamplesInside, tableCI, sampMean, sampSD*/ 780) textlegend_changes.elements = [
-    				/*tableNSamplesInside*/ ctx[9],
-    				"95% CI: " + /*tableCI*/ ctx[8],
-    				"sample mean: " + /*sampMean*/ ctx[2].toFixed(1),
-    				"sample sd: " + /*sampSD*/ ctx[3].toFixed(2)
-    			];
-
+    			if (dirty & /*f*/ 2) textlegend_changes.y = max(/*f*/ ctx[1]) * 1.4;
+    			if (dirty & /*labelsStr*/ 1024) textlegend_changes.elements = /*labelsStr*/ ctx[10];
     			textlegend.$set(textlegend_changes);
     			const areaseries_changes = {};
-    			if (dirty & /*cix*/ 64) areaseries_changes.xValues = /*cix*/ ctx[6];
-    			if (dirty & /*cif*/ 128) areaseries_changes.yValues = /*cif*/ ctx[7];
-    			if (dirty & /*colors*/ 2) areaseries_changes.lineColor = /*colors*/ ctx[1][1] + "20";
-    			if (dirty & /*colors*/ 2) areaseries_changes.fillColor = /*colors*/ ctx[1][1] + "20";
+    			if (dirty & /*cix*/ 4) areaseries_changes.xValues = /*cix*/ ctx[2];
+    			if (dirty & /*cif*/ 8) areaseries_changes.yValues = /*cif*/ ctx[3];
+    			if (dirty & /*mainColor*/ 128) areaseries_changes.lineColor = /*mainColor*/ ctx[7] + "40";
+    			if (dirty & /*mainColor*/ 128) areaseries_changes.fillColor = /*mainColor*/ ctx[7] + "40";
     			areaseries.$set(areaseries_changes);
     			const lineseries_changes = {};
-    			if (dirty & /*x*/ 32) lineseries_changes.xValues = /*x*/ ctx[5];
-    			if (dirty & /*f*/ 16) lineseries_changes.yValues = /*f*/ ctx[4];
-    			if (dirty & /*colors*/ 2) lineseries_changes.lineColor = /*colors*/ ctx[1][1] + "20";
+    			if (dirty & /*x*/ 1) lineseries_changes.xValues = /*x*/ ctx[0];
+    			if (dirty & /*f*/ 2) lineseries_changes.yValues = /*f*/ ctx[1];
+    			if (dirty & /*mainColor*/ 128) lineseries_changes.lineColor = /*mainColor*/ ctx[7] + "40";
     			lineseries.$set(lineseries_changes);
     			const segments_changes = {};
-    			if (dirty & /*popMean*/ 1) segments_changes.xStart = [/*popMean*/ ctx[0]];
-    			if (dirty & /*popMean*/ 1) segments_changes.xEnd = [/*popMean*/ ctx[0]];
-    			if (dirty & /*f*/ 16) segments_changes.yEnd = [max(/*f*/ ctx[4])];
-    			if (dirty & /*colors*/ 2) segments_changes.lineColor = /*colors*/ ctx[1][0];
+    			if (dirty & /*ciStat*/ 16) segments_changes.xStart = [/*ciStat*/ ctx[4]];
+    			if (dirty & /*ciStat*/ 16) segments_changes.xEnd = [/*ciStat*/ ctx[4]];
+    			if (dirty & /*f*/ 2) segments_changes.yEnd = [max(/*f*/ ctx[1])];
+    			if (dirty & /*lineColor*/ 64) segments_changes.lineColor = /*lineColor*/ ctx[6];
     			segments.$set(segments_changes);
     		},
     		i: function intro(local) {
@@ -6854,14 +7131,14 @@ var app = (function () {
     		block,
     		id: create_default_slot$1.name,
     		type: "slot",
-    		source: "(60:0) <Axes limX={[92, 108]} limY={[-0.005, max(f) * 1.70]} xLabel={\\\"Estimated population mean, µ\\\"}>",
+    		source: "(54:3) <Axes {limX} limY={[-0.01, max(f) * 1.50]} {xLabel} >",
     		ctx
     	});
 
     	return block;
     }
 
-    // (73:3) 
+    // (64:6) 
     function create_xaxis_slot(ctx) {
     	let xaxis;
     	let current;
@@ -6894,63 +7171,495 @@ var app = (function () {
     		block,
     		id: create_xaxis_slot.name,
     		type: "slot",
-    		source: "(73:3) ",
+    		source: "(64:6) ",
     		ctx
     	});
 
     	return block;
     }
 
+    function create_fragment$2(ctx) {
+    	let current_block_type_index;
+    	let if_block;
+    	let if_block_anchor;
+    	let current;
+    	const if_block_creators = [create_if_block, create_else_block];
+    	const if_blocks = [];
+
+    	function select_block_type(ctx, dirty) {
+    		if (/*errmsg*/ ctx[8] === "") return 0;
+    		return 1;
+    	}
+
+    	current_block_type_index = select_block_type(ctx);
+    	if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
+
+    	const block = {
+    		c: function create() {
+    			if_block.c();
+    			if_block_anchor = empty();
+    		},
+    		l: function claim(nodes) {
+    			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
+    		},
+    		m: function mount(target, anchor) {
+    			if_blocks[current_block_type_index].m(target, anchor);
+    			insert_dev(target, if_block_anchor, anchor);
+    			current = true;
+    		},
+    		p: function update(ctx, [dirty]) {
+    			let previous_block_index = current_block_type_index;
+    			current_block_type_index = select_block_type(ctx);
+
+    			if (current_block_type_index === previous_block_index) {
+    				if_blocks[current_block_type_index].p(ctx, dirty);
+    			} else {
+    				group_outros();
+
+    				transition_out(if_blocks[previous_block_index], 1, 1, () => {
+    					if_blocks[previous_block_index] = null;
+    				});
+
+    				check_outros();
+    				if_block = if_blocks[current_block_type_index];
+
+    				if (!if_block) {
+    					if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
+    					if_block.c();
+    				} else {
+    					if_block.p(ctx, dirty);
+    				}
+
+    				transition_in(if_block, 1);
+    				if_block.m(if_block_anchor.parentNode, if_block_anchor);
+    			}
+    		},
+    		i: function intro(local) {
+    			if (current) return;
+    			transition_in(if_block);
+    			current = true;
+    		},
+    		o: function outro(local) {
+    			transition_out(if_block);
+    			current = false;
+    		},
+    		d: function destroy(detaching) {
+    			if_blocks[current_block_type_index].d(detaching);
+    			if (detaching) detach_dev(if_block_anchor);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_fragment$2.name,
+    		type: "component",
+    		source: "",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    function instance$2($$self, $$props, $$invalidate) {
+    	let labelsStr;
+    	let { $$slots: slots = {}, $$scope } = $$props;
+    	validate_slots("CIPlot", slots, []);
+    	let { x } = $$props;
+    	let { f } = $$props;
+    	let { ci } = $$props;
+    	let { cix } = $$props;
+    	let { cif } = $$props;
+    	let { ciStat } = $$props;
+    	let { limX = [-0.02, 1.02] } = $$props; // default value is suitable for proportions CIs
+    	let { lineColor = "#000000" } = $$props;
+    	let { mainColor = "#6f6666" } = $$props;
+    	let { errmsg = "" } = $$props;
+    	let { labelStr = "# samples inside CI" } = $$props;
+    	let { xLabel = "Expected sample statistic" } = $$props;
+    	let { reset = false } = $$props;
+    	let { clicked } = $$props;
+    	let nSamples = 0;
+    	let nSamplesInside = 0;
+
+    	const writable_props = [
+    		"x",
+    		"f",
+    		"ci",
+    		"cix",
+    		"cif",
+    		"ciStat",
+    		"limX",
+    		"lineColor",
+    		"mainColor",
+    		"errmsg",
+    		"labelStr",
+    		"xLabel",
+    		"reset",
+    		"clicked"
+    	];
+
+    	Object.keys($$props).forEach(key => {
+    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== "$$") console.warn(`<CIPlot> was created with unknown prop '${key}'`);
+    	});
+
+    	$$self.$$set = $$props => {
+    		if ("x" in $$props) $$invalidate(0, x = $$props.x);
+    		if ("f" in $$props) $$invalidate(1, f = $$props.f);
+    		if ("ci" in $$props) $$invalidate(11, ci = $$props.ci);
+    		if ("cix" in $$props) $$invalidate(2, cix = $$props.cix);
+    		if ("cif" in $$props) $$invalidate(3, cif = $$props.cif);
+    		if ("ciStat" in $$props) $$invalidate(4, ciStat = $$props.ciStat);
+    		if ("limX" in $$props) $$invalidate(5, limX = $$props.limX);
+    		if ("lineColor" in $$props) $$invalidate(6, lineColor = $$props.lineColor);
+    		if ("mainColor" in $$props) $$invalidate(7, mainColor = $$props.mainColor);
+    		if ("errmsg" in $$props) $$invalidate(8, errmsg = $$props.errmsg);
+    		if ("labelStr" in $$props) $$invalidate(12, labelStr = $$props.labelStr);
+    		if ("xLabel" in $$props) $$invalidate(9, xLabel = $$props.xLabel);
+    		if ("reset" in $$props) $$invalidate(13, reset = $$props.reset);
+    		if ("clicked" in $$props) $$invalidate(14, clicked = $$props.clicked);
+    	};
+
+    	$$self.$capture_state = () => ({
+    		max,
+    		Axes,
+    		XAxis,
+    		LineSeries,
+    		AreaSeries,
+    		TextLegend,
+    		Segments,
+    		formatLabels,
+    		x,
+    		f,
+    		ci,
+    		cix,
+    		cif,
+    		ciStat,
+    		limX,
+    		lineColor,
+    		mainColor,
+    		errmsg,
+    		labelStr,
+    		xLabel,
+    		reset,
+    		clicked,
+    		nSamples,
+    		nSamplesInside,
+    		labelsStr
+    	});
+
+    	$$self.$inject_state = $$props => {
+    		if ("x" in $$props) $$invalidate(0, x = $$props.x);
+    		if ("f" in $$props) $$invalidate(1, f = $$props.f);
+    		if ("ci" in $$props) $$invalidate(11, ci = $$props.ci);
+    		if ("cix" in $$props) $$invalidate(2, cix = $$props.cix);
+    		if ("cif" in $$props) $$invalidate(3, cif = $$props.cif);
+    		if ("ciStat" in $$props) $$invalidate(4, ciStat = $$props.ciStat);
+    		if ("limX" in $$props) $$invalidate(5, limX = $$props.limX);
+    		if ("lineColor" in $$props) $$invalidate(6, lineColor = $$props.lineColor);
+    		if ("mainColor" in $$props) $$invalidate(7, mainColor = $$props.mainColor);
+    		if ("errmsg" in $$props) $$invalidate(8, errmsg = $$props.errmsg);
+    		if ("labelStr" in $$props) $$invalidate(12, labelStr = $$props.labelStr);
+    		if ("xLabel" in $$props) $$invalidate(9, xLabel = $$props.xLabel);
+    		if ("reset" in $$props) $$invalidate(13, reset = $$props.reset);
+    		if ("clicked" in $$props) $$invalidate(14, clicked = $$props.clicked);
+    		if ("nSamples" in $$props) $$invalidate(15, nSamples = $$props.nSamples);
+    		if ("nSamplesInside" in $$props) $$invalidate(16, nSamplesInside = $$props.nSamplesInside);
+    		if ("labelsStr" in $$props) $$invalidate(10, labelsStr = $$props.labelsStr);
+    	};
+
+    	if ($$props && "$$inject" in $$props) {
+    		$$self.$inject_state($$props.$$inject);
+    	}
+
+    	$$self.$$.update = () => {
+    		if ($$self.$$.dirty & /*clicked, reset, nSamples, nSamplesInside, ciStat, ci*/ 124944) {
+    			{
+
+    				// when sample size or population properties changed - reset statistics
+    				if (reset) {
+    					$$invalidate(15, nSamples = 0);
+    					$$invalidate(16, nSamplesInside = 0);
+    				}
+
+    				$$invalidate(15, nSamples = nSamples + 1);
+    				$$invalidate(16, nSamplesInside = nSamplesInside + (ciStat >= ci[0] && ciStat <= ci[1] ? 1 : 0));
+    			}
+    		}
+
+    		if ($$self.$$.dirty & /*ci, labelStr, nSamplesInside, nSamples*/ 104448) {
+    			// text values for stat table
+    			$$invalidate(10, labelsStr = formatLabels([
+    				{
+    					name: "95% CI",
+    					value: `[${ci[0].toFixed(2)}, ${ci[1].toFixed(2)}]`
+    				},
+    				{
+    					name: labelStr,
+    					value: `${nSamplesInside}/${nSamples} (${(nSamplesInside / nSamples * 100).toFixed(1)}%)`
+    				}
+    			]));
+    		}
+    	};
+
+    	return [
+    		x,
+    		f,
+    		cix,
+    		cif,
+    		ciStat,
+    		limX,
+    		lineColor,
+    		mainColor,
+    		errmsg,
+    		xLabel,
+    		labelsStr,
+    		ci,
+    		labelStr,
+    		reset,
+    		clicked,
+    		nSamples,
+    		nSamplesInside
+    	];
+    }
+
+    class CIPlot extends SvelteComponentDev {
+    	constructor(options) {
+    		super(options);
+
+    		init(this, options, instance$2, create_fragment$2, safe_not_equal, {
+    			x: 0,
+    			f: 1,
+    			ci: 11,
+    			cix: 2,
+    			cif: 3,
+    			ciStat: 4,
+    			limX: 5,
+    			lineColor: 6,
+    			mainColor: 7,
+    			errmsg: 8,
+    			labelStr: 12,
+    			xLabel: 9,
+    			reset: 13,
+    			clicked: 14
+    		});
+
+    		dispatch_dev("SvelteRegisterComponent", {
+    			component: this,
+    			tagName: "CIPlot",
+    			options,
+    			id: create_fragment$2.name
+    		});
+
+    		const { ctx } = this.$$;
+    		const props = options.props || {};
+
+    		if (/*x*/ ctx[0] === undefined && !("x" in props)) {
+    			console.warn("<CIPlot> was created without expected prop 'x'");
+    		}
+
+    		if (/*f*/ ctx[1] === undefined && !("f" in props)) {
+    			console.warn("<CIPlot> was created without expected prop 'f'");
+    		}
+
+    		if (/*ci*/ ctx[11] === undefined && !("ci" in props)) {
+    			console.warn("<CIPlot> was created without expected prop 'ci'");
+    		}
+
+    		if (/*cix*/ ctx[2] === undefined && !("cix" in props)) {
+    			console.warn("<CIPlot> was created without expected prop 'cix'");
+    		}
+
+    		if (/*cif*/ ctx[3] === undefined && !("cif" in props)) {
+    			console.warn("<CIPlot> was created without expected prop 'cif'");
+    		}
+
+    		if (/*ciStat*/ ctx[4] === undefined && !("ciStat" in props)) {
+    			console.warn("<CIPlot> was created without expected prop 'ciStat'");
+    		}
+
+    		if (/*clicked*/ ctx[14] === undefined && !("clicked" in props)) {
+    			console.warn("<CIPlot> was created without expected prop 'clicked'");
+    		}
+    	}
+
+    	get x() {
+    		throw new Error("<CIPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set x(value) {
+    		throw new Error("<CIPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get f() {
+    		throw new Error("<CIPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set f(value) {
+    		throw new Error("<CIPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get ci() {
+    		throw new Error("<CIPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set ci(value) {
+    		throw new Error("<CIPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get cix() {
+    		throw new Error("<CIPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set cix(value) {
+    		throw new Error("<CIPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get cif() {
+    		throw new Error("<CIPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set cif(value) {
+    		throw new Error("<CIPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get ciStat() {
+    		throw new Error("<CIPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set ciStat(value) {
+    		throw new Error("<CIPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get limX() {
+    		throw new Error("<CIPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set limX(value) {
+    		throw new Error("<CIPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get lineColor() {
+    		throw new Error("<CIPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set lineColor(value) {
+    		throw new Error("<CIPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get mainColor() {
+    		throw new Error("<CIPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set mainColor(value) {
+    		throw new Error("<CIPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get errmsg() {
+    		throw new Error("<CIPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set errmsg(value) {
+    		throw new Error("<CIPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get labelStr() {
+    		throw new Error("<CIPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set labelStr(value) {
+    		throw new Error("<CIPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get xLabel() {
+    		throw new Error("<CIPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set xLabel(value) {
+    		throw new Error("<CIPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get reset() {
+    		throw new Error("<CIPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set reset(value) {
+    		throw new Error("<CIPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get clicked() {
+    		throw new Error("<CIPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set clicked(value) {
+    		throw new Error("<CIPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+    }
+
+    /* src/MeanCIPlot.svelte generated by Svelte v3.38.2 */
+
     function create_fragment$1(ctx) {
-    	let axes;
+    	let ciplot;
     	let current;
 
-    	axes = new Axes({
+    	ciplot = new CIPlot({
     			props: {
-    				limX: [92, 108],
-    				limY: [-0.005, max(/*f*/ ctx[4]) * 1.7],
-    				xLabel: "Estimated population mean, µ",
-    				$$slots: {
-    					xaxis: [create_xaxis_slot],
-    					default: [create_default_slot$1]
-    				},
-    				$$scope: { ctx }
+    				limX: [85, 115],
+    				clicked: /*clicked*/ ctx[2],
+    				x: /*x*/ ctx[8],
+    				f: /*f*/ ctx[9],
+    				cix: /*cix*/ ctx[11],
+    				cif: /*cif*/ ctx[12],
+    				ci: /*ci*/ ctx[10],
+    				ciStat: /*ciStat*/ ctx[7],
+    				errmsg: /*errmsg*/ ctx[6],
+    				lineColor: /*lineColor*/ ctx[0],
+    				mainColor: /*mainColor*/ ctx[1],
+    				xLabel: /*xLabel*/ ctx[4],
+    				labelStr: /*labelStr*/ ctx[3],
+    				reset: /*reset*/ ctx[5]
     			},
     			$$inline: true
     		});
 
     	const block = {
     		c: function create() {
-    			create_component(axes.$$.fragment);
+    			create_component(ciplot.$$.fragment);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
     		},
     		m: function mount(target, anchor) {
-    			mount_component(axes, target, anchor);
+    			mount_component(ciplot, target, anchor);
     			current = true;
     		},
     		p: function update(ctx, [dirty]) {
-    			const axes_changes = {};
-    			if (dirty & /*f*/ 16) axes_changes.limY = [-0.005, max(/*f*/ ctx[4]) * 1.7];
-
-    			if (dirty & /*$$scope, popMean, f, colors, x, cix, cif, tableNSamplesInside, tableCI, sampMean, sampSD*/ 16778239) {
-    				axes_changes.$$scope = { dirty, ctx };
-    			}
-
-    			axes.$set(axes_changes);
+    			const ciplot_changes = {};
+    			if (dirty & /*clicked*/ 4) ciplot_changes.clicked = /*clicked*/ ctx[2];
+    			if (dirty & /*x*/ 256) ciplot_changes.x = /*x*/ ctx[8];
+    			if (dirty & /*f*/ 512) ciplot_changes.f = /*f*/ ctx[9];
+    			if (dirty & /*cix*/ 2048) ciplot_changes.cix = /*cix*/ ctx[11];
+    			if (dirty & /*cif*/ 4096) ciplot_changes.cif = /*cif*/ ctx[12];
+    			if (dirty & /*ci*/ 1024) ciplot_changes.ci = /*ci*/ ctx[10];
+    			if (dirty & /*ciStat*/ 128) ciplot_changes.ciStat = /*ciStat*/ ctx[7];
+    			if (dirty & /*errmsg*/ 64) ciplot_changes.errmsg = /*errmsg*/ ctx[6];
+    			if (dirty & /*lineColor*/ 1) ciplot_changes.lineColor = /*lineColor*/ ctx[0];
+    			if (dirty & /*mainColor*/ 2) ciplot_changes.mainColor = /*mainColor*/ ctx[1];
+    			if (dirty & /*xLabel*/ 16) ciplot_changes.xLabel = /*xLabel*/ ctx[4];
+    			if (dirty & /*labelStr*/ 8) ciplot_changes.labelStr = /*labelStr*/ ctx[3];
+    			if (dirty & /*reset*/ 32) ciplot_changes.reset = /*reset*/ ctx[5];
+    			ciplot.$set(ciplot_changes);
     		},
     		i: function intro(local) {
     			if (current) return;
-    			transition_in(axes.$$.fragment, local);
+    			transition_in(ciplot.$$.fragment, local);
     			current = true;
     		},
     		o: function outro(local) {
-    			transition_out(axes.$$.fragment, local);
+    			transition_out(ciplot.$$.fragment, local);
     			current = false;
     		},
     		d: function destroy(detaching) {
-    			destroy_component(axes, detaching);
+    			destroy_component(ciplot, detaching);
     		}
     	};
 
@@ -6966,118 +7675,113 @@ var app = (function () {
     }
 
     function instance$1($$self, $$props, $$invalidate) {
-    	let sampSD;
-    	let SE;
-    	let tCrit;
+    	let sampSize;
+    	let DoF;
+    	let ciCenter;
+    	let ciSD;
+    	let ciStat;
     	let t;
-    	let f;
     	let x;
+    	let f;
+    	let tCrit;
     	let ci;
-    	let ciXInd;
+    	let cit;
     	let cix;
     	let cif;
-    	let nSamples;
-    	let nSamplesInside;
-    	let tableCI;
-    	let tableNSamplesInside;
     	let { $$slots: slots = {}, $$scope } = $$props;
-    	validate_slots("CIPlot", slots, []);
+    	validate_slots("MeanCIPlot", slots, []);
+    	let { lineColor = "#000000" } = $$props;
+    	let { mainColor = "#6f6666" } = $$props;
     	let { popMean } = $$props;
-    	let { popSD } = $$props;
     	let { sample } = $$props;
-    	let { colors } = $$props;
-    	let sampStat = [];
-    	let sampMean;
-    	let sampleSize;
-    	let sampleSizeOld = sample.length;
-    	let popSDOld = popSD;
+    	let { clicked } = $$props;
+    	let { labelStr = "# samples with µ inside CI" } = $$props;
+    	let { xLabel = "Expected sample mean" } = $$props;
+    	let { reset = false } = $$props;
+    	let { errmsg = "" } = $$props;
 
-    	// critical t-values for the sample sizes
-    	const tVals = {
-    		5: 2.776445,
-    		10: 2.262157,
-    		20: 2.093024,
-    		40: 2.022691
-    	};
-
-    	const writable_props = ["popMean", "popSD", "sample", "colors"];
+    	const writable_props = [
+    		"lineColor",
+    		"mainColor",
+    		"popMean",
+    		"sample",
+    		"clicked",
+    		"labelStr",
+    		"xLabel",
+    		"reset",
+    		"errmsg"
+    	];
 
     	Object.keys($$props).forEach(key => {
-    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== "$$") console.warn(`<CIPlot> was created with unknown prop '${key}'`);
+    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== "$$") console.warn(`<MeanCIPlot> was created with unknown prop '${key}'`);
     	});
 
     	$$self.$$set = $$props => {
-    		if ("popMean" in $$props) $$invalidate(0, popMean = $$props.popMean);
-    		if ("popSD" in $$props) $$invalidate(10, popSD = $$props.popSD);
-    		if ("sample" in $$props) $$invalidate(11, sample = $$props.sample);
-    		if ("colors" in $$props) $$invalidate(1, colors = $$props.colors);
+    		if ("lineColor" in $$props) $$invalidate(0, lineColor = $$props.lineColor);
+    		if ("mainColor" in $$props) $$invalidate(1, mainColor = $$props.mainColor);
+    		if ("popMean" in $$props) $$invalidate(13, popMean = $$props.popMean);
+    		if ("sample" in $$props) $$invalidate(14, sample = $$props.sample);
+    		if ("clicked" in $$props) $$invalidate(2, clicked = $$props.clicked);
+    		if ("labelStr" in $$props) $$invalidate(3, labelStr = $$props.labelStr);
+    		if ("xLabel" in $$props) $$invalidate(4, xLabel = $$props.xLabel);
+    		if ("reset" in $$props) $$invalidate(5, reset = $$props.reset);
+    		if ("errmsg" in $$props) $$invalidate(6, errmsg = $$props.errmsg);
     	};
 
     	$$self.$capture_state = () => ({
-    		sum,
     		seq,
     		sd,
-    		max,
     		dt,
+    		qt,
     		mean,
-    		subset,
-    		closestIndex,
-    		Axes,
-    		XAxis,
-    		LineSeries,
-    		AreaSeries,
-    		TextLegend,
-    		Segments,
+    		CIPlot,
+    		lineColor,
+    		mainColor,
     		popMean,
-    		popSD,
     		sample,
-    		colors,
-    		sampStat,
-    		sampMean,
-    		sampleSize,
-    		sampleSizeOld,
-    		popSDOld,
-    		tVals,
-    		sampSD,
-    		SE,
-    		tCrit,
+    		clicked,
+    		labelStr,
+    		xLabel,
+    		reset,
+    		errmsg,
+    		sampSize,
+    		DoF,
+    		ciCenter,
+    		ciSD,
+    		ciStat,
     		t,
-    		f,
     		x,
+    		f,
+    		tCrit,
     		ci,
-    		ciXInd,
+    		cit,
     		cix,
-    		cif,
-    		nSamples,
-    		nSamplesInside,
-    		tableCI,
-    		tableNSamplesInside
+    		cif
     	});
 
     	$$self.$inject_state = $$props => {
-    		if ("popMean" in $$props) $$invalidate(0, popMean = $$props.popMean);
-    		if ("popSD" in $$props) $$invalidate(10, popSD = $$props.popSD);
-    		if ("sample" in $$props) $$invalidate(11, sample = $$props.sample);
-    		if ("colors" in $$props) $$invalidate(1, colors = $$props.colors);
-    		if ("sampStat" in $$props) $$invalidate(12, sampStat = $$props.sampStat);
-    		if ("sampMean" in $$props) $$invalidate(2, sampMean = $$props.sampMean);
-    		if ("sampleSize" in $$props) $$invalidate(13, sampleSize = $$props.sampleSize);
-    		if ("sampleSizeOld" in $$props) $$invalidate(14, sampleSizeOld = $$props.sampleSizeOld);
-    		if ("popSDOld" in $$props) $$invalidate(15, popSDOld = $$props.popSDOld);
-    		if ("sampSD" in $$props) $$invalidate(3, sampSD = $$props.sampSD);
-    		if ("SE" in $$props) $$invalidate(16, SE = $$props.SE);
-    		if ("tCrit" in $$props) $$invalidate(17, tCrit = $$props.tCrit);
-    		if ("t" in $$props) $$invalidate(18, t = $$props.t);
-    		if ("f" in $$props) $$invalidate(4, f = $$props.f);
-    		if ("x" in $$props) $$invalidate(5, x = $$props.x);
-    		if ("ci" in $$props) $$invalidate(19, ci = $$props.ci);
-    		if ("ciXInd" in $$props) $$invalidate(20, ciXInd = $$props.ciXInd);
-    		if ("cix" in $$props) $$invalidate(6, cix = $$props.cix);
-    		if ("cif" in $$props) $$invalidate(7, cif = $$props.cif);
-    		if ("nSamples" in $$props) $$invalidate(21, nSamples = $$props.nSamples);
-    		if ("nSamplesInside" in $$props) $$invalidate(22, nSamplesInside = $$props.nSamplesInside);
-    		if ("tableCI" in $$props) $$invalidate(8, tableCI = $$props.tableCI);
-    		if ("tableNSamplesInside" in $$props) $$invalidate(9, tableNSamplesInside = $$props.tableNSamplesInside);
+    		if ("lineColor" in $$props) $$invalidate(0, lineColor = $$props.lineColor);
+    		if ("mainColor" in $$props) $$invalidate(1, mainColor = $$props.mainColor);
+    		if ("popMean" in $$props) $$invalidate(13, popMean = $$props.popMean);
+    		if ("sample" in $$props) $$invalidate(14, sample = $$props.sample);
+    		if ("clicked" in $$props) $$invalidate(2, clicked = $$props.clicked);
+    		if ("labelStr" in $$props) $$invalidate(3, labelStr = $$props.labelStr);
+    		if ("xLabel" in $$props) $$invalidate(4, xLabel = $$props.xLabel);
+    		if ("reset" in $$props) $$invalidate(5, reset = $$props.reset);
+    		if ("errmsg" in $$props) $$invalidate(6, errmsg = $$props.errmsg);
+    		if ("sampSize" in $$props) $$invalidate(15, sampSize = $$props.sampSize);
+    		if ("DoF" in $$props) $$invalidate(16, DoF = $$props.DoF);
+    		if ("ciCenter" in $$props) $$invalidate(17, ciCenter = $$props.ciCenter);
+    		if ("ciSD" in $$props) $$invalidate(18, ciSD = $$props.ciSD);
+    		if ("ciStat" in $$props) $$invalidate(7, ciStat = $$props.ciStat);
+    		if ("t" in $$props) $$invalidate(19, t = $$props.t);
+    		if ("x" in $$props) $$invalidate(8, x = $$props.x);
+    		if ("f" in $$props) $$invalidate(9, f = $$props.f);
+    		if ("tCrit" in $$props) $$invalidate(20, tCrit = $$props.tCrit);
+    		if ("ci" in $$props) $$invalidate(10, ci = $$props.ci);
+    		if ("cit" in $$props) $$invalidate(21, cit = $$props.cit);
+    		if ("cix" in $$props) $$invalidate(11, cix = $$props.cix);
+    		if ("cif" in $$props) $$invalidate(12, cif = $$props.cif);
     	};
 
     	if ($$props && "$$inject" in $$props) {
@@ -7085,131 +7789,103 @@ var app = (function () {
     	}
 
     	$$self.$$.update = () => {
-    		if ($$self.$$.dirty & /*sample, sampleSize, sampleSizeOld, popSD, popSDOld*/ 60416) {
-    			// when sample size has changed - reset statistics
-    			{
-    				$$invalidate(13, sampleSize = sample.length);
-
-    				if (sampleSize != sampleSizeOld || popSD != popSDOld) {
-    					$$invalidate(14, sampleSizeOld = sampleSize);
-    					$$invalidate(15, popSDOld = popSD);
-    					$$invalidate(12, sampStat = []);
-    				}
-    			}
+    		if ($$self.$$.dirty & /*sample*/ 16384) {
+    			$$invalidate(15, sampSize = sample.length);
     		}
 
-    		if ($$self.$$.dirty & /*sample*/ 2048) {
-    			// mean of current sample
-    			$$invalidate(2, sampMean = mean(sample));
+    		if ($$self.$$.dirty & /*sampSize*/ 32768) {
+    			$$invalidate(16, DoF = sampSize - 1);
     		}
 
-    		if ($$self.$$.dirty & /*sample*/ 2048) {
-    			$$invalidate(3, sampSD = sd(sample));
+    		if ($$self.$$.dirty & /*sample*/ 16384) {
+    			$$invalidate(17, ciCenter = mean(sample));
     		}
 
-    		if ($$self.$$.dirty & /*sampSD, sampleSize*/ 8200) {
-    			$$invalidate(16, SE = sampSD / Math.sqrt(sampleSize));
+    		if ($$self.$$.dirty & /*sample, sampSize*/ 49152) {
+    			$$invalidate(18, ciSD = sd(sample) / Math.sqrt(sampSize));
     		}
 
-    		if ($$self.$$.dirty & /*sampleSize*/ 8192) {
-    			// PDF curve
-    			$$invalidate(17, tCrit = tVals[sampleSize]);
+    		if ($$self.$$.dirty & /*popMean*/ 8192) {
+    			$$invalidate(7, ciStat = popMean);
     		}
 
-    		if ($$self.$$.dirty & /*tCrit*/ 131072) {
-    			$$invalidate(18, t = seq(-tCrit * 1.5, tCrit * 1.5, 1000));
+    		if ($$self.$$.dirty & /*t, ciSD, ciCenter*/ 917504) {
+    			$$invalidate(8, x = t.map(v => v * ciSD + ciCenter));
     		}
 
-    		if ($$self.$$.dirty & /*t, sampleSize*/ 270336) {
-    			$$invalidate(4, f = dt(t, sampleSize - 1));
+    		if ($$self.$$.dirty & /*t, DoF*/ 589824) {
+    			$$invalidate(9, f = dt(t, DoF));
     		}
 
-    		if ($$self.$$.dirty & /*t, SE, sampMean*/ 327684) {
-    			$$invalidate(5, x = t.map(v => v * SE + sampMean));
-    		}
-
-    		if ($$self.$$.dirty & /*sampMean, tCrit, SE*/ 196612) {
+    		if ($$self.$$.dirty & /*sample*/ 16384) {
     			// CI and CI area
-    			$$invalidate(19, ci = [sampMean - tCrit * SE, sampMean + tCrit * SE]);
+    			$$invalidate(20, tCrit = qt(0.975, sample.length - 1));
     		}
 
-    		if ($$self.$$.dirty & /*x, ci*/ 524320) {
-    			$$invalidate(20, ciXInd = seq(closestIndex(x, ci[0]), closestIndex(x, ci[1])));
+    		if ($$self.$$.dirty & /*ciCenter, tCrit, ciSD*/ 1441792) {
+    			$$invalidate(10, ci = [ciCenter - tCrit * ciSD, ciCenter + tCrit * ciSD]);
     		}
 
-    		if ($$self.$$.dirty & /*x, ciXInd*/ 1048608) {
-    			$$invalidate(6, cix = subset(x, ciXInd));
+    		if ($$self.$$.dirty & /*tCrit*/ 1048576) {
+    			$$invalidate(21, cit = seq(-tCrit, tCrit, 200));
     		}
 
-    		if ($$self.$$.dirty & /*f, ciXInd*/ 1048592) {
-    			$$invalidate(7, cif = subset(f, ciXInd));
+    		if ($$self.$$.dirty & /*cit, ciSD, ciCenter*/ 2490368) {
+    			$$invalidate(11, cix = cit.map(v => v * ciSD + ciCenter));
     		}
 
-    		if ($$self.$$.dirty & /*sampStat, popMean, ci*/ 528385) {
-    			// if new sample is taken, add true if it is inside CI and false otherwise
-    			$$invalidate(12, sampStat = [...sampStat, popMean >= ci[0] && popMean <= ci[1] ? 1 : 0]);
-    		}
-
-    		if ($$self.$$.dirty & /*sampStat*/ 4096) {
-    			// numeric values for stat table
-    			$$invalidate(21, nSamples = sampStat.length);
-    		}
-
-    		if ($$self.$$.dirty & /*sampStat*/ 4096) {
-    			$$invalidate(22, nSamplesInside = sum(sampStat));
-    		}
-
-    		if ($$self.$$.dirty & /*ci*/ 524288) {
-    			// text values for stat table
-    			$$invalidate(8, tableCI = `[${ci[0].toFixed(2)}, ${ci[1].toFixed(2)}]`);
-    		}
-
-    		if ($$self.$$.dirty & /*nSamplesInside, nSamples*/ 6291456) {
-    			$$invalidate(9, tableNSamplesInside = `# samples with µ inside CI: ${nSamplesInside}/${nSamples} (${(nSamplesInside / nSamples * 100).toFixed(1)}%)`);
+    		if ($$self.$$.dirty & /*cit, DoF*/ 2162688) {
+    			$$invalidate(12, cif = dt(cit, DoF));
     		}
     	};
 
+    	$$invalidate(19, t = seq(-5, 5, 200));
+
     	return [
-    		popMean,
-    		colors,
-    		sampMean,
-    		sampSD,
-    		f,
+    		lineColor,
+    		mainColor,
+    		clicked,
+    		labelStr,
+    		xLabel,
+    		reset,
+    		errmsg,
+    		ciStat,
     		x,
+    		f,
+    		ci,
     		cix,
     		cif,
-    		tableCI,
-    		tableNSamplesInside,
-    		popSD,
+    		popMean,
     		sample,
-    		sampStat,
-    		sampleSize,
-    		sampleSizeOld,
-    		popSDOld,
-    		SE,
-    		tCrit,
+    		sampSize,
+    		DoF,
+    		ciCenter,
+    		ciSD,
     		t,
-    		ci,
-    		ciXInd,
-    		nSamples,
-    		nSamplesInside
+    		tCrit,
+    		cit
     	];
     }
 
-    class CIPlot extends SvelteComponentDev {
+    class MeanCIPlot extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
 
     		init(this, options, instance$1, create_fragment$1, safe_not_equal, {
-    			popMean: 0,
-    			popSD: 10,
-    			sample: 11,
-    			colors: 1
+    			lineColor: 0,
+    			mainColor: 1,
+    			popMean: 13,
+    			sample: 14,
+    			clicked: 2,
+    			labelStr: 3,
+    			xLabel: 4,
+    			reset: 5,
+    			errmsg: 6
     		});
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
-    			tagName: "CIPlot",
+    			tagName: "MeanCIPlot",
     			options,
     			id: create_fragment$1.name
     		});
@@ -7217,60 +7893,96 @@ var app = (function () {
     		const { ctx } = this.$$;
     		const props = options.props || {};
 
-    		if (/*popMean*/ ctx[0] === undefined && !("popMean" in props)) {
-    			console.warn("<CIPlot> was created without expected prop 'popMean'");
+    		if (/*popMean*/ ctx[13] === undefined && !("popMean" in props)) {
+    			console.warn("<MeanCIPlot> was created without expected prop 'popMean'");
     		}
 
-    		if (/*popSD*/ ctx[10] === undefined && !("popSD" in props)) {
-    			console.warn("<CIPlot> was created without expected prop 'popSD'");
+    		if (/*sample*/ ctx[14] === undefined && !("sample" in props)) {
+    			console.warn("<MeanCIPlot> was created without expected prop 'sample'");
     		}
 
-    		if (/*sample*/ ctx[11] === undefined && !("sample" in props)) {
-    			console.warn("<CIPlot> was created without expected prop 'sample'");
+    		if (/*clicked*/ ctx[2] === undefined && !("clicked" in props)) {
+    			console.warn("<MeanCIPlot> was created without expected prop 'clicked'");
     		}
+    	}
 
-    		if (/*colors*/ ctx[1] === undefined && !("colors" in props)) {
-    			console.warn("<CIPlot> was created without expected prop 'colors'");
-    		}
+    	get lineColor() {
+    		throw new Error("<MeanCIPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set lineColor(value) {
+    		throw new Error("<MeanCIPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get mainColor() {
+    		throw new Error("<MeanCIPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set mainColor(value) {
+    		throw new Error("<MeanCIPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
 
     	get popMean() {
-    		throw new Error("<CIPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    		throw new Error("<MeanCIPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
 
     	set popMean(value) {
-    		throw new Error("<CIPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get popSD() {
-    		throw new Error("<CIPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set popSD(value) {
-    		throw new Error("<CIPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    		throw new Error("<MeanCIPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
 
     	get sample() {
-    		throw new Error("<CIPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    		throw new Error("<MeanCIPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
 
     	set sample(value) {
-    		throw new Error("<CIPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    		throw new Error("<MeanCIPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
 
-    	get colors() {
-    		throw new Error("<CIPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	get clicked() {
+    		throw new Error("<MeanCIPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
 
-    	set colors(value) {
-    		throw new Error("<CIPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	set clicked(value) {
+    		throw new Error("<MeanCIPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get labelStr() {
+    		throw new Error("<MeanCIPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set labelStr(value) {
+    		throw new Error("<MeanCIPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get xLabel() {
+    		throw new Error("<MeanCIPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set xLabel(value) {
+    		throw new Error("<MeanCIPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get reset() {
+    		throw new Error("<MeanCIPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set reset(value) {
+    		throw new Error("<MeanCIPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get errmsg() {
+    		throw new Error("<MeanCIPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set errmsg(value) {
+    		throw new Error("<MeanCIPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
     }
 
     /* src/App.svelte generated by Svelte v3.38.2 */
     const file = "src/App.svelte";
 
-    // (49:9) <AppControlArea>
+    // (69:9) <AppControlArea>
     function create_default_slot_1(ctx) {
     	let appcontrolrange;
     	let updating_value;
@@ -7282,7 +7994,7 @@ var app = (function () {
     	let current;
 
     	function appcontrolrange_value_binding(value) {
-    		/*appcontrolrange_value_binding*/ ctx[5](value);
+    		/*appcontrolrange_value_binding*/ ctx[11](value);
     	}
 
     	let appcontrolrange_props = {
@@ -7306,7 +8018,7 @@ var app = (function () {
     	binding_callbacks.push(() => bind(appcontrolrange, "value", appcontrolrange_value_binding));
 
     	function appcontrolswitch_value_binding(value) {
-    		/*appcontrolswitch_value_binding*/ ctx[6](value);
+    		/*appcontrolswitch_value_binding*/ ctx[12](value);
     	}
 
     	let appcontrolswitch_props = {
@@ -7335,7 +8047,7 @@ var app = (function () {
     			$$inline: true
     		});
 
-    	appcontrolbutton.$on("click", /*takeNewSample*/ ctx[4]);
+    	appcontrolbutton.$on("click", /*takeNewSample*/ ctx[8]);
 
     	const block = {
     		c: function create() {
@@ -7399,14 +8111,14 @@ var app = (function () {
     		block,
     		id: create_default_slot_1.name,
     		type: "slot",
-    		source: "(49:9) <AppControlArea>",
+    		source: "(69:9) <AppControlArea>",
     		ctx
     	});
 
     	return block;
     }
 
-    // (34:0) <StatApp>
+    // (54:0) <StatApp>
     function create_default_slot(ctx) {
     	let div3;
     	let div0;
@@ -7419,22 +8131,24 @@ var app = (function () {
     	let appcontrolarea;
     	let current;
 
-    	populationplot = new PopulationPlot({
+    	populationplot = new MeanPopulationPlot({
     			props: {
     				popMean,
     				popSD: /*popSD*/ ctx[0],
     				sample: /*sample*/ ctx[2],
-    				colors: /*colors*/ ctx[3]
+    				popAreaColor: /*popAreaColor*/ ctx[6],
+    				popColor: /*popColor*/ ctx[5],
+    				sampColor: /*sampColor*/ ctx[7]
     			},
     			$$inline: true
     		});
 
-    	ciplot = new CIPlot({
+    	ciplot = new MeanCIPlot({
     			props: {
     				popMean,
-    				popSD: /*popSD*/ ctx[0],
     				sample: /*sample*/ ctx[2],
-    				colors: /*colors*/ ctx[3]
+    				reset: /*reset*/ ctx[3],
+    				clicked: /*clicked*/ ctx[4]
     			},
     			$$inline: true
     		});
@@ -7459,13 +8173,13 @@ var app = (function () {
     			div2 = element("div");
     			create_component(appcontrolarea.$$.fragment);
     			attr_dev(div0, "class", "app-population-plot-area svelte-1m6k9l7");
-    			add_location(div0, file, 37, 6, 1119);
+    			add_location(div0, file, 57, 6, 1693);
     			attr_dev(div1, "class", "app-ci-plot-area svelte-1m6k9l7");
-    			add_location(div1, file, 42, 6, 1298);
+    			add_location(div1, file, 62, 6, 1900);
     			attr_dev(div2, "class", "app-controls-area svelte-1m6k9l7");
-    			add_location(div2, file, 47, 6, 1437);
+    			add_location(div2, file, 67, 6, 2040);
     			attr_dev(div3, "class", "app-layout svelte-1m6k9l7");
-    			add_location(div3, file, 34, 3, 1039);
+    			add_location(div3, file, 54, 3, 1613);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div3, anchor);
@@ -7485,12 +8199,13 @@ var app = (function () {
     			if (dirty & /*sample*/ 4) populationplot_changes.sample = /*sample*/ ctx[2];
     			populationplot.$set(populationplot_changes);
     			const ciplot_changes = {};
-    			if (dirty & /*popSD*/ 1) ciplot_changes.popSD = /*popSD*/ ctx[0];
     			if (dirty & /*sample*/ 4) ciplot_changes.sample = /*sample*/ ctx[2];
+    			if (dirty & /*reset*/ 8) ciplot_changes.reset = /*reset*/ ctx[3];
+    			if (dirty & /*clicked*/ 16) ciplot_changes.clicked = /*clicked*/ ctx[4];
     			ciplot.$set(ciplot_changes);
     			const appcontrolarea_changes = {};
 
-    			if (dirty & /*$$scope, sampSize, popSD*/ 131) {
+    			if (dirty & /*$$scope, sampSize, popSD*/ 8195) {
     				appcontrolarea_changes.$$scope = { dirty, ctx };
     			}
 
@@ -7521,14 +8236,14 @@ var app = (function () {
     		block,
     		id: create_default_slot.name,
     		type: "slot",
-    		source: "(34:0) <StatApp>",
+    		source: "(54:0) <StatApp>",
     		ctx
     	});
 
     	return block;
     }
 
-    // (58:3) 
+    // (78:3) 
     function create_help_slot(ctx) {
     	let div;
     	let h2;
@@ -7570,15 +8285,15 @@ var app = (function () {
     			nobr = element("nobr");
     			nobr.textContent = "n - 1";
     			t12 = text(".");
-    			add_location(h2, file, 58, 6, 1913);
-    			add_location(code0, file, 60, 32, 2006);
-    			add_location(p0, file, 59, 6, 1970);
-    			add_location(p1, file, 65, 6, 2453);
-    			add_location(code1, file, 76, 25, 3407);
-    			add_location(nobr, file, 77, 60, 3564);
-    			add_location(p2, file, 71, 6, 2905);
+    			add_location(h2, file, 78, 6, 2516);
+    			add_location(code0, file, 80, 32, 2609);
+    			add_location(p0, file, 79, 6, 2573);
+    			add_location(p1, file, 85, 6, 3056);
+    			add_location(code1, file, 96, 25, 4010);
+    			add_location(nobr, file, 97, 60, 4167);
+    			add_location(p2, file, 91, 6, 3508);
     			attr_dev(div, "slot", "help");
-    			add_location(div, file, 57, 3, 1889);
+    			add_location(div, file, 77, 3, 2492);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -7607,7 +8322,7 @@ var app = (function () {
     		block,
     		id: create_help_slot.name,
     		type: "slot",
-    		source: "(58:3) ",
+    		source: "(78:3) ",
     		ctx
     	});
 
@@ -7643,7 +8358,7 @@ var app = (function () {
     		p: function update(ctx, [dirty]) {
     			const statapp_changes = {};
 
-    			if (dirty & /*$$scope, sampSize, popSD, sample*/ 135) {
+    			if (dirty & /*$$scope, sampSize, popSD, sample, reset, clicked*/ 8223) {
     				statapp_changes.$$scope = { dirty, ctx };
     			}
 
@@ -7679,17 +8394,27 @@ var app = (function () {
     function instance($$self, $$props, $$invalidate) {
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots("App", slots, []);
-    	const colors = ["#909090", "#0000ff"];
+    	const popColor = colors.plots.POPULATIONS[0];
+    	const popAreaColor = colors.plots.POPULATIONS_PALE[0];
+    	const sampColor = colors.plots.SAMPLES[0];
 
     	// variable parameters
     	let popSD = 3;
 
     	let sampSize = 5;
-    	let sample;
+    	let sample = [];
+    	let sampSizeOld;
+    	let popSDOld;
+    	let reset = false;
+    	let clicked;
 
     	function takeNewSample() {
     		$$invalidate(2, sample = rnorm(sampSize, popMean, popSD));
+    		$$invalidate(4, clicked = Math.random());
     	}
+
+    	// take first sample
+    	takeNewSample();
 
     	const writable_props = [];
 
@@ -7710,17 +8435,24 @@ var app = (function () {
     	$$self.$capture_state = () => ({
     		rnorm,
     		StatApp,
+    		colors,
     		AppControlArea,
     		AppControlButton,
     		AppControlSwitch,
     		AppControlRange,
-    		PopulationPlot,
-    		CIPlot,
-    		colors,
+    		PopulationPlot: MeanPopulationPlot,
+    		CIPlot: MeanCIPlot,
+    		popColor,
+    		popAreaColor,
+    		sampColor,
     		popMean,
     		popSD,
     		sampSize,
     		sample,
+    		sampSizeOld,
+    		popSDOld,
+    		reset,
+    		clicked,
     		takeNewSample
     	});
 
@@ -7728,6 +8460,10 @@ var app = (function () {
     		if ("popSD" in $$props) $$invalidate(0, popSD = $$props.popSD);
     		if ("sampSize" in $$props) $$invalidate(1, sampSize = $$props.sampSize);
     		if ("sample" in $$props) $$invalidate(2, sample = $$props.sample);
+    		if ("sampSizeOld" in $$props) $$invalidate(9, sampSizeOld = $$props.sampSizeOld);
+    		if ("popSDOld" in $$props) $$invalidate(10, popSDOld = $$props.popSDOld);
+    		if ("reset" in $$props) $$invalidate(3, reset = $$props.reset);
+    		if ("clicked" in $$props) $$invalidate(4, clicked = $$props.clicked);
     	};
 
     	if ($$props && "$$inject" in $$props) {
@@ -7735,9 +8471,18 @@ var app = (function () {
     	}
 
     	$$self.$$.update = () => {
-    		if ($$self.$$.dirty & /*popSD, sampSize*/ 3) {
-    			// take a sample if population proportion has changed
-    			popSD > 0 & sampSize > 0 ? takeNewSample() : NULL;
+    		if ($$self.$$.dirty & /*sample, sampSizeOld, sampSize, popSDOld, popSD*/ 1543) {
+    			// when sample size or population SD changed - reset statistics and take new sample
+    			{
+    				if (sample && (sampSizeOld !== sampSize || popSDOld !== popSD)) {
+    					$$invalidate(3, reset = true);
+    					$$invalidate(9, sampSizeOld = sampSize);
+    					$$invalidate(10, popSDOld = popSD);
+    					takeNewSample();
+    				} else {
+    					$$invalidate(3, reset = false);
+    				}
+    			}
     		}
     	};
 
@@ -7745,8 +8490,14 @@ var app = (function () {
     		popSD,
     		sampSize,
     		sample,
-    		colors,
+    		reset,
+    		clicked,
+    		popColor,
+    		popAreaColor,
+    		sampColor,
     		takeNewSample,
+    		sampSizeOld,
+    		popSDOld,
     		appcontrolrange_value_binding,
     		appcontrolswitch_value_binding
     	];
