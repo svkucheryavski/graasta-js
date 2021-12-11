@@ -1,34 +1,73 @@
 <script>
-   import {rnorm} from 'stat-js';
+   import {rnorm} from "stat-js";
 
-   // children blocks
-   import PopulationPlot from './PopulationPlot.svelte';
-   import TestResults from './TestResults.svelte';
+   // shared components
+   import {default as StatApp} from "../../shared/StatApp.svelte";
+   import { colors } from "../../shared/graasta.js";
 
-   // common blocks
-   import {default as StatApp} from '../../shared/StatApp.svelte';
-   import AppControlArea from '../../shared/AppControlArea.svelte';
-   import AppControlButton from '../../shared/AppControlButton.svelte';
-   import AppControlSwitch from '../../shared/AppControlSwitch.svelte';
-   import AppControlRange from '../../shared/AppControlRange.svelte';
+   // shared components - controls
+   import AppControlArea from "../../shared/controls/AppControlArea.svelte";
+   import AppControlButton from "../../shared/controls/AppControlButton.svelte";
+   import AppControlSwitch from "../../shared/controls/AppControlSwitch.svelte";
+   import AppControlRange from "../../shared/controls/AppControlRange.svelte";
+
+   // local components
+   import PopulationPlot from "./PopulationPlot.svelte";
+   import TestResults from "./TestResults.svelte";
+
+   // colors for population
+   const colorsPop = {
+      line: colors.plots.POPULATIONS[0],
+      area: colors.plots.POPULATIONS_PALE[0],
+      sample: colors.plots.SAMPLES[0],
+      stat: colors.plots.SAMPLES[0]
+   };
+
+   // colors for H0
+   const colorsH0 = {
+      line: "#c0c0c0",
+      area: "#c0c0c020",
+      stat: "606060"
+   };
 
    // size of population and vector with element indices
-   const colors = ["#909090", "#6666ff"];
    const popH0Mean = 100;
 
    // variable parameters
    let popMean = 105;
    let popSD = 3;
    let sampSize = 5;
-   let sample;
+   let sample = [];
    let tail = "right";
+
+   let sampSizeOld = sampSize;
+   let popSDOld = popSD;
+   let popMeanOld = popMean;
+   let tailOld = tail;
+   let reset = false;
+   let clicked;
+
+   // when sample size or population SD changed - reset statistics and take new sample
+   $: {
+      if (sample && (tailOld !== tail || sampSizeOld !== sampSize || popSDOld !== popSD || popMean !== popMeanOld)) {
+         reset = true;
+         sampSizeOld = sampSize;
+         popSDOld = popSD;
+         popMeanOld = popMean;
+         tailOld = tail;
+         takeNewSample()
+      } else {
+         reset = false;
+      }
+   }
 
    function takeNewSample() {
       sample = rnorm(sampSize, popMean, popSD);
+      clicked = Math.random();
    }
 
-   // take a sample if population proportion has changed
-   $: popMean > 0 & popSD > 0 & sampSize > 0 ? takeNewSample() : NULL;
+   // take first sample
+   takeNewSample()
 </script>
 
 <StatApp>
@@ -36,12 +75,12 @@
 
       <!-- plot for population individuals  -->
       <div class="app-population-plot-area">
-         <PopulationPlot {popMean} {popH0Mean} {popSD} {sample} {colors} />
+         <PopulationPlot {popMean} {popH0Mean} {popSD} {sample} {colorsPop} {colorsH0}  />
       </div>
 
       <!-- confidence intervals and statistic table -->
-      <div class="app-ci-plot-area">
-         <TestResults {popMean} {popH0Mean} {popSD} {sample} {colors} {tail} />
+      <div class="app-test-plot-area">
+         <TestResults {clicked} {reset} {popMean} {popH0Mean} {popSD} {sample} {tail} {colorsPop} />
       </div>
 
       <!-- control elements -->
@@ -91,7 +130,7 @@
    position: relative;
    display: grid;
    grid-template-areas:
-      "pop ciplot"
+      "pop testplot"
       "pop controls"
       "pop .";
    grid-template-rows: max(250px, 30%) 1fr min-content;
@@ -107,9 +146,8 @@
    padding-right: 20px;
 }
 
-
-.app-ci-plot-area {
-   grid-area: ciplot;
+.app-test-plot-area {
+   grid-area: testplot;
 }
 
 .app-controls-area {
