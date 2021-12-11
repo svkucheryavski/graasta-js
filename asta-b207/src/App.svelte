@@ -1,5 +1,5 @@
 <script>
-   import {rnorm} from "stat-js";
+   import {rnorm, tTest1} from "stat-js";
 
    // shared components
    import {default as StatApp} from "../../shared/StatApp.svelte";
@@ -11,9 +11,9 @@
    import AppControlSwitch from "../../shared/controls/AppControlSwitch.svelte";
    import AppControlRange from "../../shared/controls/AppControlRange.svelte";
 
-   // local components
+   // shared components - здщеы
    import PopulationPlot from "../../shared/plots/MeanPopulationPlot.svelte";
-   import TestResults from "./TestResults.svelte";
+   import TTestPlot from "../../shared/plots/TTestPlot.svelte";
 
    const popColor = colors.plots.POPULATIONS[0];
    const popAreaColor = colors.plots.POPULATIONS_PALE[0];
@@ -48,6 +48,8 @@
       clicked = Math.random();
    }
 
+   $: testRes = tTest1(sample, popMean, 0.05, tail);
+
    // take first sample
    takeNewSample()
 </script>
@@ -62,7 +64,7 @@
 
       <!-- confidence intervals and statistic table -->
       <div class="app-ci-plot-area">
-         <TestResults {clicked} {reset} {popMean}  {popSD} {sample} {tail} />
+         <TTestPlot {clicked} {reset} {testRes}  />
       </div>
 
       <!-- control elements -->
