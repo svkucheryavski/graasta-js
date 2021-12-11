@@ -1,33 +1,55 @@
 <script>
-   import {rnorm} from 'stat-js';
+   import {rnorm} from "stat-js";
 
-   // children blocks
-   import PopulationPlot from './PopulationPlot.svelte';
-   import TestResults from './TestResults.svelte';
+   // shared components
+   import {default as StatApp} from "../../shared/StatApp.svelte";
+   import { colors } from "../../shared/graasta.js";
 
-   // common blocks
-   import {default as StatApp} from '../../shared/StatApp.svelte';
-   import AppControlArea from '../../shared/AppControlArea.svelte';
-   import AppControlButton from '../../shared/AppControlButton.svelte';
-   import AppControlSwitch from '../../shared/AppControlSwitch.svelte';
-   import AppControlRange from '../../shared/AppControlRange.svelte';
+   // shared components - controls
+   import AppControlArea from "../../shared/controls/AppControlArea.svelte";
+   import AppControlButton from "../../shared/controls/AppControlButton.svelte";
+   import AppControlSwitch from "../../shared/controls/AppControlSwitch.svelte";
+   import AppControlRange from "../../shared/controls/AppControlRange.svelte";
 
-   // size of population and vector with element indices
-   const colors = ["#909090", "#0000ff"];
+   // local components
+   import PopulationPlot from "../../shared/plots/MeanPopulationPlot.svelte";
+   import TestResults from "./TestResults.svelte";
+
+   const popColor = colors.plots.POPULATIONS[0];
+   const popAreaColor = colors.plots.POPULATIONS_PALE[0];
+   const sampColor = colors.plots.SAMPLES[0]
    const popMean = 100;
 
    // variable parameters
    let popSD = 3;
    let sampSize = 5;
-   let sample;
    let tail = "left";
+   let sample = [];
+   let sampSizeOld;
+   let popSDOld;
+   let reset = false;
+   let clicked;
+
+
+   // when sample size or population SD changed - reset statistics and take new sample
+   $: {
+      if (sample && (sampSizeOld !== sampSize || popSDOld !== popSD)) {
+         reset = true;
+         sampSizeOld = sampSize;
+         popSDOld = popSD;
+         takeNewSample()
+      } else {
+         reset = false;
+      }
+   }
 
    function takeNewSample() {
       sample = rnorm(sampSize, popMean, popSD);
+      clicked = Math.random();
    }
 
-   // take a sample if population proportion has changed
-   $: popSD > 0 & sampSize > 0 ? takeNewSample() : NULL;
+   // take first sample
+   takeNewSample()
 </script>
 
 <StatApp>
@@ -35,12 +57,12 @@
 
       <!-- plot for population individuals  -->
       <div class="app-population-plot-area">
-         <PopulationPlot {popMean} {popSD} {sample} {colors} />
+         <PopulationPlot {popMean} {popSD} {sample} {popAreaColor} {popColor} {sampColor}/>
       </div>
 
       <!-- confidence intervals and statistic table -->
       <div class="app-ci-plot-area">
-         <TestResults {popMean} {popSD} {sample} {colors} {tail} />
+         <TestResults {clicked} {reset} {popMean}  {popSD} {sample} {tail} />
       </div>
 
       <!-- control elements -->
