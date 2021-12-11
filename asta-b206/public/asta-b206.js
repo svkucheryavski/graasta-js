@@ -7258,7 +7258,7 @@ var app = (function () {
     const get_box_slot_changes = dirty => ({});
     const get_box_slot_context = ctx => ({});
 
-    // (51:3) {#if axLeft.length > 0 && (tail === "left" || tail === "both")}
+    // (51:3) {#if axLeft && axLeft.length > 1 && (tail === "left" || tail === "both")}
     function create_if_block_2(ctx) {
     	let areaseries;
     	let current;
@@ -7306,14 +7306,14 @@ var app = (function () {
     		block,
     		id: create_if_block_2.name,
     		type: "if",
-    		source: "(51:3) {#if axLeft.length > 0 && (tail === \\\"left\\\" || tail === \\\"both\\\")}",
+    		source: "(51:3) {#if axLeft && axLeft.length > 1 && (tail === \\\"left\\\" || tail === \\\"both\\\")}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (56:3) {#if axRight.length > 0 && (tail === "right" || tail === "both")}
+    // (56:3) {#if axRight !== undefined && axRight.length > 1 && (tail === "right" || tail === "both")}
     function create_if_block_1(ctx) {
     	let areaseries;
     	let current;
@@ -7361,7 +7361,7 @@ var app = (function () {
     		block,
     		id: create_if_block_1.name,
     		type: "if",
-    		source: "(56:3) {#if axRight.length > 0 && (tail === \\\"right\\\" || tail === \\\"both\\\")}",
+    		source: "(56:3) {#if axRight !== undefined && axRight.length > 1 && (tail === \\\"right\\\" || tail === \\\"both\\\")}",
     		ctx
     	});
 
@@ -7441,8 +7441,8 @@ var app = (function () {
     	const box_slot = create_slot(box_slot_template, ctx, /*$$scope*/ ctx[20], get_box_slot_context);
     	const legend_slot_template = /*#slots*/ ctx[19].legend;
     	const legend_slot = create_slot(legend_slot_template, ctx, /*$$scope*/ ctx[20], get_legend_slot_context$1);
-    	let if_block0 = /*axLeft*/ ctx[11].length > 0 && (/*tail*/ ctx[5] === "left" || /*tail*/ ctx[5] === "both") && create_if_block_2(ctx);
-    	let if_block1 = /*axRight*/ ctx[12].length > 0 && (/*tail*/ ctx[5] === "right" || /*tail*/ ctx[5] === "both") && create_if_block_1(ctx);
+    	let if_block0 = /*axLeft*/ ctx[11] && /*axLeft*/ ctx[11].length > 1 && (/*tail*/ ctx[5] === "left" || /*tail*/ ctx[5] === "both") && create_if_block_2(ctx);
+    	let if_block1 = /*axRight*/ ctx[12] !== undefined && /*axRight*/ ctx[12].length > 1 && (/*tail*/ ctx[5] === "right" || /*tail*/ ctx[5] === "both") && create_if_block_1(ctx);
 
     	lineseries = new LineSeries({
     			props: {
@@ -7523,7 +7523,7 @@ var app = (function () {
     				}
     			}
 
-    			if (/*axLeft*/ ctx[11].length > 0 && (/*tail*/ ctx[5] === "left" || /*tail*/ ctx[5] === "both")) {
+    			if (/*axLeft*/ ctx[11] && /*axLeft*/ ctx[11].length > 1 && (/*tail*/ ctx[5] === "left" || /*tail*/ ctx[5] === "both")) {
     				if (if_block0) {
     					if_block0.p(ctx, dirty);
 
@@ -7546,7 +7546,7 @@ var app = (function () {
     				check_outros();
     			}
 
-    			if (/*axRight*/ ctx[12].length > 0 && (/*tail*/ ctx[5] === "right" || /*tail*/ ctx[5] === "both")) {
+    			if (/*axRight*/ ctx[12] !== undefined && /*axRight*/ ctx[12].length > 1 && (/*tail*/ ctx[5] === "right" || /*tail*/ ctx[5] === "both")) {
     				if (if_block1) {
     					if_block1.p(ctx, dirty);
 
@@ -8194,18 +8194,29 @@ var app = (function () {
     	return block;
     }
 
-    // (67:0) <DistributionPlot {x} {f} {xLabel} {crit} {tail} {lineColor} {areaColor} {statColor} {limX} limY={limYLocal} >
+    // (66:0) <DistributionPlot {x} {f} {xLabel} {crit} {tail} {lineColor} {areaColor} {statColor} {limX} limY={limYLocal} >
     function create_default_slot$1(ctx) {
+    	let t;
     	let current;
+    	const default_slot_template = /*#slots*/ ctx[22].default;
+    	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[23], null);
     	const legend_slot_template = /*#slots*/ ctx[22].legend;
     	const legend_slot = create_slot(legend_slot_template, ctx, /*$$scope*/ ctx[23], get_legend_slot_context);
     	const legend_slot_or_fallback = legend_slot || fallback_block(ctx);
 
     	const block = {
     		c: function create() {
+    			if (default_slot) default_slot.c();
+    			t = space();
     			if (legend_slot_or_fallback) legend_slot_or_fallback.c();
     		},
     		m: function mount(target, anchor) {
+    			if (default_slot) {
+    				default_slot.m(target, anchor);
+    			}
+
+    			insert_dev(target, t, anchor);
+
     			if (legend_slot_or_fallback) {
     				legend_slot_or_fallback.m(target, anchor);
     			}
@@ -8213,6 +8224,12 @@ var app = (function () {
     			current = true;
     		},
     		p: function update(ctx, dirty) {
+    			if (default_slot) {
+    				if (default_slot.p && (!current || dirty & /*$$scope*/ 8388608)) {
+    					update_slot(default_slot, default_slot_template, ctx, /*$$scope*/ ctx[23], dirty, null, null);
+    				}
+    			}
+
     			if (legend_slot) {
     				if (legend_slot.p && (!current || dirty & /*$$scope*/ 8388608)) {
     					update_slot(legend_slot, legend_slot_template, ctx, /*$$scope*/ ctx[23], dirty, get_legend_slot_changes, get_legend_slot_context);
@@ -8225,14 +8242,18 @@ var app = (function () {
     		},
     		i: function intro(local) {
     			if (current) return;
+    			transition_in(default_slot, local);
     			transition_in(legend_slot_or_fallback, local);
     			current = true;
     		},
     		o: function outro(local) {
+    			transition_out(default_slot, local);
     			transition_out(legend_slot_or_fallback, local);
     			current = false;
     		},
     		d: function destroy(detaching) {
+    			if (default_slot) default_slot.d(detaching);
+    			if (detaching) detach_dev(t);
     			if (legend_slot_or_fallback) legend_slot_or_fallback.d(detaching);
     		}
     	};
@@ -8241,7 +8262,7 @@ var app = (function () {
     		block,
     		id: create_default_slot$1.name,
     		type: "slot",
-    		source: "(67:0) <DistributionPlot {x} {f} {xLabel} {crit} {tail} {lineColor} {areaColor} {statColor} {limX} limY={limYLocal} >",
+    		source: "(66:0) <DistributionPlot {x} {f} {xLabel} {crit} {tail} {lineColor} {areaColor} {statColor} {limX} limY={limYLocal} >",
     		ctx
     	});
 
@@ -8332,7 +8353,7 @@ var app = (function () {
     	let limYLocal;
     	let labelsStr;
     	let { $$slots: slots = {}, $$scope } = $$props;
-    	validate_slots("TestPlot", slots, ['legend']);
+    	validate_slots("TestPlot", slots, ['default','legend']);
     	let { x } = $$props;
     	let { f } = $$props;
     	let { crit } = $$props;

@@ -5078,6 +5078,7 @@ var app = (function () {
     let colors = {
        plots: {
           // population colors
+          POPULATIONS_PALE: ["#33668820", "#ff990020"],
           POPULATIONS: ["#33668850", "#ff990050"],
           SAMPLES: ["#336688", "#ff9900"],
 

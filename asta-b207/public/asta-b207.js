@@ -625,6 +625,44 @@ var app = (function () {
 
 
     /**
+     * Makes one-sample t-test for a mean
+     * @param {number[]} x - vector with sample values
+     * @param {number} mu - assumed mean value for population (H0)
+     * @param {number} alpha - significance level (used to compute confidence interval)
+     * @param {string} tail - which tail to use ("left", "right", or "both")
+     * @returns {Object} - a JSON with test results
+     */
+    function tTest1(x, mu = 0, alpha = 0.05, tail = "both") {
+
+       if (typeof(mu) !== "number") {
+          throw Error("Parameter 'mu' should be a number.");
+       }
+
+       const nx = x.length;
+
+       const effectExpected = mu;
+       const effectObserved = mean(x);
+       const se = sd(x) / Math.sqrt(nx);
+       const tValue = (effectObserved - effectExpected) / se;
+       const DoF = nx - 1;
+       const errMargin = qt(1 - alpha/2, DoF) * se;
+
+       return {
+          test: "One sample t-test",
+          effectExpected: mu,
+          effectObserved: effectObserved,
+          se: se,
+          tValue: tValue,
+          alpha: alpha,
+          tail: tail,
+          DoF: DoF,
+          pValue: getPValue(pt, tValue, tail, [DoF]),
+          ci: [effectObserved - errMargin, effectObserved + errMargin]
+       };
+    }
+
+
+    /**
      * Finds smallest value in a vector
      * @param {number[]} x - vector with values
      * @returns {number}
@@ -765,6 +803,16 @@ var app = (function () {
 
 
     /**
+     * Finds a range of values in a vector (min and max)
+     * @param {number[]} x - vector with values
+     * @returns {number[]} array with min and max values
+     */
+    function range(x) {
+       return [min(x), max(x)];
+    }
+
+
+    /**
      * Computes a range of values in a vector with a margin
      * @param {number[]} x - vector with values
      * @param {number} margin - margin in parts of one (e.g. 0.1 for 10% or 2 for 200%)
@@ -824,6 +872,80 @@ var app = (function () {
     }
 
     /**
+     * Inverse cumulative distribution function for normal distribution
+     * @param {number|number[]} p - vector of probabilities or a single probability value
+     * @param {number} mu - average value of the population
+     * @param {number} sigma - standard deviation of the population
+     * @returns {number|number[]} vector with quantiles or single quantile value
+     */
+    function qnorm(p, mu = 0, sigma = 1) {
+
+       if (Array.isArray(p)) {
+          return p.map(v => qnorm(v, mu, sigma));
+       }
+
+       if (mu !== 0 || sigma !== 1) {
+          return qnorm(p) * sigma + mu;
+       }
+
+       if (p < 0 || p > 1) {
+          throw Error("Parameter 'p' must be between 0 and 1.");
+       }
+
+       if (p < 0.0000000001) return -Infinity;
+       if (p > 0.9999999999) return +Infinity;
+
+       const SP1 = 0.425;
+       const SP2 = 5.0;
+       const C1 = 0.180625;
+       const C2 = 1.6;
+
+       const a0 = 3.3871327179;
+       const a1 = 5.0434271938 * 10;
+       const a2 = 1.5929113202 * 100;
+       const a3 = 5.9109374720 * 10;
+       const b1 = 1.7895169469 * 10;
+       const b2 = 7.8757757664 * 10;
+       const b3 = 6.7187563600 * 10;
+
+       const c0 = 1.4234372777;
+       const c1 = 2.7568153900;
+       const c2 = 1.3067284816;
+       const c3 = 1.7023821103 * 0.1;
+       const d1 = 7.3700164250 * 0.1;
+       const d2 = 1.2021132975 * 0.1;
+
+       const e0 = 6.6579051150;
+       const e1 = 3.0812263860;
+       const e2 = 4.2868294337 * 0.1;
+       const e3 = 1.7337203997 * 0.01;
+       const f1 = 2.4197894225 * 0.1;
+       const f2 = 1.2258202635 * 0.01;
+
+       const q = p - 0.5;
+       let r;
+
+       if (Math.abs(q) <= SP1) {
+          r = C1 - q * q;
+          return q * (((a3 * r + a2) * r + a1) *r + a0) / (((b3 * r + b2) * r + b1) * r + 1.0);
+       }
+
+       r = q < 0 ? p : 1 - p;
+       r = Math.sqrt(-Math.log(r));
+       let res;
+
+       if (r <= SP2) {
+          r = r - C2;
+          res = (((c3 * r + c2) * r + c1) * r + c0) / ((d2 * r + d1) * r + 1.0);
+       } else {
+          r = r - SP2;
+          res = (((e3 * r + e2) * r + e1) + e0) / ((f2 * r + f1) * r + 1.0);
+       }
+
+       return q < 0 ? -res : res;
+    }
+
+    /**
      * Probability density function for Student's t-distribution
      * @param {number|number[]} t - t-value or a vector of t-values
      * @param {number} dof - degrees of freedom
@@ -866,6 +988,80 @@ var app = (function () {
        if (t > 0) return (1 - pt(-t, dof));
 
        return integrate((x) => dt(x, dof), -Infinity, t);
+    }
+
+
+    /**
+     * Inverse cumulative distribution function for Student's t-distribution
+     * @param {number|number[]} p - probability or vector with probabilities
+     * @param {number} dof - degrees of freedom
+     */
+    function qt(p, dof) {
+
+       if (dof === undefined || dof === null || dof < 1) {
+          throw Error("Parameter 'dof' (degrees of freedom) must be an integer number >= 1.");
+       }
+
+       if (p < 0 || p > 1) {
+          throw Error("Parameter 'p' must be between 0 and 1.");
+       }
+
+       if (Array.isArray(p)) {
+          return p.map(v => qt(v, dof));
+       }
+
+       if (p < 0.0000000001) return -Infinity;
+       if (p > 0.9999999999) return +Infinity;
+
+
+       // simple cases — exact solutions
+       if (dof === 1) {
+          return Math.tan(Math.PI * (p - 0.5));
+       }
+
+       if (dof === 2) {
+          return 2 * (p - 0.5) * Math.sqrt(2 / (4 * p * (1 - p)));
+       }
+
+       // approximation
+
+       let sign = -1;
+       if (p >= 0.5){
+          sign = +1 ;
+          p = 2 * (1 - p);
+       } else {
+          sign = -1;
+          p = 2 * p;
+       }
+
+       const a = 1.0 / (dof - 0.5);
+       const b = 48.0 / (a ** 2);
+       let c = ((20700 * a / b - 98) * a - 16) * a + 96.36;
+       const d = ((94.5 / (b + c) - 3.0)/b + 1.0) * Math.sqrt(a * Math.PI / 2) * dof;
+
+       let x = d * p;
+       let y = x ** (2.0/dof);
+
+       if (y > 0.05 + a) {
+
+          // asymptotic inverse expansion about normal
+          x = qnorm(p * 0.5);
+          y = x ** 2;
+
+          if (dof < 5) {
+             c = c + 0.3 * (dof - 4.5) * (x + 0.6);
+          }
+
+          c = (((0.05 * d * x - 5.0) * x - 7.0) * x - 2.0) * x + b + c;
+          y = (((((0.4 * y + 6.3) * y + 36.0) * y + 94.5) / c - y - 3.0)/b + 1.0) * x;
+          y = a * (y ** 2);
+          y = y > 0.002 ? Math.exp(y) - 1.0 : 0.5 * (y ** 2) + y;
+       } else {
+          y = ((1.0 / (((dof + 6.0)/(dof * y) - 0.089 * d - 0.822) * (dof + 2.0) * 3.0) + 0.5/(dof + 4.0)) * y - 1.0) *
+             (dof + 1.0)/(dof + 2.0) + 1.0/y;
+       }
+
+       return sign * Math.sqrt(dof * y);
     }
 
 
@@ -936,19 +1132,6 @@ var app = (function () {
     function closestIndex(x, a) {
        const c = x.reduce((prev, curr) => Math.abs(curr - a) < Math.abs(prev - a) ? curr : prev);
        return x.indexOf(c);
-    }
-
-
-    /**
-     * Rounds number (or vector of numbers) to given amount of decimals
-     * @param {number | number[]} x - a vector with values
-     * @return {number | number[]}
-     */
-    function round(x, n = 0) {
-       if (Array.isArray(x)) {
-          return x.map(v => round(v, n));
-       }
-       return Number.parseFloat(x.toFixed(n));
     }
 
 
@@ -1690,7 +1873,7 @@ var app = (function () {
     const file$b = "../shared/controls/AppControlButton.svelte";
 
     // (9:0) <AppControl id={id} label={label} >
-    function create_default_slot$6(ctx) {
+    function create_default_slot$7(ctx) {
     	let button;
     	let t;
     	let mounted;
@@ -1724,7 +1907,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_default_slot$6.name,
+    		id: create_default_slot$7.name,
     		type: "slot",
     		source: "(9:0) <AppControl id={id} label={label} >",
     		ctx
@@ -1741,7 +1924,7 @@ var app = (function () {
     			props: {
     				id: /*id*/ ctx[0],
     				label: /*label*/ ctx[1],
-    				$$slots: { default: [create_default_slot$6] },
+    				$$slots: { default: [create_default_slot$7] },
     				$$scope: { ctx }
     			},
     			$$inline: true
@@ -1962,7 +2145,7 @@ var app = (function () {
     }
 
     // (11:0) <AppControl id={id} label={label} >
-    function create_default_slot$5(ctx) {
+    function create_default_slot$6(ctx) {
     	let div;
     	let each_blocks = [];
     	let each_1_lookup = new Map();
@@ -2045,7 +2228,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_default_slot$5.name,
+    		id: create_default_slot$6.name,
     		type: "slot",
     		source: "(11:0) <AppControl id={id} label={label} >",
     		ctx
@@ -2062,7 +2245,7 @@ var app = (function () {
     			props: {
     				id: /*id*/ ctx[1],
     				label: /*label*/ ctx[2],
-    				$$slots: { default: [create_default_slot$5] },
+    				$$slots: { default: [create_default_slot$6] },
     				$$scope: { ctx }
     			},
     			$$inline: true
@@ -2230,7 +2413,7 @@ var app = (function () {
     const file$9 = "../shared/controls/AppControlRange.svelte";
 
     // (67:0) <AppControl id={id} label={label}>
-    function create_default_slot$4(ctx) {
+    function create_default_slot$5(ctx) {
     	let div1;
     	let div0;
     	let t0;
@@ -2326,7 +2509,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_default_slot$4.name,
+    		id: create_default_slot$5.name,
     		type: "slot",
     		source: "(67:0) <AppControl id={id} label={label}>",
     		ctx
@@ -2343,7 +2526,7 @@ var app = (function () {
     			props: {
     				id: /*id*/ ctx[1],
     				label: /*label*/ ctx[2],
-    				$$slots: { default: [create_default_slot$4] },
+    				$$slots: { default: [create_default_slot$5] },
     				$$scope: { ctx }
     			},
     			$$inline: true
@@ -6587,25 +6770,28 @@ var app = (function () {
 
     /* ../shared/plots/MeanPopulationPlot.svelte generated by Svelte v3.38.2 */
 
-    // (26:0) <Axes title={`Population: µ = ${popMean}, σ = ${popSD.toFixed(1)}`} xLabel={"Chloride in water, [mg/L]"} limX={[80, 120]} limY={mrange(popY, 0.01)}>
-    function create_default_slot$3(ctx) {
-    	let lineseries;
+    // (35:0) <Axes title={`Population: µ = ${popMean}, σ = ${popSD.toFixed(1)}`} xLabel={"Chloride in water, [mg/L]"} {limX} {limY}>
+    function create_default_slot$4(ctx) {
     	let t0;
-    	let areaseries;
+    	let lineseries;
     	let t1;
-    	let segments0;
+    	let areaseries;
     	let t2;
-    	let scatterseries;
+    	let segments0;
     	let t3;
-    	let segments1;
+    	let scatterseries;
     	let t4;
+    	let segments1;
+    	let t5;
     	let textlegend;
     	let current;
+    	const default_slot_template = /*#slots*/ ctx[14].default;
+    	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[15], null);
 
     	lineseries = new LineSeries({
     			props: {
-    				xValues: /*popX*/ ctx[6],
-    				yValues: /*popY*/ ctx[7],
+    				xValues: /*popX*/ ctx[7],
+    				yValues: /*popY*/ ctx[8],
     				lineColor: /*popColor*/ ctx[3]
     			},
     			$$inline: true
@@ -6613,8 +6799,8 @@ var app = (function () {
 
     	areaseries = new AreaSeries({
     			props: {
-    				xValues: /*popX*/ ctx[6],
-    				yValues: /*popY*/ ctx[7],
+    				xValues: /*popX*/ ctx[7],
+    				yValues: /*popY*/ ctx[8],
     				lineColor: "transparent",
     				fillColor: /*popAreaColor*/ ctx[4]
     			},
@@ -6623,10 +6809,10 @@ var app = (function () {
 
     	segments0 = new Segments({
     			props: {
-    				xStart: [/*sampMean*/ ctx[9]],
-    				xEnd: [/*sampMean*/ ctx[9]],
+    				xStart: [/*sampMean*/ ctx[11]],
+    				xEnd: [/*sampMean*/ ctx[11]],
     				yStart: [0],
-    				yEnd: [max(/*popY*/ ctx[7])],
+    				yEnd: [max(/*popY*/ ctx[8])],
     				lineColor: /*sampColor*/ ctx[5],
     				lineType: 3
     			},
@@ -6636,7 +6822,7 @@ var app = (function () {
     	scatterseries = new ScatterSeries({
     			props: {
     				xValues: /*sample*/ ctx[2],
-    				yValues: /*sampY*/ ctx[8],
+    				yValues: /*sampY*/ ctx[10],
     				borderWidth: 2,
     				markerSize: 1.25,
     				faceColor: "transparent",
@@ -6650,7 +6836,7 @@ var app = (function () {
     				xStart: [/*popMean*/ ctx[0]],
     				xEnd: [/*popMean*/ ctx[0]],
     				yStart: [0],
-    				yEnd: [max(/*popY*/ ctx[7])],
+    				yEnd: [max(/*popY*/ ctx[8])],
     				lineColor: /*popColor*/ ctx[3],
     				lineType: 2
     			},
@@ -6660,78 +6846,92 @@ var app = (function () {
     	textlegend = new TextLegend({
     			props: {
     				textSize: 1.15,
-    				left: /*popMean*/ ctx[0] + /*popSD*/ ctx[1],
-    				top: max(/*popY*/ ctx[7]) * 0.9,
-    				dx: "1.25em",
-    				elements: /*labelsStr*/ ctx[10]
+    				left: /*left*/ ctx[9],
+    				top: max(/*popY*/ ctx[8]) * 0.9,
+    				dx: "0",
+    				elements: /*labelsStr*/ ctx[13]
     			},
     			$$inline: true
     		});
 
     	const block = {
     		c: function create() {
-    			create_component(lineseries.$$.fragment);
+    			if (default_slot) default_slot.c();
     			t0 = space();
-    			create_component(areaseries.$$.fragment);
+    			create_component(lineseries.$$.fragment);
     			t1 = space();
-    			create_component(segments0.$$.fragment);
+    			create_component(areaseries.$$.fragment);
     			t2 = space();
-    			create_component(scatterseries.$$.fragment);
+    			create_component(segments0.$$.fragment);
     			t3 = space();
-    			create_component(segments1.$$.fragment);
+    			create_component(scatterseries.$$.fragment);
     			t4 = space();
+    			create_component(segments1.$$.fragment);
+    			t5 = space();
     			create_component(textlegend.$$.fragment);
     		},
     		m: function mount(target, anchor) {
-    			mount_component(lineseries, target, anchor);
+    			if (default_slot) {
+    				default_slot.m(target, anchor);
+    			}
+
     			insert_dev(target, t0, anchor);
-    			mount_component(areaseries, target, anchor);
+    			mount_component(lineseries, target, anchor);
     			insert_dev(target, t1, anchor);
-    			mount_component(segments0, target, anchor);
+    			mount_component(areaseries, target, anchor);
     			insert_dev(target, t2, anchor);
-    			mount_component(scatterseries, target, anchor);
+    			mount_component(segments0, target, anchor);
     			insert_dev(target, t3, anchor);
-    			mount_component(segments1, target, anchor);
+    			mount_component(scatterseries, target, anchor);
     			insert_dev(target, t4, anchor);
+    			mount_component(segments1, target, anchor);
+    			insert_dev(target, t5, anchor);
     			mount_component(textlegend, target, anchor);
     			current = true;
     		},
     		p: function update(ctx, dirty) {
+    			if (default_slot) {
+    				if (default_slot.p && (!current || dirty & /*$$scope*/ 32768)) {
+    					update_slot(default_slot, default_slot_template, ctx, /*$$scope*/ ctx[15], dirty, null, null);
+    				}
+    			}
+
     			const lineseries_changes = {};
-    			if (dirty & /*popX*/ 64) lineseries_changes.xValues = /*popX*/ ctx[6];
-    			if (dirty & /*popY*/ 128) lineseries_changes.yValues = /*popY*/ ctx[7];
+    			if (dirty & /*popX*/ 128) lineseries_changes.xValues = /*popX*/ ctx[7];
+    			if (dirty & /*popY*/ 256) lineseries_changes.yValues = /*popY*/ ctx[8];
     			if (dirty & /*popColor*/ 8) lineseries_changes.lineColor = /*popColor*/ ctx[3];
     			lineseries.$set(lineseries_changes);
     			const areaseries_changes = {};
-    			if (dirty & /*popX*/ 64) areaseries_changes.xValues = /*popX*/ ctx[6];
-    			if (dirty & /*popY*/ 128) areaseries_changes.yValues = /*popY*/ ctx[7];
+    			if (dirty & /*popX*/ 128) areaseries_changes.xValues = /*popX*/ ctx[7];
+    			if (dirty & /*popY*/ 256) areaseries_changes.yValues = /*popY*/ ctx[8];
     			if (dirty & /*popAreaColor*/ 16) areaseries_changes.fillColor = /*popAreaColor*/ ctx[4];
     			areaseries.$set(areaseries_changes);
     			const segments0_changes = {};
-    			if (dirty & /*sampMean*/ 512) segments0_changes.xStart = [/*sampMean*/ ctx[9]];
-    			if (dirty & /*sampMean*/ 512) segments0_changes.xEnd = [/*sampMean*/ ctx[9]];
-    			if (dirty & /*popY*/ 128) segments0_changes.yEnd = [max(/*popY*/ ctx[7])];
+    			if (dirty & /*sampMean*/ 2048) segments0_changes.xStart = [/*sampMean*/ ctx[11]];
+    			if (dirty & /*sampMean*/ 2048) segments0_changes.xEnd = [/*sampMean*/ ctx[11]];
+    			if (dirty & /*popY*/ 256) segments0_changes.yEnd = [max(/*popY*/ ctx[8])];
     			if (dirty & /*sampColor*/ 32) segments0_changes.lineColor = /*sampColor*/ ctx[5];
     			segments0.$set(segments0_changes);
     			const scatterseries_changes = {};
     			if (dirty & /*sample*/ 4) scatterseries_changes.xValues = /*sample*/ ctx[2];
-    			if (dirty & /*sampY*/ 256) scatterseries_changes.yValues = /*sampY*/ ctx[8];
+    			if (dirty & /*sampY*/ 1024) scatterseries_changes.yValues = /*sampY*/ ctx[10];
     			if (dirty & /*sampColor*/ 32) scatterseries_changes.borderColor = /*sampColor*/ ctx[5];
     			scatterseries.$set(scatterseries_changes);
     			const segments1_changes = {};
     			if (dirty & /*popMean*/ 1) segments1_changes.xStart = [/*popMean*/ ctx[0]];
     			if (dirty & /*popMean*/ 1) segments1_changes.xEnd = [/*popMean*/ ctx[0]];
-    			if (dirty & /*popY*/ 128) segments1_changes.yEnd = [max(/*popY*/ ctx[7])];
+    			if (dirty & /*popY*/ 256) segments1_changes.yEnd = [max(/*popY*/ ctx[8])];
     			if (dirty & /*popColor*/ 8) segments1_changes.lineColor = /*popColor*/ ctx[3];
     			segments1.$set(segments1_changes);
     			const textlegend_changes = {};
-    			if (dirty & /*popMean, popSD*/ 3) textlegend_changes.left = /*popMean*/ ctx[0] + /*popSD*/ ctx[1];
-    			if (dirty & /*popY*/ 128) textlegend_changes.top = max(/*popY*/ ctx[7]) * 0.9;
-    			if (dirty & /*labelsStr*/ 1024) textlegend_changes.elements = /*labelsStr*/ ctx[10];
+    			if (dirty & /*left*/ 512) textlegend_changes.left = /*left*/ ctx[9];
+    			if (dirty & /*popY*/ 256) textlegend_changes.top = max(/*popY*/ ctx[8]) * 0.9;
+    			if (dirty & /*labelsStr*/ 8192) textlegend_changes.elements = /*labelsStr*/ ctx[13];
     			textlegend.$set(textlegend_changes);
     		},
     		i: function intro(local) {
     			if (current) return;
+    			transition_in(default_slot, local);
     			transition_in(lineseries.$$.fragment, local);
     			transition_in(areaseries.$$.fragment, local);
     			transition_in(segments0.$$.fragment, local);
@@ -6741,6 +6941,7 @@ var app = (function () {
     			current = true;
     		},
     		o: function outro(local) {
+    			transition_out(default_slot, local);
     			transition_out(lineseries.$$.fragment, local);
     			transition_out(areaseries.$$.fragment, local);
     			transition_out(segments0.$$.fragment, local);
@@ -6750,32 +6951,34 @@ var app = (function () {
     			current = false;
     		},
     		d: function destroy(detaching) {
-    			destroy_component(lineseries, detaching);
+    			if (default_slot) default_slot.d(detaching);
     			if (detaching) detach_dev(t0);
-    			destroy_component(areaseries, detaching);
+    			destroy_component(lineseries, detaching);
     			if (detaching) detach_dev(t1);
-    			destroy_component(segments0, detaching);
+    			destroy_component(areaseries, detaching);
     			if (detaching) detach_dev(t2);
-    			destroy_component(scatterseries, detaching);
+    			destroy_component(segments0, detaching);
     			if (detaching) detach_dev(t3);
-    			destroy_component(segments1, detaching);
+    			destroy_component(scatterseries, detaching);
     			if (detaching) detach_dev(t4);
+    			destroy_component(segments1, detaching);
+    			if (detaching) detach_dev(t5);
     			destroy_component(textlegend, detaching);
     		}
     	};
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_default_slot$3.name,
+    		id: create_default_slot$4.name,
     		type: "slot",
-    		source: "(26:0) <Axes title={`Population: µ = ${popMean}, σ = ${popSD.toFixed(1)}`} xLabel={\\\"Chloride in water, [mg/L]\\\"} limX={[80, 120]} limY={mrange(popY, 0.01)}>",
+    		source: "(35:0) <Axes title={`Population: µ = ${popMean}, σ = ${popSD.toFixed(1)}`} xLabel={\\\"Chloride in water, [mg/L]\\\"} {limX} {limY}>",
     		ctx
     	});
 
     	return block;
     }
 
-    // (28:3) 
+    // (51:3) 
     function create_xaxis_slot$1(ctx) {
     	let xaxis;
     	let current;
@@ -6808,7 +7011,7 @@ var app = (function () {
     		block,
     		id: create_xaxis_slot$1.name,
     		type: "slot",
-    		source: "(28:3) ",
+    		source: "(51:3) ",
     		ctx
     	});
 
@@ -6823,11 +7026,11 @@ var app = (function () {
     			props: {
     				title: `Population: µ = ${/*popMean*/ ctx[0]}, σ = ${/*popSD*/ ctx[1].toFixed(1)}`,
     				xLabel: "Chloride in water, [mg/L]",
-    				limX: [80, 120],
-    				limY: mrange(/*popY*/ ctx[7], 0.01),
+    				limX: /*limX*/ ctx[6],
+    				limY: /*limY*/ ctx[12],
     				$$slots: {
     					xaxis: [create_xaxis_slot$1],
-    					default: [create_default_slot$3]
+    					default: [create_default_slot$4]
     				},
     				$$scope: { ctx }
     			},
@@ -6848,9 +7051,10 @@ var app = (function () {
     		p: function update(ctx, [dirty]) {
     			const axes_changes = {};
     			if (dirty & /*popMean, popSD*/ 3) axes_changes.title = `Population: µ = ${/*popMean*/ ctx[0]}, σ = ${/*popSD*/ ctx[1].toFixed(1)}`;
-    			if (dirty & /*popY*/ 128) axes_changes.limY = mrange(/*popY*/ ctx[7], 0.01);
+    			if (dirty & /*limX*/ 64) axes_changes.limX = /*limX*/ ctx[6];
+    			if (dirty & /*limY*/ 4096) axes_changes.limY = /*limY*/ ctx[12];
 
-    			if (dirty & /*$$scope, popMean, popSD, popY, labelsStr, popColor, sample, sampY, sampColor, sampMean, popX, popAreaColor*/ 4095) {
+    			if (dirty & /*$$scope, left, popY, labelsStr, popMean, popColor, sample, sampY, sampColor, sampMean, popX, popAreaColor*/ 44989) {
     				axes_changes.$$scope = { dirty, ctx };
     			}
 
@@ -6882,20 +7086,23 @@ var app = (function () {
     }
 
     function instance$4($$self, $$props, $$invalidate) {
+    	let left;
     	let popX;
     	let popY;
     	let sampY;
     	let sampMean;
+    	let limY;
     	let labelsStr;
     	let { $$slots: slots = {}, $$scope } = $$props;
-    	validate_slots("MeanPopulationPlot", slots, []);
+    	validate_slots("MeanPopulationPlot", slots, ['default']);
     	let { popMean } = $$props;
     	let { popSD } = $$props;
     	let { sample } = $$props;
     	let { popColor } = $$props;
     	let { popAreaColor } = $$props;
     	let { sampColor } = $$props;
-    	const writable_props = ["popMean", "popSD", "sample", "popColor", "popAreaColor", "sampColor"];
+    	let { limX = [80, 120] } = $$props;
+    	const writable_props = ["popMean", "popSD", "sample", "popColor", "popAreaColor", "sampColor", "limX"];
 
     	Object.keys($$props).forEach(key => {
     		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== "$$") console.warn(`<MeanPopulationPlot> was created with unknown prop '${key}'`);
@@ -6908,6 +7115,8 @@ var app = (function () {
     		if ("popColor" in $$props) $$invalidate(3, popColor = $$props.popColor);
     		if ("popAreaColor" in $$props) $$invalidate(4, popAreaColor = $$props.popAreaColor);
     		if ("sampColor" in $$props) $$invalidate(5, sampColor = $$props.sampColor);
+    		if ("limX" in $$props) $$invalidate(6, limX = $$props.limX);
+    		if ("$$scope" in $$props) $$invalidate(15, $$scope = $$props.$$scope);
     	};
 
     	$$self.$capture_state = () => ({
@@ -6918,6 +7127,7 @@ var app = (function () {
     		sd,
     		max,
     		mrange,
+    		range,
     		Axes,
     		XAxis,
     		LineSeries,
@@ -6932,10 +7142,13 @@ var app = (function () {
     		popColor,
     		popAreaColor,
     		sampColor,
+    		limX,
+    		left,
     		popX,
     		popY,
     		sampY,
     		sampMean,
+    		limY,
     		labelsStr
     	});
 
@@ -6946,11 +7159,14 @@ var app = (function () {
     		if ("popColor" in $$props) $$invalidate(3, popColor = $$props.popColor);
     		if ("popAreaColor" in $$props) $$invalidate(4, popAreaColor = $$props.popAreaColor);
     		if ("sampColor" in $$props) $$invalidate(5, sampColor = $$props.sampColor);
-    		if ("popX" in $$props) $$invalidate(6, popX = $$props.popX);
-    		if ("popY" in $$props) $$invalidate(7, popY = $$props.popY);
-    		if ("sampY" in $$props) $$invalidate(8, sampY = $$props.sampY);
-    		if ("sampMean" in $$props) $$invalidate(9, sampMean = $$props.sampMean);
-    		if ("labelsStr" in $$props) $$invalidate(10, labelsStr = $$props.labelsStr);
+    		if ("limX" in $$props) $$invalidate(6, limX = $$props.limX);
+    		if ("left" in $$props) $$invalidate(9, left = $$props.left);
+    		if ("popX" in $$props) $$invalidate(7, popX = $$props.popX);
+    		if ("popY" in $$props) $$invalidate(8, popY = $$props.popY);
+    		if ("sampY" in $$props) $$invalidate(10, sampY = $$props.sampY);
+    		if ("sampMean" in $$props) $$invalidate(11, sampMean = $$props.sampMean);
+    		if ("limY" in $$props) $$invalidate(12, limY = $$props.limY);
+    		if ("labelsStr" in $$props) $$invalidate(13, labelsStr = $$props.labelsStr);
     	};
 
     	if ($$props && "$$inject" in $$props) {
@@ -6958,26 +7174,37 @@ var app = (function () {
     	}
 
     	$$self.$$.update = () => {
+    		if ($$self.$$.dirty & /*limX*/ 64) {
+    			// left position of the legend
+    			$$invalidate(9, left = limX[0] + 0.75 * (limX[1] - limX[0]));
+    		}
+
     		if ($$self.$$.dirty & /*popMean, popSD*/ 3) {
-    			// size of population and axes plus coordinates of the points
-    			$$invalidate(6, popX = seq(popMean - 3.5 * popSD, popMean + 3.5 * popSD, 100));
+    			// parameters of PDF curve
+    			$$invalidate(7, popX = seq(popMean - 3.5 * popSD, popMean + 3.5 * popSD, 100));
     		}
 
-    		if ($$self.$$.dirty & /*popX, popMean, popSD*/ 67) {
-    			$$invalidate(7, popY = dnorm(popX, popMean, popSD));
+    		if ($$self.$$.dirty & /*popX, popMean, popSD*/ 131) {
+    			$$invalidate(8, popY = dnorm(popX, popMean, popSD));
     		}
 
-    		if ($$self.$$.dirty & /*popY, sample*/ 132) {
-    			$$invalidate(8, sampY = rep(max(popY) * 0.05, sample.length));
-    		}
-
-    		if ($$self.$$.dirty & /*sample*/ 4) {
-    			$$invalidate(9, sampMean = mean(sample));
+    		if ($$self.$$.dirty & /*popY, sample*/ 260) {
+    			// sample statistics
+    			$$invalidate(10, sampY = rep(max(popY) * 0.05, sample.length));
     		}
 
     		if ($$self.$$.dirty & /*sample*/ 4) {
-    			// text values for stat table
-    			$$invalidate(10, labelsStr = formatLabels([
+    			$$invalidate(11, sampMean = mean(sample));
+    		}
+
+    		if ($$self.$$.dirty & /*popY*/ 256) {
+    			// limits for y-axis
+    			$$invalidate(12, limY = mrange(popY, 0.01));
+    		}
+
+    		if ($$self.$$.dirty & /*sample*/ 4) {
+    			// text values for legend
+    			$$invalidate(13, labelsStr = formatLabels([
     				{
     					name: "Sample mean",
     					value: mean(sample).toFixed(1)
@@ -6997,11 +7224,16 @@ var app = (function () {
     		popColor,
     		popAreaColor,
     		sampColor,
+    		limX,
     		popX,
     		popY,
+    		left,
     		sampY,
     		sampMean,
-    		labelsStr
+    		limY,
+    		labelsStr,
+    		slots,
+    		$$scope
     	];
     }
 
@@ -7015,7 +7247,8 @@ var app = (function () {
     			sample: 2,
     			popColor: 3,
     			popAreaColor: 4,
-    			sampColor: 5
+    			sampColor: 5,
+    			limX: 6
     		});
 
     		dispatch_dev("SvelteRegisterComponent", {
@@ -7100,6 +7333,14 @@ var app = (function () {
     	set sampColor(value) {
     		throw new Error("<MeanPopulationPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
+
+    	get limX() {
+    		throw new Error("<MeanPopulationPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set limX(value) {
+    		throw new Error("<MeanPopulationPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
     }
 
     /* ../shared/plots/DistributionPlot.svelte generated by Svelte v3.38.2 */
@@ -7110,7 +7351,7 @@ var app = (function () {
     const get_box_slot_changes = dirty => ({});
     const get_box_slot_context = ctx => ({});
 
-    // (51:3) {#if axLeft.length > 0 && (tail === "left" || tail === "both")}
+    // (51:3) {#if axLeft && axLeft.length > 1 && (tail === "left" || tail === "both")}
     function create_if_block_2(ctx) {
     	let areaseries;
     	let current;
@@ -7158,14 +7399,14 @@ var app = (function () {
     		block,
     		id: create_if_block_2.name,
     		type: "if",
-    		source: "(51:3) {#if axLeft.length > 0 && (tail === \\\"left\\\" || tail === \\\"both\\\")}",
+    		source: "(51:3) {#if axLeft && axLeft.length > 1 && (tail === \\\"left\\\" || tail === \\\"both\\\")}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (56:3) {#if axRight.length > 0 && (tail === "right" || tail === "both")}
+    // (56:3) {#if axRight !== undefined && axRight.length > 1 && (tail === "right" || tail === "both")}
     function create_if_block_1(ctx) {
     	let areaseries;
     	let current;
@@ -7213,7 +7454,7 @@ var app = (function () {
     		block,
     		id: create_if_block_1.name,
     		type: "if",
-    		source: "(56:3) {#if axRight.length > 0 && (tail === \\\"right\\\" || tail === \\\"both\\\")}",
+    		source: "(56:3) {#if axRight !== undefined && axRight.length > 1 && (tail === \\\"right\\\" || tail === \\\"both\\\")}",
     		ctx
     	});
 
@@ -7279,7 +7520,7 @@ var app = (function () {
     }
 
     // (44:0) <Axes {limX} {limY} {xLabel} {yLabel} {title}>
-    function create_default_slot$2(ctx) {
+    function create_default_slot$3(ctx) {
     	let t0;
     	let t1;
     	let t2;
@@ -7293,8 +7534,8 @@ var app = (function () {
     	const box_slot = create_slot(box_slot_template, ctx, /*$$scope*/ ctx[20], get_box_slot_context);
     	const legend_slot_template = /*#slots*/ ctx[19].legend;
     	const legend_slot = create_slot(legend_slot_template, ctx, /*$$scope*/ ctx[20], get_legend_slot_context$1);
-    	let if_block0 = /*axLeft*/ ctx[11].length > 0 && (/*tail*/ ctx[5] === "left" || /*tail*/ ctx[5] === "both") && create_if_block_2(ctx);
-    	let if_block1 = /*axRight*/ ctx[12].length > 0 && (/*tail*/ ctx[5] === "right" || /*tail*/ ctx[5] === "both") && create_if_block_1(ctx);
+    	let if_block0 = /*axLeft*/ ctx[11] && /*axLeft*/ ctx[11].length > 1 && (/*tail*/ ctx[5] === "left" || /*tail*/ ctx[5] === "both") && create_if_block_2(ctx);
+    	let if_block1 = /*axRight*/ ctx[12] !== undefined && /*axRight*/ ctx[12].length > 1 && (/*tail*/ ctx[5] === "right" || /*tail*/ ctx[5] === "both") && create_if_block_1(ctx);
 
     	lineseries = new LineSeries({
     			props: {
@@ -7375,7 +7616,7 @@ var app = (function () {
     				}
     			}
 
-    			if (/*axLeft*/ ctx[11].length > 0 && (/*tail*/ ctx[5] === "left" || /*tail*/ ctx[5] === "both")) {
+    			if (/*axLeft*/ ctx[11] && /*axLeft*/ ctx[11].length > 1 && (/*tail*/ ctx[5] === "left" || /*tail*/ ctx[5] === "both")) {
     				if (if_block0) {
     					if_block0.p(ctx, dirty);
 
@@ -7398,7 +7639,7 @@ var app = (function () {
     				check_outros();
     			}
 
-    			if (/*axRight*/ ctx[12].length > 0 && (/*tail*/ ctx[5] === "right" || /*tail*/ ctx[5] === "both")) {
+    			if (/*axRight*/ ctx[12] !== undefined && /*axRight*/ ctx[12].length > 1 && (/*tail*/ ctx[5] === "right" || /*tail*/ ctx[5] === "both")) {
     				if (if_block1) {
     					if_block1.p(ctx, dirty);
 
@@ -7506,7 +7747,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_default_slot$2.name,
+    		id: create_default_slot$3.name,
     		type: "slot",
     		source: "(44:0) <Axes {limX} {limY} {xLabel} {yLabel} {title}>",
     		ctx
@@ -7568,7 +7809,7 @@ var app = (function () {
     				title: /*title*/ ctx[10],
     				$$slots: {
     					xaxis: [create_xaxis_slot],
-    					default: [create_default_slot$2]
+    					default: [create_default_slot$3]
     				},
     				$$scope: { ctx }
     			},
@@ -8046,18 +8287,29 @@ var app = (function () {
     	return block;
     }
 
-    // (67:0) <DistributionPlot {x} {f} {xLabel} {crit} {tail} {lineColor} {areaColor} {statColor} {limX} limY={limYLocal} >
-    function create_default_slot$1(ctx) {
+    // (66:0) <DistributionPlot {x} {f} {xLabel} {crit} {tail} {lineColor} {areaColor} {statColor} {limX} limY={limYLocal} >
+    function create_default_slot$2(ctx) {
+    	let t;
     	let current;
+    	const default_slot_template = /*#slots*/ ctx[22].default;
+    	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[23], null);
     	const legend_slot_template = /*#slots*/ ctx[22].legend;
     	const legend_slot = create_slot(legend_slot_template, ctx, /*$$scope*/ ctx[23], get_legend_slot_context);
     	const legend_slot_or_fallback = legend_slot || fallback_block(ctx);
 
     	const block = {
     		c: function create() {
+    			if (default_slot) default_slot.c();
+    			t = space();
     			if (legend_slot_or_fallback) legend_slot_or_fallback.c();
     		},
     		m: function mount(target, anchor) {
+    			if (default_slot) {
+    				default_slot.m(target, anchor);
+    			}
+
+    			insert_dev(target, t, anchor);
+
     			if (legend_slot_or_fallback) {
     				legend_slot_or_fallback.m(target, anchor);
     			}
@@ -8065,6 +8317,12 @@ var app = (function () {
     			current = true;
     		},
     		p: function update(ctx, dirty) {
+    			if (default_slot) {
+    				if (default_slot.p && (!current || dirty & /*$$scope*/ 8388608)) {
+    					update_slot(default_slot, default_slot_template, ctx, /*$$scope*/ ctx[23], dirty, null, null);
+    				}
+    			}
+
     			if (legend_slot) {
     				if (legend_slot.p && (!current || dirty & /*$$scope*/ 8388608)) {
     					update_slot(legend_slot, legend_slot_template, ctx, /*$$scope*/ ctx[23], dirty, get_legend_slot_changes, get_legend_slot_context);
@@ -8077,23 +8335,27 @@ var app = (function () {
     		},
     		i: function intro(local) {
     			if (current) return;
+    			transition_in(default_slot, local);
     			transition_in(legend_slot_or_fallback, local);
     			current = true;
     		},
     		o: function outro(local) {
+    			transition_out(default_slot, local);
     			transition_out(legend_slot_or_fallback, local);
     			current = false;
     		},
     		d: function destroy(detaching) {
+    			if (default_slot) default_slot.d(detaching);
+    			if (detaching) detach_dev(t);
     			if (legend_slot_or_fallback) legend_slot_or_fallback.d(detaching);
     		}
     	};
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_default_slot$1.name,
+    		id: create_default_slot$2.name,
     		type: "slot",
-    		source: "(67:0) <DistributionPlot {x} {f} {xLabel} {crit} {tail} {lineColor} {areaColor} {statColor} {limX} limY={limYLocal} >",
+    		source: "(66:0) <DistributionPlot {x} {f} {xLabel} {crit} {tail} {lineColor} {areaColor} {statColor} {limX} limY={limYLocal} >",
     		ctx
     	});
 
@@ -8116,7 +8378,7 @@ var app = (function () {
     				statColor: /*statColor*/ ctx[9],
     				limX: /*limX*/ ctx[6],
     				limY: /*limYLocal*/ ctx[10],
-    				$$slots: { default: [create_default_slot$1] },
+    				$$slots: { default: [create_default_slot$2] },
     				$$scope: { ctx }
     			},
     			$$inline: true
@@ -8184,7 +8446,7 @@ var app = (function () {
     	let limYLocal;
     	let labelsStr;
     	let { $$slots: slots = {}, $$scope } = $$props;
-    	validate_slots("TestPlot", slots, ['legend']);
+    	validate_slots("TestPlot", slots, ['default','legend']);
     	let { x } = $$props;
     	let { f } = $$props;
     	let { crit } = $$props;
@@ -8568,7 +8830,56 @@ var app = (function () {
     	}
     }
 
-    /* src/TestResults.svelte generated by Svelte v3.38.2 */
+    /* ../shared/plots/TTestPlot.svelte generated by Svelte v3.38.2 */
+
+    // (28:0) <TestPlot    {x} {f} {crit} {showLegend} {mainColor} {xLabel} {H0LegendStr} {limX} {limY} {reset} {clicked}    pValue={testRes.pValue}    alpha={testRes.alpha}    tail={testRes.tail} >
+    function create_default_slot$1(ctx) {
+    	let current;
+    	const default_slot_template = /*#slots*/ ctx[14].default;
+    	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[15], null);
+
+    	const block = {
+    		c: function create() {
+    			if (default_slot) default_slot.c();
+    		},
+    		m: function mount(target, anchor) {
+    			if (default_slot) {
+    				default_slot.m(target, anchor);
+    			}
+
+    			current = true;
+    		},
+    		p: function update(ctx, dirty) {
+    			if (default_slot) {
+    				if (default_slot.p && (!current || dirty & /*$$scope*/ 32768)) {
+    					update_slot(default_slot, default_slot_template, ctx, /*$$scope*/ ctx[15], dirty, null, null);
+    				}
+    			}
+    		},
+    		i: function intro(local) {
+    			if (current) return;
+    			transition_in(default_slot, local);
+    			current = true;
+    		},
+    		o: function outro(local) {
+    			transition_out(default_slot, local);
+    			current = false;
+    		},
+    		d: function destroy(detaching) {
+    			if (default_slot) default_slot.d(detaching);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_default_slot$1.name,
+    		type: "slot",
+    		source: "(28:0) <TestPlot    {x} {f} {crit} {showLegend} {mainColor} {xLabel} {H0LegendStr} {limX} {limY} {reset} {clicked}    pValue={testRes.pValue}    alpha={testRes.alpha}    tail={testRes.tail} >",
+    		ctx
+    	});
+
+    	return block;
+    }
 
     function create_fragment$1(ctx) {
     	let testplot;
@@ -8576,19 +8887,22 @@ var app = (function () {
 
     	testplot = new TestPlot({
     			props: {
-    				mainColor,
-    				reset: /*reset*/ ctx[0],
-    				clicked: /*clicked*/ ctx[2],
-    				xLabel,
-    				limX: /*limX*/ ctx[3],
-    				x: /*x*/ ctx[4],
-    				f: /*f*/ ctx[5],
-    				tail: /*tail*/ ctx[1],
-    				crit: /*crit*/ ctx[7],
-    				pValue: /*pValue*/ ctx[6],
-    				alpha,
-    				H0LegendStr: /*H0LegendStr*/ ctx[8],
-    				showLegend: true
+    				x: /*x*/ ctx[9],
+    				f: /*f*/ ctx[10],
+    				crit: /*crit*/ ctx[11],
+    				showLegend: /*showLegend*/ ctx[2],
+    				mainColor: /*mainColor*/ ctx[6],
+    				xLabel: /*xLabel*/ ctx[3],
+    				H0LegendStr: /*H0LegendStr*/ ctx[0],
+    				limX: /*limX*/ ctx[4],
+    				limY: /*limY*/ ctx[5],
+    				reset: /*reset*/ ctx[7],
+    				clicked: /*clicked*/ ctx[8],
+    				pValue: /*testRes*/ ctx[1].pValue,
+    				alpha: /*testRes*/ ctx[1].alpha,
+    				tail: /*testRes*/ ctx[1].tail,
+    				$$slots: { default: [create_default_slot$1] },
+    				$$scope: { ctx }
     			},
     			$$inline: true
     		});
@@ -8606,15 +8920,25 @@ var app = (function () {
     		},
     		p: function update(ctx, [dirty]) {
     			const testplot_changes = {};
-    			if (dirty & /*reset*/ 1) testplot_changes.reset = /*reset*/ ctx[0];
-    			if (dirty & /*clicked*/ 4) testplot_changes.clicked = /*clicked*/ ctx[2];
-    			if (dirty & /*limX*/ 8) testplot_changes.limX = /*limX*/ ctx[3];
-    			if (dirty & /*x*/ 16) testplot_changes.x = /*x*/ ctx[4];
-    			if (dirty & /*f*/ 32) testplot_changes.f = /*f*/ ctx[5];
-    			if (dirty & /*tail*/ 2) testplot_changes.tail = /*tail*/ ctx[1];
-    			if (dirty & /*crit*/ 128) testplot_changes.crit = /*crit*/ ctx[7];
-    			if (dirty & /*pValue*/ 64) testplot_changes.pValue = /*pValue*/ ctx[6];
-    			if (dirty & /*H0LegendStr*/ 256) testplot_changes.H0LegendStr = /*H0LegendStr*/ ctx[8];
+    			if (dirty & /*x*/ 512) testplot_changes.x = /*x*/ ctx[9];
+    			if (dirty & /*f*/ 1024) testplot_changes.f = /*f*/ ctx[10];
+    			if (dirty & /*crit*/ 2048) testplot_changes.crit = /*crit*/ ctx[11];
+    			if (dirty & /*showLegend*/ 4) testplot_changes.showLegend = /*showLegend*/ ctx[2];
+    			if (dirty & /*mainColor*/ 64) testplot_changes.mainColor = /*mainColor*/ ctx[6];
+    			if (dirty & /*xLabel*/ 8) testplot_changes.xLabel = /*xLabel*/ ctx[3];
+    			if (dirty & /*H0LegendStr*/ 1) testplot_changes.H0LegendStr = /*H0LegendStr*/ ctx[0];
+    			if (dirty & /*limX*/ 16) testplot_changes.limX = /*limX*/ ctx[4];
+    			if (dirty & /*limY*/ 32) testplot_changes.limY = /*limY*/ ctx[5];
+    			if (dirty & /*reset*/ 128) testplot_changes.reset = /*reset*/ ctx[7];
+    			if (dirty & /*clicked*/ 256) testplot_changes.clicked = /*clicked*/ ctx[8];
+    			if (dirty & /*testRes*/ 2) testplot_changes.pValue = /*testRes*/ ctx[1].pValue;
+    			if (dirty & /*testRes*/ 2) testplot_changes.alpha = /*testRes*/ ctx[1].alpha;
+    			if (dirty & /*testRes*/ 2) testplot_changes.tail = /*testRes*/ ctx[1].tail;
+
+    			if (dirty & /*$$scope*/ 32768) {
+    				testplot_changes.$$scope = { dirty, ctx };
+    			}
+
     			testplot.$set(testplot_changes);
     		},
     		i: function intro(local) {
@@ -8642,105 +8966,92 @@ var app = (function () {
     	return block;
     }
 
-    const alpha = 0.05;
-    const xLabel = "Possible sample mean";
-    const mainColor = "#6f6666";
-
     function instance$1($$self, $$props, $$invalidate) {
-    	let sampSize;
-    	let sampMean;
-    	let sampSD;
-    	let SE;
-    	let tValue;
-    	let limX;
     	let t;
     	let x;
     	let f;
-    	let pValue;
     	let dp;
     	let crit;
-    	let H0LegendStr;
     	let { $$slots: slots = {}, $$scope } = $$props;
-    	validate_slots("TestResults", slots, []);
-    	let { popMean } = $$props;
-    	let { popSD } = $$props;
-    	let { sample } = $$props;
+    	validate_slots("TTestPlot", slots, ['default']);
+    	let { testRes } = $$props;
+    	let { showLegend = true } = $$props;
+    	let { H0LegendStr = "" } = $$props;
+    	let { xLabel = "" } = $$props;
+    	let { limX = undefined } = $$props;
+    	let { limY = undefined } = $$props;
+    	let { mainColor = "#404040" } = $$props;
     	let { reset } = $$props;
-    	let { tail } = $$props;
     	let { clicked } = $$props;
-
-    	// sign symbols for hypothesis tails
     	const signs = { "both": "=", "left": "≥", "right": "≤" };
 
-    	const writable_props = ["popMean", "popSD", "sample", "reset", "tail", "clicked"];
+    	const writable_props = [
+    		"testRes",
+    		"showLegend",
+    		"H0LegendStr",
+    		"xLabel",
+    		"limX",
+    		"limY",
+    		"mainColor",
+    		"reset",
+    		"clicked"
+    	];
 
     	Object.keys($$props).forEach(key => {
-    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== "$$") console.warn(`<TestResults> was created with unknown prop '${key}'`);
+    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== "$$") console.warn(`<TTestPlot> was created with unknown prop '${key}'`);
     	});
 
     	$$self.$$set = $$props => {
-    		if ("popMean" in $$props) $$invalidate(9, popMean = $$props.popMean);
-    		if ("popSD" in $$props) $$invalidate(10, popSD = $$props.popSD);
-    		if ("sample" in $$props) $$invalidate(11, sample = $$props.sample);
-    		if ("reset" in $$props) $$invalidate(0, reset = $$props.reset);
-    		if ("tail" in $$props) $$invalidate(1, tail = $$props.tail);
-    		if ("clicked" in $$props) $$invalidate(2, clicked = $$props.clicked);
+    		if ("testRes" in $$props) $$invalidate(1, testRes = $$props.testRes);
+    		if ("showLegend" in $$props) $$invalidate(2, showLegend = $$props.showLegend);
+    		if ("H0LegendStr" in $$props) $$invalidate(0, H0LegendStr = $$props.H0LegendStr);
+    		if ("xLabel" in $$props) $$invalidate(3, xLabel = $$props.xLabel);
+    		if ("limX" in $$props) $$invalidate(4, limX = $$props.limX);
+    		if ("limY" in $$props) $$invalidate(5, limY = $$props.limY);
+    		if ("mainColor" in $$props) $$invalidate(6, mainColor = $$props.mainColor);
+    		if ("reset" in $$props) $$invalidate(7, reset = $$props.reset);
+    		if ("clicked" in $$props) $$invalidate(8, clicked = $$props.clicked);
+    		if ("$$scope" in $$props) $$invalidate(15, $$scope = $$props.$$scope);
     	};
 
     	$$self.$capture_state = () => ({
-    		pt,
-    		round,
     		seq,
-    		sd,
-    		getPValue,
+    		max,
+    		mrange,
     		dt,
-    		mean,
     		TestPlot,
-    		popMean,
-    		popSD,
-    		sample,
+    		testRes,
+    		showLegend,
+    		H0LegendStr,
+    		xLabel,
+    		limX,
+    		limY,
+    		mainColor,
     		reset,
-    		tail,
     		clicked,
     		signs,
-    		alpha,
-    		xLabel,
-    		mainColor,
-    		sampSize,
-    		sampMean,
-    		sampSD,
-    		SE,
-    		tValue,
-    		limX,
     		t,
     		x,
     		f,
-    		pValue,
     		dp,
-    		crit,
-    		H0LegendStr
+    		crit
     	});
 
     	$$self.$inject_state = $$props => {
-    		if ("popMean" in $$props) $$invalidate(9, popMean = $$props.popMean);
-    		if ("popSD" in $$props) $$invalidate(10, popSD = $$props.popSD);
-    		if ("sample" in $$props) $$invalidate(11, sample = $$props.sample);
-    		if ("reset" in $$props) $$invalidate(0, reset = $$props.reset);
-    		if ("tail" in $$props) $$invalidate(1, tail = $$props.tail);
-    		if ("clicked" in $$props) $$invalidate(2, clicked = $$props.clicked);
-    		if ("sampSize" in $$props) $$invalidate(12, sampSize = $$props.sampSize);
-    		if ("sampMean" in $$props) $$invalidate(13, sampMean = $$props.sampMean);
-    		if ("sampSD" in $$props) $$invalidate(14, sampSD = $$props.sampSD);
-    		if ("SE" in $$props) $$invalidate(15, SE = $$props.SE);
-    		if ("tValue" in $$props) $$invalidate(16, tValue = $$props.tValue);
-    		if ("limX" in $$props) $$invalidate(3, limX = $$props.limX);
-    		if ("t" in $$props) $$invalidate(17, t = $$props.t);
-    		if ("x" in $$props) $$invalidate(4, x = $$props.x);
-    		if ("f" in $$props) $$invalidate(5, f = $$props.f);
-    		if ("pValue" in $$props) $$invalidate(6, pValue = $$props.pValue);
-    		if ("dp" in $$props) $$invalidate(18, dp = $$props.dp);
-    		if ("crit" in $$props) $$invalidate(7, crit = $$props.crit);
-    		if ("H0LegendStr" in $$props) $$invalidate(8, H0LegendStr = $$props.H0LegendStr);
+    		if ("testRes" in $$props) $$invalidate(1, testRes = $$props.testRes);
+    		if ("showLegend" in $$props) $$invalidate(2, showLegend = $$props.showLegend);
+    		if ("H0LegendStr" in $$props) $$invalidate(0, H0LegendStr = $$props.H0LegendStr);
+    		if ("xLabel" in $$props) $$invalidate(3, xLabel = $$props.xLabel);
+    		if ("limX" in $$props) $$invalidate(4, limX = $$props.limX);
+    		if ("limY" in $$props) $$invalidate(5, limY = $$props.limY);
+    		if ("mainColor" in $$props) $$invalidate(6, mainColor = $$props.mainColor);
+    		if ("reset" in $$props) $$invalidate(7, reset = $$props.reset);
+    		if ("clicked" in $$props) $$invalidate(8, clicked = $$props.clicked);
+    		if ("t" in $$props) $$invalidate(12, t = $$props.t);
+    		if ("x" in $$props) $$invalidate(9, x = $$props.x);
+    		if ("f" in $$props) $$invalidate(10, f = $$props.f);
+    		if ("dp" in $$props) $$invalidate(13, dp = $$props.dp);
+    		if ("crit" in $$props) $$invalidate(11, crit = $$props.crit);
     	};
 
     	if ($$props && "$$inject" in $$props) {
@@ -8748,100 +9059,71 @@ var app = (function () {
     	}
 
     	$$self.$$.update = () => {
-    		if ($$self.$$.dirty & /*sample*/ 2048) {
-    			// statistics for current sample
-    			$$invalidate(12, sampSize = sample.length);
+    		if ($$self.$$.dirty & /*t, testRes*/ 4098) {
+    			$$invalidate(9, x = t.map(v => v * testRes.se + testRes.effectExpected));
     		}
 
-    		if ($$self.$$.dirty & /*sample*/ 2048) {
-    			$$invalidate(13, sampMean = round(mean(sample), 2));
+    		if ($$self.$$.dirty & /*t, testRes*/ 4098) {
+    			$$invalidate(10, f = dt(t, testRes.DoF));
     		}
 
-    		if ($$self.$$.dirty & /*sample*/ 2048) {
-    			$$invalidate(14, sampSD = round(sd(sample), 2));
+    		if ($$self.$$.dirty & /*testRes*/ 2) {
+    			// critical values
+    			$$invalidate(13, dp = Math.abs(testRes.effectObserved - testRes.effectExpected));
     		}
 
-    		if ($$self.$$.dirty & /*sampSD, sampSize*/ 20480) {
-    			$$invalidate(15, SE = sampSD / Math.sqrt(sampSize));
+    		if ($$self.$$.dirty & /*testRes, dp*/ 8194) {
+    			$$invalidate(11, crit = testRes.tail === "both"
+    			? [testRes.effectExpected - dp, testRes.effectExpected + dp]
+    			: [testRes.effectObserved]);
     		}
 
-    		if ($$self.$$.dirty & /*sampMean, popMean, SE*/ 41472) {
-    			$$invalidate(16, tValue = (sampMean - popMean) / SE);
-    		}
-
-    		if ($$self.$$.dirty & /*popMean, popSD*/ 1536) {
-    			$$invalidate(3, limX = [popMean - 3 * popSD, popMean + 3 * popSD]);
-    		}
-
-    		if ($$self.$$.dirty & /*t, SE, popMean*/ 164352) {
-    			$$invalidate(4, x = t.map(v => v * SE + popMean));
-    		}
-
-    		if ($$self.$$.dirty & /*t, sampSize*/ 135168) {
-    			$$invalidate(5, f = dt(t, sampSize - 1));
-    		}
-
-    		if ($$self.$$.dirty & /*tValue, tail, sampSize*/ 69634) {
-    			// this p-value is always for left half of the PDF and has to be adjusted
-    			$$invalidate(6, pValue = getPValue(pt, tValue, tail, [sampSize - 1]));
-    		}
-
-    		if ($$self.$$.dirty & /*popMean, sampMean*/ 8704) {
-    			$$invalidate(18, dp = Math.abs(popMean - sampMean));
-    		}
-
-    		if ($$self.$$.dirty & /*tail, popMean, dp, sampMean*/ 270850) {
-    			$$invalidate(7, crit = tail === "both"
-    			? [popMean - dp, popMean + dp]
-    			: [sampMean]);
-    		}
-
-    		if ($$self.$$.dirty & /*tail, popMean*/ 514) {
-    			$$invalidate(8, H0LegendStr = `H0: µ ${signs[tail]} ${popMean.toFixed(1)}`);
+    		if ($$self.$$.dirty & /*testRes*/ 2) {
+    			$$invalidate(0, H0LegendStr = `H0: µ ${signs[testRes.tail]} ${testRes.effectExpected.toFixed(2)}`);
     		}
     	};
 
-    	$$invalidate(17, t = seq(-10, 10, 300));
+    	$$invalidate(12, t = seq(-10, 10, 300));
 
     	return [
-    		reset,
-    		tail,
-    		clicked,
+    		H0LegendStr,
+    		testRes,
+    		showLegend,
+    		xLabel,
     		limX,
+    		limY,
+    		mainColor,
+    		reset,
+    		clicked,
     		x,
     		f,
-    		pValue,
     		crit,
-    		H0LegendStr,
-    		popMean,
-    		popSD,
-    		sample,
-    		sampSize,
-    		sampMean,
-    		sampSD,
-    		SE,
-    		tValue,
     		t,
-    		dp
+    		dp,
+    		slots,
+    		$$scope
     	];
     }
 
-    class TestResults extends SvelteComponentDev {
+    class TTestPlot extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
 
     		init(this, options, instance$1, create_fragment$1, safe_not_equal, {
-    			popMean: 9,
-    			popSD: 10,
-    			sample: 11,
-    			reset: 0,
-    			tail: 1,
-    			clicked: 2
+    			testRes: 1,
+    			showLegend: 2,
+    			H0LegendStr: 0,
+    			xLabel: 3,
+    			limX: 4,
+    			limY: 5,
+    			mainColor: 6,
+    			reset: 7,
+    			clicked: 8
     		});
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
-    			tagName: "TestResults",
+    			tagName: "TTestPlot",
     			options,
     			id: create_fragment$1.name
     		});
@@ -8849,84 +9131,96 @@ var app = (function () {
     		const { ctx } = this.$$;
     		const props = options.props || {};
 
-    		if (/*popMean*/ ctx[9] === undefined && !("popMean" in props)) {
-    			console.warn("<TestResults> was created without expected prop 'popMean'");
+    		if (/*testRes*/ ctx[1] === undefined && !("testRes" in props)) {
+    			console.warn("<TTestPlot> was created without expected prop 'testRes'");
     		}
 
-    		if (/*popSD*/ ctx[10] === undefined && !("popSD" in props)) {
-    			console.warn("<TestResults> was created without expected prop 'popSD'");
+    		if (/*reset*/ ctx[7] === undefined && !("reset" in props)) {
+    			console.warn("<TTestPlot> was created without expected prop 'reset'");
     		}
 
-    		if (/*sample*/ ctx[11] === undefined && !("sample" in props)) {
-    			console.warn("<TestResults> was created without expected prop 'sample'");
-    		}
-
-    		if (/*reset*/ ctx[0] === undefined && !("reset" in props)) {
-    			console.warn("<TestResults> was created without expected prop 'reset'");
-    		}
-
-    		if (/*tail*/ ctx[1] === undefined && !("tail" in props)) {
-    			console.warn("<TestResults> was created without expected prop 'tail'");
-    		}
-
-    		if (/*clicked*/ ctx[2] === undefined && !("clicked" in props)) {
-    			console.warn("<TestResults> was created without expected prop 'clicked'");
+    		if (/*clicked*/ ctx[8] === undefined && !("clicked" in props)) {
+    			console.warn("<TTestPlot> was created without expected prop 'clicked'");
     		}
     	}
 
-    	get popMean() {
-    		throw new Error("<TestResults>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	get testRes() {
+    		throw new Error("<TTestPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
 
-    	set popMean(value) {
-    		throw new Error("<TestResults>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	set testRes(value) {
+    		throw new Error("<TTestPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
 
-    	get popSD() {
-    		throw new Error("<TestResults>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	get showLegend() {
+    		throw new Error("<TTestPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
 
-    	set popSD(value) {
-    		throw new Error("<TestResults>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	set showLegend(value) {
+    		throw new Error("<TTestPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
 
-    	get sample() {
-    		throw new Error("<TestResults>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	get H0LegendStr() {
+    		throw new Error("<TTestPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
 
-    	set sample(value) {
-    		throw new Error("<TestResults>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	set H0LegendStr(value) {
+    		throw new Error("<TTestPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get xLabel() {
+    		throw new Error("<TTestPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set xLabel(value) {
+    		throw new Error("<TTestPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get limX() {
+    		throw new Error("<TTestPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set limX(value) {
+    		throw new Error("<TTestPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get limY() {
+    		throw new Error("<TTestPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set limY(value) {
+    		throw new Error("<TTestPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get mainColor() {
+    		throw new Error("<TTestPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set mainColor(value) {
+    		throw new Error("<TTestPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
 
     	get reset() {
-    		throw new Error("<TestResults>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    		throw new Error("<TTestPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
 
     	set reset(value) {
-    		throw new Error("<TestResults>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get tail() {
-    		throw new Error("<TestResults>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set tail(value) {
-    		throw new Error("<TestResults>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    		throw new Error("<TTestPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
 
     	get clicked() {
-    		throw new Error("<TestResults>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    		throw new Error("<TTestPlot>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
 
     	set clicked(value) {
-    		throw new Error("<TestResults>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    		throw new Error("<TTestPlot>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
     }
 
     /* src/App.svelte generated by Svelte v3.38.2 */
     const file = "src/App.svelte";
 
-    // (70:9) <AppControlArea>
+    // (72:9) <AppControlArea>
     function create_default_slot_1(ctx) {
     	let appcontrolswitch0;
     	let updating_value;
@@ -8941,7 +9235,7 @@ var app = (function () {
     	let current;
 
     	function appcontrolswitch0_value_binding(value) {
-    		/*appcontrolswitch0_value_binding*/ ctx[12](value);
+    		/*appcontrolswitch0_value_binding*/ ctx[13](value);
     	}
 
     	let appcontrolswitch0_props = {
@@ -8950,8 +9244,8 @@ var app = (function () {
     		options: ["left", "both", "right"]
     	};
 
-    	if (/*tail*/ ctx[3] !== void 0) {
-    		appcontrolswitch0_props.value = /*tail*/ ctx[3];
+    	if (/*tail*/ ctx[2] !== void 0) {
+    		appcontrolswitch0_props.value = /*tail*/ ctx[2];
     	}
 
     	appcontrolswitch0 = new AppControlSwitch({
@@ -8962,7 +9256,7 @@ var app = (function () {
     	binding_callbacks.push(() => bind(appcontrolswitch0, "value", appcontrolswitch0_value_binding));
 
     	function appcontrolrange_value_binding(value) {
-    		/*appcontrolrange_value_binding*/ ctx[13](value);
+    		/*appcontrolrange_value_binding*/ ctx[14](value);
     	}
 
     	let appcontrolrange_props = {
@@ -8986,7 +9280,7 @@ var app = (function () {
     	binding_callbacks.push(() => bind(appcontrolrange, "value", appcontrolrange_value_binding));
 
     	function appcontrolswitch1_value_binding(value) {
-    		/*appcontrolswitch1_value_binding*/ ctx[14](value);
+    		/*appcontrolswitch1_value_binding*/ ctx[15](value);
     	}
 
     	let appcontrolswitch1_props = {
@@ -9015,7 +9309,7 @@ var app = (function () {
     			$$inline: true
     		});
 
-    	appcontrolbutton.$on("click", /*takeNewSample*/ ctx[9]);
+    	appcontrolbutton.$on("click", /*takeNewSample*/ ctx[10]);
 
     	const block = {
     		c: function create() {
@@ -9040,9 +9334,9 @@ var app = (function () {
     		p: function update(ctx, dirty) {
     			const appcontrolswitch0_changes = {};
 
-    			if (!updating_value && dirty & /*tail*/ 8) {
+    			if (!updating_value && dirty & /*tail*/ 4) {
     				updating_value = true;
-    				appcontrolswitch0_changes.value = /*tail*/ ctx[3];
+    				appcontrolswitch0_changes.value = /*tail*/ ctx[2];
     				add_flush_callback(() => updating_value = false);
     			}
 
@@ -9096,21 +9390,21 @@ var app = (function () {
     		block,
     		id: create_default_slot_1.name,
     		type: "slot",
-    		source: "(70:9) <AppControlArea>",
+    		source: "(72:9) <AppControlArea>",
     		ctx
     	});
 
     	return block;
     }
 
-    // (55:0) <StatApp>
+    // (57:0) <StatApp>
     function create_default_slot(ctx) {
     	let div3;
     	let div0;
     	let populationplot;
     	let t0;
     	let div1;
-    	let testresults;
+    	let ttestplot;
     	let t1;
     	let div2;
     	let appcontrolarea;
@@ -9120,22 +9414,19 @@ var app = (function () {
     			props: {
     				popMean,
     				popSD: /*popSD*/ ctx[0],
-    				sample: /*sample*/ ctx[2],
-    				popAreaColor: /*popAreaColor*/ ctx[7],
-    				popColor: /*popColor*/ ctx[6],
-    				sampColor: /*sampColor*/ ctx[8]
+    				sample: /*sample*/ ctx[3],
+    				popAreaColor: /*popAreaColor*/ ctx[8],
+    				popColor: /*popColor*/ ctx[7],
+    				sampColor: /*sampColor*/ ctx[9]
     			},
     			$$inline: true
     		});
 
-    	testresults = new TestResults({
+    	ttestplot = new TTestPlot({
     			props: {
     				clicked: /*clicked*/ ctx[5],
     				reset: /*reset*/ ctx[4],
-    				popMean,
-    				popSD: /*popSD*/ ctx[0],
-    				sample: /*sample*/ ctx[2],
-    				tail: /*tail*/ ctx[3]
+    				testRes: /*testRes*/ ctx[6]
     			},
     			$$inline: true
     		});
@@ -9155,18 +9446,18 @@ var app = (function () {
     			create_component(populationplot.$$.fragment);
     			t0 = space();
     			div1 = element("div");
-    			create_component(testresults.$$.fragment);
+    			create_component(ttestplot.$$.fragment);
     			t1 = space();
     			div2 = element("div");
     			create_component(appcontrolarea.$$.fragment);
     			attr_dev(div0, "class", "app-population-plot-area svelte-120cezr");
-    			add_location(div0, file, 58, 6, 1647);
+    			add_location(div0, file, 60, 6, 1731);
     			attr_dev(div1, "class", "app-ci-plot-area svelte-120cezr");
-    			add_location(div1, file, 63, 6, 1854);
+    			add_location(div1, file, 65, 6, 1938);
     			attr_dev(div2, "class", "app-controls-area svelte-120cezr");
-    			add_location(div2, file, 68, 6, 2015);
+    			add_location(div2, file, 70, 6, 2073);
     			attr_dev(div3, "class", "app-layout svelte-120cezr");
-    			add_location(div3, file, 55, 3, 1567);
+    			add_location(div3, file, 57, 3, 1651);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div3, anchor);
@@ -9174,7 +9465,7 @@ var app = (function () {
     			mount_component(populationplot, div0, null);
     			append_dev(div3, t0);
     			append_dev(div3, div1);
-    			mount_component(testresults, div1, null);
+    			mount_component(ttestplot, div1, null);
     			append_dev(div3, t1);
     			append_dev(div3, div2);
     			mount_component(appcontrolarea, div2, null);
@@ -9183,18 +9474,16 @@ var app = (function () {
     		p: function update(ctx, dirty) {
     			const populationplot_changes = {};
     			if (dirty & /*popSD*/ 1) populationplot_changes.popSD = /*popSD*/ ctx[0];
-    			if (dirty & /*sample*/ 4) populationplot_changes.sample = /*sample*/ ctx[2];
+    			if (dirty & /*sample*/ 8) populationplot_changes.sample = /*sample*/ ctx[3];
     			populationplot.$set(populationplot_changes);
-    			const testresults_changes = {};
-    			if (dirty & /*clicked*/ 32) testresults_changes.clicked = /*clicked*/ ctx[5];
-    			if (dirty & /*reset*/ 16) testresults_changes.reset = /*reset*/ ctx[4];
-    			if (dirty & /*popSD*/ 1) testresults_changes.popSD = /*popSD*/ ctx[0];
-    			if (dirty & /*sample*/ 4) testresults_changes.sample = /*sample*/ ctx[2];
-    			if (dirty & /*tail*/ 8) testresults_changes.tail = /*tail*/ ctx[3];
-    			testresults.$set(testresults_changes);
+    			const ttestplot_changes = {};
+    			if (dirty & /*clicked*/ 32) ttestplot_changes.clicked = /*clicked*/ ctx[5];
+    			if (dirty & /*reset*/ 16) ttestplot_changes.reset = /*reset*/ ctx[4];
+    			if (dirty & /*testRes*/ 64) ttestplot_changes.testRes = /*testRes*/ ctx[6];
+    			ttestplot.$set(ttestplot_changes);
     			const appcontrolarea_changes = {};
 
-    			if (dirty & /*$$scope, sampSize, popSD, tail*/ 32779) {
+    			if (dirty & /*$$scope, sampSize, popSD, tail*/ 65543) {
     				appcontrolarea_changes.$$scope = { dirty, ctx };
     			}
 
@@ -9203,20 +9492,20 @@ var app = (function () {
     		i: function intro(local) {
     			if (current) return;
     			transition_in(populationplot.$$.fragment, local);
-    			transition_in(testresults.$$.fragment, local);
+    			transition_in(ttestplot.$$.fragment, local);
     			transition_in(appcontrolarea.$$.fragment, local);
     			current = true;
     		},
     		o: function outro(local) {
     			transition_out(populationplot.$$.fragment, local);
-    			transition_out(testresults.$$.fragment, local);
+    			transition_out(ttestplot.$$.fragment, local);
     			transition_out(appcontrolarea.$$.fragment, local);
     			current = false;
     		},
     		d: function destroy(detaching) {
     			if (detaching) detach_dev(div3);
     			destroy_component(populationplot);
-    			destroy_component(testresults);
+    			destroy_component(ttestplot);
     			destroy_component(appcontrolarea);
     		}
     	};
@@ -9225,14 +9514,14 @@ var app = (function () {
     		block,
     		id: create_default_slot.name,
     		type: "slot",
-    		source: "(55:0) <StatApp>",
+    		source: "(57:0) <StatApp>",
     		ctx
     	});
 
     	return block;
     }
 
-    // (80:3) 
+    // (82:3) 
     function create_help_slot(ctx) {
     	let div;
     	let h2;
@@ -9269,14 +9558,14 @@ var app = (function () {
     			em = element("em");
     			em.textContent = "significance limit";
     			t10 = text(". You will see\n         that if you take many samples (100 or more), you will find out that approximately 5% of the samples will have\n         p-value below 0.05 although the H0 is true. And this happens regardless the sample size. So this threshold is\n         simply a chance to make a wrong decision by rejection the correct H0. So, if you use 0.05 you have 5% chance to\n         make a wrong decision and e.g. \"see\" an effect, which does not exist.");
-    			add_location(h2, file, 80, 6, 2601);
-    			add_location(p0, file, 81, 6, 2634);
-    			add_location(strong, file, 93, 56, 3666);
-    			add_location(p1, file, 90, 6, 3388);
-    			add_location(em, file, 98, 79, 4007);
-    			add_location(p2, file, 97, 6, 3924);
+    			add_location(h2, file, 82, 6, 2659);
+    			add_location(p0, file, 83, 6, 2692);
+    			add_location(strong, file, 95, 56, 3724);
+    			add_location(p1, file, 92, 6, 3446);
+    			add_location(em, file, 100, 79, 4065);
+    			add_location(p2, file, 99, 6, 3982);
     			attr_dev(div, "slot", "help");
-    			add_location(div, file, 79, 3, 2577);
+    			add_location(div, file, 81, 3, 2635);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -9303,7 +9592,7 @@ var app = (function () {
     		block,
     		id: create_help_slot.name,
     		type: "slot",
-    		source: "(80:3) ",
+    		source: "(82:3) ",
     		ctx
     	});
 
@@ -9339,7 +9628,7 @@ var app = (function () {
     		p: function update(ctx, [dirty]) {
     			const statapp_changes = {};
 
-    			if (dirty & /*$$scope, sampSize, popSD, tail, clicked, reset, sample*/ 32831) {
+    			if (dirty & /*$$scope, sampSize, popSD, tail, clicked, reset, testRes, sample*/ 65663) {
     				statapp_changes.$$scope = { dirty, ctx };
     			}
 
@@ -9373,6 +9662,7 @@ var app = (function () {
     const popMean = 100;
 
     function instance($$self, $$props, $$invalidate) {
+    	let testRes;
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots("App", slots, []);
     	const popColor = colors.plots.POPULATIONS[0];
@@ -9391,7 +9681,7 @@ var app = (function () {
     	let clicked;
 
     	function takeNewSample() {
-    		$$invalidate(2, sample = rnorm(sampSize, popMean, popSD));
+    		$$invalidate(3, sample = rnorm(sampSize, popMean, popSD));
     		$$invalidate(5, clicked = Math.random());
     	}
 
@@ -9406,7 +9696,7 @@ var app = (function () {
 
     	function appcontrolswitch0_value_binding(value) {
     		tail = value;
-    		$$invalidate(3, tail);
+    		$$invalidate(2, tail);
     	}
 
     	function appcontrolrange_value_binding(value) {
@@ -9421,6 +9711,7 @@ var app = (function () {
 
     	$$self.$capture_state = () => ({
     		rnorm,
+    		tTest1,
     		StatApp,
     		colors,
     		AppControlArea,
@@ -9428,7 +9719,7 @@ var app = (function () {
     		AppControlSwitch,
     		AppControlRange,
     		PopulationPlot: MeanPopulationPlot,
-    		TestResults,
+    		TTestPlot,
     		popColor,
     		popAreaColor,
     		sampColor,
@@ -9441,18 +9732,20 @@ var app = (function () {
     		popSDOld,
     		reset,
     		clicked,
-    		takeNewSample
+    		takeNewSample,
+    		testRes
     	});
 
     	$$self.$inject_state = $$props => {
     		if ("popSD" in $$props) $$invalidate(0, popSD = $$props.popSD);
     		if ("sampSize" in $$props) $$invalidate(1, sampSize = $$props.sampSize);
-    		if ("tail" in $$props) $$invalidate(3, tail = $$props.tail);
-    		if ("sample" in $$props) $$invalidate(2, sample = $$props.sample);
-    		if ("sampSizeOld" in $$props) $$invalidate(10, sampSizeOld = $$props.sampSizeOld);
-    		if ("popSDOld" in $$props) $$invalidate(11, popSDOld = $$props.popSDOld);
+    		if ("tail" in $$props) $$invalidate(2, tail = $$props.tail);
+    		if ("sample" in $$props) $$invalidate(3, sample = $$props.sample);
+    		if ("sampSizeOld" in $$props) $$invalidate(11, sampSizeOld = $$props.sampSizeOld);
+    		if ("popSDOld" in $$props) $$invalidate(12, popSDOld = $$props.popSDOld);
     		if ("reset" in $$props) $$invalidate(4, reset = $$props.reset);
     		if ("clicked" in $$props) $$invalidate(5, clicked = $$props.clicked);
+    		if ("testRes" in $$props) $$invalidate(6, testRes = $$props.testRes);
     	};
 
     	if ($$props && "$$inject" in $$props) {
@@ -9460,28 +9753,33 @@ var app = (function () {
     	}
 
     	$$self.$$.update = () => {
-    		if ($$self.$$.dirty & /*sample, sampSizeOld, sampSize, popSDOld, popSD*/ 3079) {
+    		if ($$self.$$.dirty & /*sample, sampSizeOld, sampSize, popSDOld, popSD*/ 6155) {
     			// when sample size or population SD changed - reset statistics and take new sample
     			{
     				if (sample && (sampSizeOld !== sampSize || popSDOld !== popSD)) {
     					$$invalidate(4, reset = true);
-    					$$invalidate(10, sampSizeOld = sampSize);
-    					$$invalidate(11, popSDOld = popSD);
+    					$$invalidate(11, sampSizeOld = sampSize);
+    					$$invalidate(12, popSDOld = popSD);
     					takeNewSample();
     				} else {
     					$$invalidate(4, reset = false);
     				}
     			}
     		}
+
+    		if ($$self.$$.dirty & /*sample, tail*/ 12) {
+    			$$invalidate(6, testRes = tTest1(sample, popMean, 0.05, tail));
+    		}
     	};
 
     	return [
     		popSD,
     		sampSize,
-    		sample,
     		tail,
+    		sample,
     		reset,
     		clicked,
+    		testRes,
     		popColor,
     		popAreaColor,
     		sampColor,
