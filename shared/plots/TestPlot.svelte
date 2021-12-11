@@ -36,7 +36,6 @@
 
    // cumulative statistics
    $: {
-
       clicked;
 
       // reset statistics if sample size, population proportion or a test tail has been changed
@@ -54,7 +53,7 @@
    $: labelsStr = formatLabels([
       {
          name: H0LegendStr + ", p",
-         value: pValue.toFixed(3)
+         value: `<tspan ${pValue < alpha ? "fill=" + testFailColor : ""}>${pValue.toFixed(3)}</tspan>`
       },
       {
          name: `# samples with p < ${alpha}`,
@@ -65,9 +64,10 @@
 
 <!-- plot with population based CI and position of current sample proportion -->
 <DistributionPlot {x} {f} {xLabel} {crit} {tail} {lineColor} {areaColor} {statColor} {limX} limY={limYLocal} >
+   <slot></slot>
    <slot name="legend">
    {#if showLegend}
-      <TextLegend textSize={1.15} x={0} y={max(f) * 1.35} pos={2} dx="1.5em" dy="1.35em" elements={labelsStr} />
+      <TextLegend textSize={1.15} left={limX[0]} top={max(f) * 1.35} dx="1.5em" dy="1.35em" elements={labelsStr} />
    {/if}
    </slot>
 </DistributionPlot>

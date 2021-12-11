@@ -53,7 +53,7 @@
 {#if errmsg === ""  }
    <Axes {limX} limY={[-0.01, max(f) * 1.50]} {xLabel} >
       <!-- legend -->
-      <TextLegend textSize={1.15} x={90} y={max(f) * 1.40} pos={2} dx="1.25em" elements = {labelsStr} />
+      <TextLegend textSize={1.15} left={limX[0]} top={max(f) * 1.40} dx="1.25em" elements = {labelsStr} />
 
       <!-- PDF and intervaæ  -->
       <AreaSeries xValues={cix} yValues={cif} lineColor={mainColor + "40"} fillColor={mainColor + "40"}/>

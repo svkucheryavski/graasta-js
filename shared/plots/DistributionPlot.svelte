@@ -1,6 +1,6 @@
 <script>
-   import { max, mrange, subset, seq, rep, closestIndex } from 'stat-js';
-   import {Axes, XAxis, LineSeries, AreaSeries, Segments} from 'svelte-plots-basic';
+   import { max, mrange, subset, seq, rep, closestIndex } from "stat-js";
+   import {Axes, XAxis, LineSeries, AreaSeries, Segments} from "svelte-plots-basic";
 
    export let lineColor = "#000000";
    export let areaColor = lineColor + "40";
@@ -14,7 +14,7 @@
    export let limX = mrange(x, 0.1);
    export let limY = [0, max(f) * 1.2];
    export let xLabel = "";
-   export let yLabel = null;
+   export let yLabel = undefined;
    export let title = null;
 
    let axLeft = [], axRight = [], afLeft = [], afRight = [];
@@ -48,12 +48,12 @@
    <slot name="legend"></slot>
 
    <!-- area for left tail -->
-   {#if axLeft.length > 0 && (tail === "left" || tail === "both")}
+   {#if axLeft && axLeft.length > 1 && (tail === "left" || tail === "both")}
       <AreaSeries xValues={axLeft} yValues={afLeft} lineColor="transparent" fillColor={areaColor}/>
    {/if}
 
    <!-- area for right tail -->
-   {#if axRight.length > 0 && (tail === "right" || tail === "both")}
+   {#if axRight !== undefined && axRight.length > 1 && (tail === "right" || tail === "both")}
       <AreaSeries xValues={axRight} yValues={afRight} lineColor="transparent" fillColor={areaColor}/>
    {/if}
 

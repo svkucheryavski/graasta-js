@@ -1,5 +1,5 @@
 <script>
-   import {seq, dnorm, rep, mean, sd, max, mrange} from 'stat-js';
+   import {seq, dnorm, rep, mean, sd, max, mrange, range} from 'stat-js';
    import {Axes, XAxis, LineSeries, Segments,  TextLegend, ScatterSeries, AreaSeries} from 'svelte-plots-basic';
    import { formatLabels } from '../../shared/graasta';
 
@@ -9,23 +9,34 @@
    export let popColor;
    export let popAreaColor;
    export let sampColor;
+   export let limX = [80, 120];
 
-   // size of population and axes plus coordinates of the points
+   // left position of the legend
+   $: left = limX[0] + 0.75 * (limX[1] - limX[0]);
+
+   // parameters of PDF curve
    $: popX = seq(popMean - 3.5 * popSD, popMean + 3.5 * popSD, 100);
    $: popY = dnorm(popX, popMean, popSD);
+
+   // sample statistics
    $: sampY = rep(max(popY) * 0.05, sample.length);
    $: sampMean = mean(sample);
 
-   // text values for stat table
+   // limits for y-axis
+   $: limY = mrange(popY, 0.01);
+
+   // text values for legend
    $: labelsStr = formatLabels([
       {name: "Sample mean", value: mean(sample).toFixed(1)},
       {name: "Sample sd", value: sd(sample).toFixed(1)}
    ])
 </script>
 
-<Axes title={`Population: µ = ${popMean}, σ = ${popSD.toFixed(1)}`} xLabel={"Chloride in water, [mg/L]"} limX={[80, 120]} limY={mrange(popY, 0.01)}>
+<Axes title={`Population: µ = ${popMean}, σ = ${popSD.toFixed(1)}`} xLabel={"Chloride in water, [mg/L]"} {limX} {limY}>
+
+   <slot></slot>
+
    <!-- population distribution and mean  -->
-   <XAxis slot="xaxis"></XAxis>
    <LineSeries xValues={popX} yValues={popY} lineColor={popColor} />
    <AreaSeries xValues={popX} yValues={popY} lineColor={"transparent"} fillColor={popAreaColor}  />
    <Segments xStart={[sampMean]} xEnd={[sampMean]} yStart={[0]} yEnd={[max(popY)]} lineColor={sampColor} lineType={3} />
@@ -35,6 +46,8 @@
    <Segments xStart={[popMean]} xEnd={[popMean]} yStart={[0]} yEnd={[max(popY)]} lineColor={popColor} lineType={2} />
 
    <!-- sample statistics -->
-   <TextLegend textSize={1.15} x={90} y={max(popY) * 0.40} pos={2} dx="1.25em" elements={labelsStr} />
+   <TextLegend textSize={1.15} {left} top={max(popY) * 0.90} dx="0" elements={labelsStr} />
+
+   <XAxis slot="xaxis"></XAxis>
 </Axes>
 

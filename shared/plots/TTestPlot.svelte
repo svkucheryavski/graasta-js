@@ -1,5 +1,5 @@
 <script>
-   import {seq, sd, dt, mean, pt, range, max} from 'stat-js';
+   import {seq, max, mrange, dt} from 'stat-js';
    import TestPlot from '../../shared/plots/TestPlot.svelte';
 
    export let testRes;
@@ -8,25 +8,25 @@
    export let xLabel = "";
    export let limX = undefined;
    export let limY = undefined;
-
-   export let lineColor = "#404040";
-   export let areaColor = lineColor + "40";
-   export let statColor = "#000000";
+   export let mainColor = "#404040";
+   export let reset;
+   export let clicked;
 
    // PDF curve for sampling distribution
-   $: x = seq(testRes.effectExpected - 10 * testRes.se, testRes.effectExpected + 10 * testRes.se, 300);
-   $: f = dt(x.map(v => v / testRes.se), testRes.DoF);
+   $: t = seq(-10, 10, 300)
+   $: x = t.map(v => v * testRes.se + testRes.effectExpected);
+   $: f = dt(t, testRes.DoF);
 
    // critical t-value
-   $: crit = testRes.tail === "both" ? [-Math.abs(testRes.effectObserved), Math.abs(testRes.effectObserved)] : [testRes.effectObserved];
-
+   $: crit = testRes.tail === "both" ?
+      [-Math.abs(testRes.effectObserved), Math.abs(testRes.effectObserved)] : [testRes.effectObserved];
 </script>
 
 <TestPlot
-   {x} {f} {crit} {showLegend} {lineColor} {areaColor} {statColor} {xLabel} {H0LegendStr}
+   {x} {f} {crit} {showLegend} {mainColor} {xLabel} {H0LegendStr} {limX} {limY} {reset} {clicked}
    pValue={testRes.pValue}
    alpha={testRes.alpha}
-   limX={limX}
-   limY={limY}
-   tail="both"
-/>
+   tail={testRes.tail}
+>
+<slot></slot>
+</TestPlot>
