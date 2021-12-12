@@ -1,33 +1,65 @@
 <script>
-   import {sd, mean, rnorm} from 'stat-js';
+   import {tTest2, rnorm} from "stat-js";
 
-   // common blocks
-   import {default as StatApp} from '../../shared/StatApp.svelte';
-   import AppControlArea from '../../shared/AppControlArea.svelte';
-   import AppControlButton from '../../shared/AppControlButton.svelte';
-   import AppControlSwitch from '../../shared/AppControlSwitch.svelte';
-   import AppControlRange from '../../shared/AppControlRange.svelte';
+   // shared components
+   import {default as StatApp} from "../../shared/StatApp.svelte";
 
-   // children blocks
+   // shared components - controls
+   import AppControlArea from "../../shared/controls/AppControlArea.svelte";
+   import AppControlButton from "../../shared/controls/AppControlButton.svelte";
+   import AppControlSwitch from "../../shared/controls/AppControlSwitch.svelte";
+   import AppControlRange from "../../shared/controls/AppControlRange.svelte";
+
+   // shared components - controls
+   import TTestPlot from "../../shared/plots/TTestPlot.svelte";
+   import CIPlotSimple from "../../shared/plots/CIPlotSimple.svelte";
+
+   // local components
    import PopulationPlot from "./PopulationPlot.svelte";
-   import TestPlot from "./TestPlot.svelte";
-   import CIPlot  from "./CIPlot.svelte"
 
    const globalMean = 100;
    let effectExpected = 0;
    let noiseExpected = 10;
    let sampSize = 3;
-   let samples;
+   let samples = [];
+
+   let sampSizeOld = sampSize;
+   let expEffectOld = effectExpected;
+   let expNoiseOld = noiseExpected;
+   let reset = false;
+   let clicked;
+
+   const xLabelTest = "Expected values for m1 – m2";
+   const xLabelCI = "Expected values for µ1 – µ2";
+   const limX = [-70, 70];
+
+   // when sample size or population SD changed - reset statistics and take new sample
+   $: {
+      if (samples && (sampSizeOld !== sampSize || expEffectOld !== effectExpected ||expNoiseOld !== noiseExpected)) {
+         reset = true;
+         sampSizeOld = sampSize;
+         expEffectOld = effectExpected;
+         expNoiseOld = noiseExpected;
+         takeNewSample()
+      } else {
+         reset = false;
+      }
+   }
+
+   // make a test
+   $: testRes = tTest2(samples[0], samples[1], 0.05, "both");
 
    function takeNewSample() {
       samples = [
          rnorm(sampSize, globalMean - effectExpected/2, noiseExpected),
          rnorm(sampSize, globalMean + effectExpected/2, noiseExpected)
       ];
+
+      clicked = Math.random();
    }
 
-   // take new sample when the three parameters are changed
-   $: effectExpected || noiseExpected || sampSize ? takeNewSample() : null;
+   // take first sample
+   takeNewSample()
 </script>
 
 <StatApp>
@@ -40,18 +72,20 @@
 
       <!-- test plot -->
       <div class="app-testplot-area">
-         <TestPlot {samples} {noiseExpected} {effectExpected} />
+         <TTestPlot {testRes} {reset} {clicked} xLabel={xLabelTest} {limX} />
       </div>
 
       <!-- confidence interval plot -->
       <div class="app-ciplot-area">
-         <CIPlot {samples} {effectExpected} />
+         <CIPlotSimple effectObserved={testRes.effectObserved} effectExpected={testRes.effectExpected} ci={testRes.ci}
+            se={testRes.se} {limX} xLabel={xLabelCI} />
       </div>
 
       <!-- control elements -->
       <div class="app-controls-area">
          <AppControlArea>
-            <AppControlRange id="effect" label="Expected effect" bind:value={effectExpected} min={-10} max={10} step={1} decNum={0} />
+            <AppControlRange id="effect" label="Expected effect" bind:value={effectExpected} min={-10} max={10} step={1}
+               decNum={0} />
             <AppControlRange id="noise" label="Noise (σ)" bind:value={noiseExpected} min={5} max={20} step={1} decNum={0} />
             <AppControlSwitch id="sampSize" label="SampleSize" bind:value={sampSize} options={[3, 5, 10, 30]} />
             <AppControlButton id="newSample" label="Sample" text="Take new" on:click={takeNewSample} />

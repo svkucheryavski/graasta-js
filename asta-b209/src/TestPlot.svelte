@@ -5,8 +5,8 @@
    export let samples;
    export let effectExpected;
    export let noiseExpected;
-
-   const colors = ["#606060", "#000000"];
+   export let showLegend = true;
+   export let colors = ["#606060", "#000000"];
 
    // variables for collecting cumulative statistics
    let oldEffectExpected = effectExpected;
@@ -52,13 +52,15 @@
 </script>
 
 <!-- plot with population based CI and position of current sample proportion -->
-<Axes limX={[-60, 60]} limY={[-0.005, max(f) * 1.50]} xLabel={"Expected value for  (m<sub>1</sub> – m<sub>2</sub>)"}>
+<Axes limX={[-60, 60]} limY={[-0.005, max(f) * (showLegend ? 1.50 : 1.2)]} xLabel={"Expected value for  (m<sub>1</sub> – m<sub>2</sub>)"}>
 
    <!-- statistics -->
+   {#if showLegend}
    <TextLegend textSize={1.05} x={90} y={max(f) * 1.4} pos={2} dx="2em" dy="1.35em" elements = {[
          percentBelow005Str,
          H0LegendStr + ", p-value: " + p.toFixed(3)
    ]} />
+   {/if}
 
    <!-- area for p-value -->
    {#each px as x, i}

@@ -1,14 +1,18 @@
 <script>
-   import {seq, rep, mean, dnorm} from 'stat-js';
+   import {seq, rep, mean, dnorm} from "stat-js";
    import {Axes, XAxis, YAxis, LineSeries,ScatterSeries, AreaSeries, Segments} from 'svelte-plots-basic';
+   import { colors } from "../../shared/graasta";
 
    export let globalMean;
    export let effectExpected;
    export let noiseExpected ;
    export let samples;
-   export let colors = ["#0000ff", "#ff0000"];
 
-   const effectLineColor = "#202020";
+   const mainColors = colors.plots.POPULATIONS;
+   const areaColors = colors.plots.POPULATIONS_PALE;
+   const sampColors = colors.plots.SAMPLES;
+
+   const effectLineColor = "#606060";
 
    $: sampSize = samples[0].length;
 
@@ -32,29 +36,29 @@
    <YAxis slot="yaxis" showGrid={true}></YAxis>
 
     <!-- PDF  for population 1 -->
-   <LineSeries xValues={y1} yValues={x1} lineColor="{colors[0]}90"></LineSeries>
-   <AreaSeries xValues={y1} yValues={x1} fillColor="{colors[0]}10" lineColor="transparent"/>
+   <LineSeries xValues={y1} yValues={x1} lineColor={mainColors[0]}></LineSeries>
+   <AreaSeries xValues={y1} yValues={x1} fillColor={areaColors[0]} lineColor="transparent"/>
 
     <!-- line for mu1 -->
-   <Segments xStart={[0]} xEnd={[1.49]} yStart={[mu1]} yEnd={[mu1]} lineType={2} lineColor="{colors[0]}a0" />
-   <ScatterSeries xValues={[1.49]} yValues={[mu1]} faceColor="{colors[0]}a0" borderColor="transparent" />
+   <Segments xStart={[0]} xEnd={[1.49]} yStart={[mu1]} yEnd={[mu1]} lineType={2} lineColor={sampColors[0]} />
+   <ScatterSeries xValues={[1.49]} yValues={[mu1]} faceColor={sampColors[0]} borderColor="transparent" />
 
     <!-- sample points for population 1 -->
-   <ScatterSeries xValues={rep(-0, sampSize)} yValues={samples[0]} borderColor={colors[0]} borderWidth={2} markerSize={1.3} faceColor="transparent" />
+   <ScatterSeries xValues={rep(-0, sampSize)} yValues={samples[0]} borderColor={sampColors[0]} borderWidth={2} markerSize={1.3} faceColor="transparent" />
 
     <!-- PDF  for population 2 -->
-   <LineSeries xValues={y2} yValues={x2} lineColor="{colors[1]}90"></LineSeries>
-   <AreaSeries xValues={y2} yValues={x2} fillColor="{colors[1]}10" lineColor="transparent"/>
+   <LineSeries xValues={y2} yValues={x2} lineColor={mainColors[1]}></LineSeries>
+   <AreaSeries xValues={y2} yValues={x2} fillColor={areaColors[1]} lineColor="transparent"/>
 
     <!-- line for mu2 -->
-   <Segments xStart={[1.51]} xEnd={[3]} yStart={[mu2]} yEnd={[mu2]} lineType={2} lineColor="{colors[1]}a0" />
-   <ScatterSeries xValues={[1.51]} yValues={[mu2]} faceColor="{colors[1]}a0" borderColor="transparent" />
+   <Segments xStart={[1.51]} xEnd={[3]} yStart={[mu2]} yEnd={[mu2]} lineType={2} lineColor={sampColors[1]} />
+   <ScatterSeries xValues={[1.51]} yValues={[mu2]} faceColor={sampColors[1]} borderColor="transparent" />
 
     <!-- sample points for population 2 -->
-   <ScatterSeries xValues={rep(3, sampSize)} yValues={samples[1]} borderColor={colors[1]} borderWidth={2} markerSize={1.3} faceColor="transparent" />
+   <ScatterSeries xValues={rep(3, sampSize)} yValues={samples[1]} borderColor={sampColors[1]} borderWidth={2} markerSize={1.3} faceColor="transparent" />
 
     <!-- line fo observed effect -->
-   <Segments xStart={[0]} xEnd={[3]} yStart={[m1]} yEnd={[m2]} lineWidth={2} lineColor="{effectLineColor}" />
+   <Segments xStart={[0]} xEnd={[3]} yStart={[m1]} yEnd={[m2]} lineWidth={1.5} lineColor="{effectLineColor}" />
    <ScatterSeries xValues={[0]} yValues={[m1]} borderColor={effectLineColor} markerSize={1} faceColor={effectLineColor} />
    <ScatterSeries xValues={[3]} yValues={[m2]} borderColor={effectLineColor} markerSize={1} faceColor={effectLineColor} />
 </Axes>
