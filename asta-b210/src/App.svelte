@@ -1,18 +1,19 @@
 <script>
-   import {subset, seq, dnorm, rnorm} from 'stat-js';
+   import {subset, rnorm} from "stat-js";
 
-   // common blocks
-   import {default as StatApp} from '../../shared/StatApp.svelte';
-   import AppControlArea from '../../shared/AppControlArea.svelte';
-   import AppControlButton from '../../shared/AppControlButton.svelte';
-   import AppControlRange from '../../shared/AppControlRange.svelte';
+   // shared components
+   import {default as StatApp} from "../../shared/StatApp.svelte";
 
+   // shared components - controls
+   import AppControlArea from "../../shared/controls/AppControlArea.svelte";
+   import AppControlButton from "../../shared/controls/AppControlButton.svelte";
+   import AppControlRange from "../../shared/controls/AppControlRange.svelte";
+   import AppControlSwitch from '../../shared/controls/AppControlSwitch.svelte';
 
-   // children blocks
+   // local components
    import TestColumnPlot from "./TestColumnPlot.svelte";
    import TestColumnTable from "./TestColumnTable.svelte";
-   import TestColumn from './TestColumn.svelte';
-   import AppControlSwitch from '../../shared/AppControlSwitch.svelte';
+   import TestColumn from "./TestColumn.svelte";
 
    // constant parameters
    const globalMean = 100;

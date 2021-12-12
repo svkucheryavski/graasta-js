@@ -1,8 +1,12 @@
 <script>
-   import {rep, mean} from 'stat-js';
-   import {Axes, YAxis, Segments, TextLegend, ScatterSeries} from 'svelte-plots-basic';
+   import {rep, mean} from "stat-js";
+   import {Axes, YAxis, TextLegend, ScatterSeries} from "svelte-plots-basic";
 
-   import BoxAndWhiskers from '../../shared/BoxAndWhiskers.svelte';
+   // shared components
+   import {formatLabels} from "../../shared/graasta";
+
+   // shared components - plots
+   import BoxAndWhiskers from "../../shared/plots/BoxAndWhiskers.svelte";
 
    export let popMeans;
    export let popSigma;
@@ -18,7 +22,6 @@
    let nSamples = 0;
 
    $: {
-
       // reset statistics if sample size, population proportion or a test tail has been changed
       if (oldPopSigma !== popSigma || oldAlpha !== alpha) {
          oldPopSigma = popSigma;
@@ -37,23 +40,16 @@
    $: popQuartiles = popMeans.map(v => [v - popSigma, v, v + popSigma]);
    $: popRanges = popQuartiles.map(v => [v[0] - 1.5 * (v[2] - v[0]), v[2] + 1.5 * (v[2] - v[0])]);
 
-   // strings for legend
-   $: H0LegendStr = `
-      H0:
-      µ<tspan font-size="0.75em" baseline-shift="sub">A</tspan> =
-      µ<tspan font-size="0.75em" baseline-shift="sub">B</tspan> =
-      µ<tspan font-size="0.75em" baseline-shift="sub">C</tspan>
-   `;
-   $: percentBelow005Str = `H0 rejections = ${nSamplesBelow005}/${nSamples} (${(100 * nSamplesBelow005/nSamples).toFixed(1)}%)`;
-   $: alphaStr = "<tspan font-weight=bold>alpha = " + alpha.toFixed(3) + "</tspan>";
+   $: legendElements = formatLabels([
+      {name: "H0", value: "µA = µB = µC"},
+      {name: "H0 rejections", value: `${nSamplesBelow005}/${nSamples} (${(100 * nSamplesBelow005/nSamples).toFixed(1)})`},
+      {name: "alpha for each test", value: alpha.toFixed(3)}
+   ]);
 </script>
 
 <Axes limX={[-0.5, 2.5]} limY={[50, 180]}>
    <!-- statistics -->
-   <TextLegend
-      textSize={1.05} x={1} y={170} pos={2} dx="3.5em" dy="1.4em"
-      elements = {[H0LegendStr, percentBelow005Str, alphaStr]}
-   />
+   <TextLegend textSize={1.05} left={-0.5} top={170} dx="1.5em" dy="1.4em" elements={legendElements} />
 
    {#each popQuartiles as p, i}
 

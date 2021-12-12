@@ -1,10 +1,13 @@
 <script>
    import { subset, tTest2 } from "stat-js";
 
-   import DataTable  from "../../shared/DataTable.svelte";
-   import TestColumnTable from "./TestColumnTable.svelte";
-   import CIPlot from "../../shared/plots/CIPlot.svelte";
+   // shared components - plots
+   import DataTable  from "../../shared/tables/DataTable.svelte";
+   import CIPlot from "../../shared/plots/CIPlotSimple.svelte";
    import TTestPlot from '../../shared/plots/TTestPlot.svelte';
+
+   // local components
+   import TestColumnTable from "./TestColumnTable.svelte";
 
    export let labels;
    export let samples;
@@ -37,6 +40,7 @@
       showLegend={false}
       limX={[-60, 60]}
       ci={testRes.ci}
+      se={testRes.se}
       ciColor={mainColor}
       expectedEffectColor={"#202020"}
       effectObserved={testRes.effectObserved}
@@ -44,11 +48,11 @@
    />
 
    <TTestPlot {xLabel} {testRes}
+      reset={true}
+      clicked={0}
       showLegend={false}
       limX={[-60, 60]}
-      lineColor={mainColor}
-      statColor={mainColor + "90"}
-      areaColor={mainColor + "30"}
+      mainColor={mainColor}
    />
 </div>
 

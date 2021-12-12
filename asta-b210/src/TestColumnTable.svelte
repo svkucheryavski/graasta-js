@@ -1,7 +1,8 @@
 <script>
-   import {rep, mean} from 'stat-js';
+   import {rep, mean} from "stat-js";
 
-   import DataTable from "../../shared/DataTable.svelte";
+   // shared components - table
+   import DataTable from "../../shared/tables/DataTable.svelte";
 
    export let labels;
    export let samples;
