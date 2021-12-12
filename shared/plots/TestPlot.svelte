@@ -22,8 +22,8 @@
    export let limX = mrange(x, 0.1);
    export let limY = null;
 
-   export let mainColor = "#000000";
-   export let testFailColor = "#ff2211";
+   export let mainColor = "#b0b0b0";
+   export let testFailColor = "#ff8866";
 
    let nSamples = 0;
    let nSamplesBelowAlpha = 0;
