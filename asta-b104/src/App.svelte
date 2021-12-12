@@ -1,6 +1,6 @@
 <script>
-   import {ppoints, sd, seq, pnorm, rnorm, skewness, kurtosis, mean, quantile, diff} from "stat-js";
-   import {Axes, XAxis, YAxis, Box, LineSeries, ScatterSeries} from "svelte-plots-basic";
+   import {ppoints, sd, seq, pnorm, rnorm, skewness, kurtosis, mean} from "stat-js";
+   import {LineSeries} from "svelte-plots-basic";
 
    // shared components
    import {default as StatApp} from "../../shared/StatApp.svelte";
@@ -10,6 +10,9 @@
    import AppControlArea from "../../shared/controls/AppControlArea.svelte";
    import AppControlButton from "../../shared/controls/AppControlButton.svelte";
    import AppControlSwitch from "../../shared/controls/AppControlSwitch.svelte";
+
+   // shared components - plots
+   import QQPlot from "../../shared/plots/QQPlot.svelte";
 
    // shared tables
    import DataTable from "../../shared/tables/DataTable.svelte";
@@ -41,16 +44,6 @@
    $: sp = ppoints(sampleSize);
    $: sz = sp.map((v, i) => zseq[closestIndex(pseq, v)]);
    $: sx = getSample(sampleSize);
-
-   // theoretical line
-   const lp = [0.25, 0.75];
-   const lz = [-0.6744898,  0.6744898];
-
-   $: lx = quantile(sx, lp);
-   $: la = diff(lx) / diff(lz);
-   $: lb = mean(lx) - la * mean(lz)
-   $: llx = [-4, 4];
-   $: lly = [-4 * la + lb, 4 * la + lb];
 </script>
 
 <StatApp>
@@ -58,16 +51,11 @@
 
       <!-- QQ plot with corresponding data  -->
       <div class="app-qqplot-area">
-         <Axes {limX} {limY} yLabel="Height, cm" xLabel="Standard score, z">
-            <XAxis slot="xaxis" showGrid={true}></XAxis>
-            <YAxis slot="yaxis" showGrid={true}></YAxis>
-            <Box slot="box"></Box>
+         <QQPlot {limX} {limY} sample={sx} yLabel="Height, cm" xLabel="Standard score, z">
             {#if showPopLine === "on"}
             <LineSeries xValues={limX} yValues={limY} lineType={1} lineWidth={2} lineColor={populationColor} />
             {/if}
-            <LineSeries xValues={llx} yValues={lly} lineType={2} lineColor={sampleColor} />
-            <ScatterSeries xValues={sz} yValues={sx} borderWidth={2} markerSize={1.25} borderColor={sampleColor}/>
-         </Axes>
+         </QQPlot>
       </div>
 
       <!-- Tables with values and quantiles -->
