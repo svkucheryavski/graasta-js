@@ -60,7 +60,7 @@ import { getContext } from 'svelte';
          bw = boxSize;
          bh = IQR;
          ys = [mn < Q1 ? mn : Q1, Q3, Q2];
-         ye = [Q1, mx > Q3 ? Q3 : mx, Q2];
+         ye = [Q1, mx > Q3 ? mx : Q3, Q2];
          xs = [boxPosition, boxPosition, bl];
          xe = [boxPosition, boxPosition, bl + bw];
          py = out;
