@@ -2,8 +2,9 @@
    import { sum } from "stat-js";
 
    import DataTable  from "../../shared/tables/DataTable.svelte";
+   import ANOVAPlot from "../../shared/plots/ANOVABoxplot.svelte";
+
    import ANOVATable from "./ANOVATable.svelte";
-   import ANOVAPlot from "./ANOVABoxplot.svelte";
 
    export let effectExpected;
    export let noiseExpected;
