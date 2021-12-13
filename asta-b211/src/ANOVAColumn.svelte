@@ -3,7 +3,7 @@
 
    import DataTable  from "../../shared/tables/DataTable.svelte";
    import ANOVATable from "./ANOVATable.svelte";
-   import ANOVAPlot from "./ANOVAPlot.svelte";
+   import ANOVAPlot from "./ANOVABoxplot.svelte";
 
    export let effectExpected;
    export let noiseExpected;
@@ -32,7 +32,7 @@
       {label: "SSQ", values: [SSQ]},
       {label: "MS", values: [MS]}
    ]} decNum={[1, 1, 1]} horizontal={true} />
-   <ANOVAPlot color="{colors[0]}" boxColor="{colors[1]}" popMeans={effectExpected} popSigma={noiseExpected} samples={samples}  />
+   <ANOVAPlot color={colors[0]} boxColor={colors[1]} popMeans={effectExpected} popSigma={noiseExpected} samples={samples}  />
 </div>
 
 <style>
