@@ -12,11 +12,11 @@
    export let tail;
    export let pValue;
    export let alpha;
-   export let xLabel;
    export let clicked;
 
    export let showLegend = true;
    export let H0LegendStr = "";
+   export let xLabel = "";
 
    export let reset = false;
    export let limX = mrange(x, 0.1);
@@ -56,7 +56,7 @@
          value: `<tspan ${pValue < alpha ? "fill=" + testFailColor : ""}>${pValue.toFixed(3)}</tspan>`
       },
       {
-         name: `# samples with p < ${alpha}`,
+         name: `# samples p < ${alpha}`,
          value:  `${nSamplesBelowAlpha}/${nSamples} (${(100 * nSamplesBelowAlpha/nSamples).toFixed(1)}%)`
       }
    ]);
@@ -67,7 +67,7 @@
    <slot></slot>
    <slot name="legend">
    {#if showLegend}
-      <TextLegend textSize={1.15} left={limX[0]} top={max(f) * 1.35} dx="1.5em" dy="1.35em" elements={labelsStr} />
+      <TextLegend textSize={1.15} left={limX[0]} top={max(f) * 1.35} dx="0.5em" dy="1.35em" elements={labelsStr} />
    {/if}
    </slot>
 </DistributionPlot>

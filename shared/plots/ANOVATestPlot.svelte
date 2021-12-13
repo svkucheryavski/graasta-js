@@ -8,6 +8,7 @@
    // shared components - plots
    import TestPlot from "../../shared/plots/TestPlot.svelte";
 
+   export let mainColor = "#a0a0a0";
    export let sysSample;
    export let errSample;
    export let reset;
@@ -34,8 +35,8 @@
 
 </script>
 
-<TestPlot {x} {f} {pValue} {reset} {clicked} {H0LegendStr} crit={[crit]} alpha={0.05} tail="right">
+<TestPlot limX={[-0.2, 10]} {x} {f} {pValue} {reset} {clicked} {H0LegendStr} {mainColor} crit={[crit]} alpha={0.05} tail="right">
    <!-- add legend item with current F-value -->
-   <TextLegend textSize={1.15} left={-0.2} top={max(f) * 1.05} dx="0em"
+   <TextLegend textSize={1.15} left={-0.2} top={max(f) * 1.025} dx="0.5em"
       elements={formatLabels([{name: "F-value", value: crit.toFixed(1)}])} />
 </TestPlot>
