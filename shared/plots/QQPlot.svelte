@@ -1,5 +1,5 @@
 <script>
-   import {ppoints, sd, seq, pnorm, qnorm, skewness, kurtosis, mean, quantile, diff, mrange, sort} from "stat-js";
+   import {ppoints, qnorm, mean, quantile, diff, mrange, sort} from "stat-js";
    import {Axes, XAxis, YAxis, Box, LineSeries, ScatterSeries} from "svelte-plots-basic";
    import { colors } from "../../shared/graasta";
 
@@ -16,7 +16,6 @@
 
    export let limX = undefined;
    export let limY = undefined;
-
 
    $: sx = sort([].concat.apply([], sample));
    $: sampSize = sx.length;
