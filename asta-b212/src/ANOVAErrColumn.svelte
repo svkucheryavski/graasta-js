@@ -7,6 +7,7 @@
 
    export let errSample;
    export let labels;
+   export let mainColor = "#a0a0a0";
 
    $: DoF = errSample.length * (errSample[0].length - 1);
    $: SSQ = sum(errSample.map(v => sum(v.map(x => x**2))));
@@ -23,7 +24,7 @@
       {label: "SSQ", values: [SSQ]},
       {label: "MS", values: [MS]}
    ]} decNum={[1, 1, 1]} horizontal={true} />
-   <QQPlot sample={errSample} />
+   <QQPlot xLabel="" yLabel="" borderColor={mainColor} sample={errSample} />
 </div>
 
 <style>

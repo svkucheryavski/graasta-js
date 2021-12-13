@@ -8,6 +8,7 @@
    import AppControlArea from "../../shared/controls/AppControlArea.svelte";
    import AppControlButton from "../../shared/controls/AppControlButton.svelte";
    import AppControlRange from "../../shared/controls/AppControlRange.svelte";
+   import ANOVABoxplot from "../../shared/plots/ANOVABoxplot.svelte";
 
    // local components
    import ANOVATable from "./ANOVATable.svelte";
@@ -15,35 +16,31 @@
    import ANOVAErrColumn from "./ANOVAErrColumn.svelte";
 
    // constant parameters
-   const globalMean = 100;
    const sampSize = 5;
-   const nGroups = 3;
    const labels = ["A", "B", "C"];
+   const noiseExpected = 10;
 
    // needed to make first sample predefined
    let firstSample = true;
 
    // population parameters, which can vary
-   let muA = 0;
-   let muB = 0;
-   let muC = 0;
-   let noiseExpected = 10;
+   let muA = 100;
+   let muB = 100;
+   let muC = 100;
 
    // parameters to reset statistics
    let oldMuA = muA;
    let oldMuB = muB;
    let oldMuC = muC;
-   let oldNoiseExpected = noiseExpected;
    let reset = false;
    let clicked;
 
    $: {
-      if (sample && (oldMuA !== muA || oldMuB !== muB || oldMuC !== muC || oldNoiseExpected !== noiseExpected)) {
+      if (sample && (oldMuA !== muA || oldMuB !== muB || oldMuC !== muC)) {
          reset = true;
          oldMuA = muA;
          oldMuB = muB;
          oldMuC = muC;
-         oldNoiseExpected = noiseExpected;
          takeNewSample();
       } else {
          reset = false;
@@ -88,35 +85,32 @@
       <div class="app-original-data-area">
          <!-- original values table and the sign -->
          <ANOVATable {labels} values={sample} />
+         <ANOVABoxplot limX={[-0.5, 2.3]} limY={[50, 150]} popSigma={noiseExpected} popMeans={[muA, muB, muC]} samples={sample} />
 
          <!-- Control elements -->
          <AppControlArea>
             <AppControlRange
                id="effectA" label="µ<sub>A</sub>"
-               bind:value={muA} min={-10} max={10} step={1} decNum={0}
+               bind:value={muA} min={90} max={110} step={1} decNum={0}
             />
             <AppControlRange
                id="effectB" label="µ<sub>B</sub>"
-               bind:value={muB} min={-10} max={10} step={1} decNum={0}
+               bind:value={muB} min={90} max={110} step={1} decNum={0}
             />
             <AppControlRange
                id="effectC" label="µ<sub>C</sub>"
-               bind:value={muC} min={-10} max={10} step={1} decNum={0}
-            />
-            <AppControlRange
-               id="noise" label="Noise (σ)"
-               bind:value={noiseExpected} min={5} max={15} step={1} decNum={0}
+               bind:value={muC} min={90} max={110} step={1} decNum={0}
             />
             <AppControlButton id="newSample" label="Sample" text="Take new" on:click={takeNewSample} />
          </AppControlArea>
       </div>
 
-      <div class="app-systematic-data-area">
-         <ANOVASysColumn {sysSample} {errSample} {labels} {clicked} {reset} />
+      <div class="app-data-area app-systematic-data-area">
+         <ANOVASysColumn mainColor="#66aa88" {sysSample} {errSample} {labels} {clicked} {reset} />
       </div>
 
-      <div class="app-error-data-area">
-         <ANOVAErrColumn {errSample} {labels} />
+      <div class="app-data-area app-error-data-area">
+         <ANOVAErrColumn mainColor="#aa6644" {errSample} {labels} />
       </div>
    </div>
 
@@ -124,9 +118,10 @@
       <h2>One way ANOVA (full)</h2>
       <p>
          This app is almost identical to the <code>asta-b211</code> but here we show calculations as they
-         are without sbstracting the global mean in advance. The results are absolutly identical but
+         are without sbstracting the global mean in advance. The results are absolutly identical but this time
+         without additional step of unbiasing the values. Plus the app shows importance of QQ plot for residuals
+         which helps to assess their normality.
       </p>
-
    </div>
 </StatApp>
 
@@ -152,9 +147,11 @@
    display: grid;
    grid-template-areas:
       "table"
+      "plot"
       "controls"
       ".";
-   grid-template-rows: min-content min-content auto;
+
+   grid-template-rows: min-content max(130px, 30%) min-content auto;
    grid-template-columns: 1fr min-content;
 }
 
@@ -173,14 +170,15 @@
    align-items: center;
 }
 
+.app-original-data-area  > :global(.anova-table) {
+   padding: 0 2em 0 1em;
+}
+
 .app-original-data-area  > :global(.plot) {
    min-height: 130px;
    height: 100%;
    grid-area: plot;
-}
-
-.app-original-data-area  > :global(.plot) {
-   grid-area: plot;
+   padding-left: 1em;
 }
 
 .app-original-data-area  > :global(.app-control-area) {
@@ -189,37 +187,39 @@
 }
 
 
-/* column with systematic data */
+/* column with systematic/error data */
 
-.app-systematic-data-area {
+.app-data-area {
    flex: 0 1 33%;
 }
 
+.app-data-area  > :global(.anova-column .anova-table) {
+   padding: 0 1.5em 0 1em;
+}
+
+.app-data-area > :global(.anova-column > .datatable  tr:last-of-type > .datatable__value) {
+   font-weight: bold;
+}
+
+/* column with systematic data */
 .app-systematic-data-area :global(.datatable),
-.app-systematic-data-area :global(.plot){
+.app-systematic-data-area :global(.plot),
+.app-systematic-data-area  > :global(.anova-column .anova-table) {
    background: #f0f6f0;
 }
 
 .app-systematic-data-area > :global(.anova-column > .datatable  tr:last-of-type > .datatable__value) {
-   font-weight: bold;
    color: #66aa88;
 }
 
-
 /* column with error data */
-
-.app-error-data-area {
-   flex: 0 1 33%;
-}
-
+.app-error-data-area  > :global(.anova-column .anova-table),
 .app-error-data-area :global(.datatable),
 .app-error-data-area :global(.plot){
    background: #f8f4f0;
 }
 
 .app-error-data-area > :global(.anova-column > .datatable  tr:last-of-type > .datatable__value) {
-   font-weight: bold;
    color: #aa6644;
 }
-
 </style>

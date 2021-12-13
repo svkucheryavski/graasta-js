@@ -10,6 +10,7 @@
    export let labels;
    export let reset;
    export let clicked;
+   export let mainColor = "#a0a0a0";
 
    $: grandMean = mean(sysSample.map(v => v[0]));
    $: DoF = sysSample.length - 1;
@@ -27,7 +28,7 @@
       {label: "SSQ", values: [SSQ]},
       {label: "MS", values: [MS]}
    ]} decNum={[1, 1, 1]} horizontal={true} />
-   <ANOVATestPlot {sysSample} {errSample} {reset} {clicked}/>
+   <ANOVATestPlot {mainColor} {sysSample} {errSample} {reset} {clicked}/>
 </div>
 
 <style>
