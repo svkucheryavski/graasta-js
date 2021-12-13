@@ -9,10 +9,12 @@
    import AppControlButton from "../../shared/controls/AppControlButton.svelte";
    import AppControlRange from "../../shared/controls/AppControlRange.svelte";
 
+   // shared components - plots
+   import ANOVATestPlot from "../../shared/plots/ANOVATestPlot.svelte";
+
    // local components
    import ANOVATable from "./ANOVATable.svelte";
    import ANOVAColumn from "./ANOVAColumn.svelte";
-   import TestPlot from "./TestPlot.svelte";
 
    // constant parameters
    const globalMean = 100;
@@ -104,7 +106,7 @@
          </div>
 
          <!-- F-distribution plot -->
-         <TestPlot {reset} {clicked} {errSample} {sysSample} />
+         <ANOVATestPlot {reset} {clicked} {errSample} {sysSample} />
 
          <!-- Control elements -->
          <AppControlArea>
