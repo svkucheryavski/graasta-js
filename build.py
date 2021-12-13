@@ -26,7 +26,7 @@ app_blocks = [
    },
    {
       "title": "Comparing means",
-      "apps": ["asta-b209", "asta-b210"]
+      "apps": ["asta-b209", "asta-b210", "asta-b211", "asta-b212"]
    }
 ]
 
