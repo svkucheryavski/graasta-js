@@ -1,5 +1,5 @@
 <script>
-   import {sum, seq, round, subset, getPValue, dnorm, pnorm} from 'stat-js';
+   import {sum, seq, round, subset, getPValue, dnorm, pnorm} from "mdatools/stat";
 
    import TestPlot from "../../shared/plots/TestPlot.svelte";
 

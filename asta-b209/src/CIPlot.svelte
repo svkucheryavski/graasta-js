@@ -3,7 +3,7 @@
     * Confidence intervals for two-sample t-test        *
     *****************************************************/
 
-   import {sd, mean, qt} from 'stat-js';
+   import {sd, mean, qt} from "mdatools/stat";
    import {Axes, XAxis, TextLegend, Segments} from 'svelte-plots-basic';
 
    export let samples;

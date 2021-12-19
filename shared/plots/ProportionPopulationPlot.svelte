@@ -1,6 +1,6 @@
 <script>
-   import {seq, subset, expandGrid, mrange} from 'stat-js';
-   import {Axes, ScatterSeries} from 'svelte-plots-basic';
+   import { seq, subset, expandGrid, mrange } from 'mdatools/stat';
+   import { Axes, ScatterSeries } from 'svelte-plots-basic';
 
    export let groups;
    export let sample;

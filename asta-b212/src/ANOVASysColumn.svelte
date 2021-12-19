@@ -1,5 +1,5 @@
 <script>
-   import { mean, sum } from "stat-js";
+   import { mean, sum } from 'mdatools/stat';
 
    import DataTable  from "../../shared/tables/DataTable.svelte";
    import ANOVATable from "./ANOVATable.svelte";

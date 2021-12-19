@@ -1,5 +1,5 @@
 <script>
-   import { subset, tTest2 } from "stat-js";
+   import { subset, tTest2 } from 'mdatools/stat';
 
    // shared components - plots
    import DataTable  from "../../shared/tables/DataTable.svelte";

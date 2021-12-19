@@ -1,6 +1,6 @@
 <script>
-   import {BarSeries} from 'svelte-plots-basic';
-   import {count, sum, mids, split} from 'stat-js';
+   import { BarSeries} from 'svelte-plots-basic';
+   import { count, sum, mids, split } from 'mdatools/stat';
 
    export let values = [];
    export let nBins = 10;

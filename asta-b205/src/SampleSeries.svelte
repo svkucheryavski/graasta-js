@@ -1,5 +1,5 @@
 <script>
-   import {seq, rep, sum} from "stat-js"
+   import {seq, rep, sum} from 'mdatools/stat'
    import {ScatterSeries} from "svelte-plots-basic"
 
    import { colors } from "../../shared/graasta.js";

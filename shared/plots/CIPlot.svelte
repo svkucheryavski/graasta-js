@@ -1,6 +1,6 @@
 <script>
-   import {max} from 'stat-js';
-   import {Axes, XAxis, LineSeries, AreaSeries, TextLegend, Segments} from 'svelte-plots-basic';
+   import { max} from 'mdatools/stat';
+   import { Axes, XAxis, LineSeries, AreaSeries, TextLegend, Segments } from 'svelte-plots-basic';
    import { formatLabels } from '../../shared/graasta';
 
 

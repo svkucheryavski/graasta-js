@@ -1,5 +1,5 @@
 <script>
-   import {subset, rnorm} from "stat-js";
+   import {subset, rnorm} from 'mdatools/stat';
 
    // shared components
    import {default as StatApp} from "../../shared/StatApp.svelte";

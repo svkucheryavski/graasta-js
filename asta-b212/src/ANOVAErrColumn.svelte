@@ -1,5 +1,5 @@
 <script>
-   import { sum } from "stat-js";
+   import { sum } from 'mdatools/stat';
 
    import DataTable  from "../../shared/tables/DataTable.svelte";
    import QQPlot from "../../shared/plots/QQPlot.svelte";

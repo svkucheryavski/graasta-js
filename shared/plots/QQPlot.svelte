@@ -1,6 +1,6 @@
 <script>
-   import {ppoints, qnorm, mean, quantile, diff, mrange, sort} from "stat-js";
-   import {Axes, XAxis, YAxis, Box, LineSeries, ScatterSeries} from "svelte-plots-basic";
+   import { ppoints, qnorm, mean, quantile, diff, mrange, sort } from "mdatools/stat";
+   import { Axes, XAxis, YAxis, Box, LineSeries, ScatterSeries } from "svelte-plots-basic";
    import { colors } from "../../shared/graasta";
 
    export let sample;

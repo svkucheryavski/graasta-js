@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "sirv-cli": "^1.0.0",
-    "stat-js": "^0.0.1",
+    "mdatools": "^0.0.1",
     "svelte-plots-basic": "^0.0.1",
     "svelte-plots-stat": "^0.0.1"
   }

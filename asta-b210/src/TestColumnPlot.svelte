@@ -1,5 +1,5 @@
 <script>
-   import {rep, mean} from "stat-js";
+   import {rep, mean} from 'mdatools/stat';
    import {Axes, YAxis, TextLegend, ScatterSeries} from "svelte-plots-basic";
 
    // shared components

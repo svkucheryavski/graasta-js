@@ -1,6 +1,6 @@
 <script>
-   import {seq, sum, subset} from 'stat-js';
-   import {Axes, TextLabels, ScatterSeries} from 'svelte-plots-basic';
+   import { seq, sum, subset } from 'mdatools/stat';
+   import { Axes, TextLabels, ScatterSeries } from 'svelte-plots-basic';
    import { formatLabels } from "../../shared/graasta.js";
 
    export let groups;

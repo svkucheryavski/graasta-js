@@ -1,6 +1,6 @@
 <script>
-   import { max, mrange, subset, seq, rep, closestIndex } from "stat-js";
-   import {Axes, XAxis, LineSeries, AreaSeries, Segments} from "svelte-plots-basic";
+   import { max, mrange, subset, seq, rep, closestIndex } from "mdatools/stat";
+   import { Axes, XAxis, LineSeries, AreaSeries, Segments } from "svelte-plots-basic";
 
    export let lineColor = "#000000";
    export let areaColor = lineColor + "40";

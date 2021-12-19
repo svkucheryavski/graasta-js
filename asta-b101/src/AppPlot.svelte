@@ -1,5 +1,5 @@
 <script>
-   import {max, quantile, mean, min} from 'stat-js';
+   import {max, quantile, mean, min} from 'mdatools/stat';
    import {Axes, XAxis, Segments, TextLabels, ScatterSeries} from 'svelte-plots-basic';
 
    // shared components

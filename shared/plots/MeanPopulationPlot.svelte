@@ -1,6 +1,6 @@
 <script>
-   import {seq, dnorm, rep, mean, sd, max, mrange, range} from 'stat-js';
-   import {Axes, XAxis, LineSeries, Segments,  TextLegend, ScatterSeries, AreaSeries} from 'svelte-plots-basic';
+   import { seq, dnorm, rep, mean, sd, max, mrange } from 'mdatools/stat';
+   import { Axes, XAxis, LineSeries, Segments,  TextLegend, ScatterSeries, AreaSeries } from 'svelte-plots-basic';
    import { formatLabels } from '../../shared/graasta';
 
    export let popMean;

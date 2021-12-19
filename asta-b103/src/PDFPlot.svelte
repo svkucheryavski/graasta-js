@@ -1,5 +1,5 @@
 <script>
-   import { mean } from "stat-js";
+   import { mean } from 'mdatools/stat';
    import {Axes, XAxis, YAxis, Box, Segments, AreaSeries, TextLabels, LineSeries} from "svelte-plots-basic";
 
    export let x;

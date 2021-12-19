@@ -1,12 +1,12 @@
 <script>
-   import {seq, df, pf, sum, mean, max} from "stat-js";
-   import {TextLegend} from "svelte-plots-basic";
+   import { seq, df, pf, sum, mean, max } from "mdatools/stat";
+   import { TextLegend } from "svelte-plots-basic";
 
    // shared components
-   import {formatLabels} from "../../shared/graasta.js";
+   import { formatLabels } from "../graasta.js";
 
    // shared components - plots
-   import TestPlot from "../../shared/plots/TestPlot.svelte";
+   import TestPlot from "./TestPlot.svelte";
 
    export let mainColor = "#a0a0a0";
    export let sysSample;

@@ -1,6 +1,6 @@
 <script>
-   import {mrange} from "stat-js";
-   import {Axes, XAxis, TextLegend, Segments} from "svelte-plots-basic";
+   import { mrange} from "mdatools/stat";
+   import { Axes, XAxis, TextLegend, Segments } from "svelte-plots-basic";
 
    import { formatLabels } from "../graasta";
 

@@ -1,5 +1,5 @@
 <script>
-   import {seq, min, max, dnorm} from 'stat-js';
+   import { seq, min, max, dnorm } from 'mdatools/stat';
    import  CIPlot from "./CIPlot.svelte";
 
    export let lineColor = "#000000";

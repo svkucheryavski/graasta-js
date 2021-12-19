@@ -1,5 +1,5 @@
 <script>
-   import {max, rnorm, sort, min} from 'stat-js';
+   import {max, rnorm, sort, min} from 'mdatools/stat';
 
    // shared components
    import {default as StatApp} from '../../shared/StatApp.svelte';

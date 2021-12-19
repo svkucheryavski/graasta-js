@@ -1,5 +1,5 @@
 <script>
-   import {runif, sum, subset} from "stat-js";
+   import {runif, sum, subset} from 'mdatools/stat';
 
    // shared components
    import {default as StatApp} from "../../shared/StatApp.svelte";

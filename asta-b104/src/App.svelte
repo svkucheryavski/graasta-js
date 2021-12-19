@@ -1,5 +1,5 @@
 <script>
-   import {ppoints, sd, seq, pnorm, rnorm, skewness, kurtosis, mean} from "stat-js";
+   import {ppoints, sd, seq, pnorm, rnorm, skewness, kurtosis, mean} from 'mdatools/stat';
    import {LineSeries} from "svelte-plots-basic";
 
    // shared components

@@ -1,5 +1,5 @@
 <script>
-   import { min, diff } from "stat-js";
+   import { min, diff } from "mdatools/stat";
    import DataTableValues from "./DataTableValues.svelte";
 
    export let variables = [];

@@ -1,5 +1,5 @@
 <script>
-   import {seq, dt} from "stat-js";
+   import { seq, dt } from "mdatools/stat";
    import TestPlot from "../../shared/plots/TestPlot.svelte";
 
    export let testRes;

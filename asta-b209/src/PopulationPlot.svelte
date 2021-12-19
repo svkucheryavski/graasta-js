@@ -1,5 +1,5 @@
 <script>
-   import {seq, rep, mean, dnorm} from "stat-js";
+   import {seq, rep, mean, dnorm} from 'mdatools/stat';
    import {Axes, XAxis, YAxis, LineSeries,ScatterSeries, AreaSeries, Segments} from 'svelte-plots-basic';
    import { colors } from "../../shared/graasta";
 

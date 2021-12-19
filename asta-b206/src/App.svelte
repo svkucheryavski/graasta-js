@@ -1,5 +1,5 @@
 <script>
-   import {seq, subset, rep, shuffle} from "stat-js";
+   import {seq, subset, rep, shuffle} from 'mdatools/stat';
 
    // shared components
    import { default as StatApp } from "../../shared/StatApp.svelte";

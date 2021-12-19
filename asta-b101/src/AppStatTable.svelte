@@ -1,5 +1,5 @@
 <script>
-   import {quantile, mean} from 'stat-js';
+   import {quantile, mean} from 'mdatools/stat';
    import DataTable from "../../shared/tables/DataTable.svelte";
 
    export let values;

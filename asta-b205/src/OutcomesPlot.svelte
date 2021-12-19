@@ -1,5 +1,5 @@
 <script>
-   import { seq, sum, min } from "stat-js";
+   import { seq, sum, min } from 'mdatools/stat';
    import OutcomesColumn from "./OutcomesColumn.svelte";
 
    export let sample;

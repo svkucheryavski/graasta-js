@@ -1,5 +1,5 @@
 <script>
-   import {seq, sd, dt, mean, pt, max} from 'stat-js';
+   import {seq, sd, dt, mean, pt, max} from "mdatools/stat";
    import {Axes, XAxis, TextLegend, LineSeries, AreaSeries, Segments} from 'svelte-plots-basic';
 
    export let samples;

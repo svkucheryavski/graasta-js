@@ -1,5 +1,5 @@
 <script>
-   import {rep, mean} from 'stat-js';
+   import {rep, mean} from "mdatools/stat";
 
    import DataTable from "../../shared/tables/DataTable.svelte";
 

@@ -1,7 +1,7 @@
 <script>
-   import {Rectangles, Segments, TextLabels} from 'svelte-plots-basic';
-   import {min, max, quantile, getOutliers} from 'stat-js';
-import { getContext } from 'svelte';
+   import { Rectangles, Segments, TextLabels } from 'svelte-plots-basic';
+   import { min, max, quantile, getOutliers } from 'mdatools/stat';
+   import { getContext } from 'svelte';
 
    export let values = [];
    export let boxPosition;

@@ -1,5 +1,5 @@
 <script>
-   import {max, count, rnorm, runif, split, quantile, min, getOutliers} from "stat-js";
+   import {max, count, rnorm, runif, split, quantile, min, getOutliers} from 'mdatools/stat';
 
    // shared components
    import {default as StatApp} from "../../shared/StatApp.svelte";

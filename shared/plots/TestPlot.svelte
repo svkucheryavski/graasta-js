@@ -1,6 +1,6 @@
 <script>
-   import {mrange, max} from "stat-js";
-   import {TextLegend} from "svelte-plots-basic";
+   import { mrange, max } from "mdatools/stat";
+   import { TextLegend } from "svelte-plots-basic";
 
    // graasta shared components
    import DistributionPlot from '../../shared/plots/DistributionPlot.svelte';

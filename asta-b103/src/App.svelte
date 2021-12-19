@@ -1,5 +1,5 @@
 <script>
-   import {seq, dnorm, dunif, pnorm, punif, closestIndex} from 'stat-js';
+   import {seq, dnorm, dunif, pnorm, punif, closestIndex} from "mdatools/stat";
 
    // shared components
    import {default as StatApp} from '../../shared/StatApp.svelte';
