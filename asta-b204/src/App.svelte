@@ -13,7 +13,7 @@
 
    // local components
    import PopulationPlot from "../../shared/plots/MeanPopulationPlot.svelte";
-   import CIPlot from "../../asta-b204/src/MeanCIPlot.svelte";
+   import CIPlot from "./MeanCIPlot.svelte";
 
    // size of population and vector with element indices
    const popColor = colors.plots.POPULATIONS[0];
