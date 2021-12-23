@@ -1,40 +1,20 @@
 <script>
-	import { onMount } from 'svelte';
-
    let showHelp = false;
-   let scale = "medium";
-   let appContainer;
 
    const toggleHelp = () => showHelp = !showHelp;
-
-   const getScale = function(width, height) {
-      if (width < 959) return "small";
-      if (width < 1279) return "medium";
-      return "large";
-   };
-
-   /* observer for the plotting area size */
-   var ro = new ResizeObserver(entries => {
-      for (let entry of entries) {
-         const cr = entry.contentRect;
-         scale = getScale(cr.width, cr.height);
-      }
-   });
 
    const handleKeyPress = e => {
       if (e.key === 'h') toggleHelp();
    };
 
-   onMount(() => {
-      ro.observe(appContainer);
-   });
+   $: showHelp = window.location.hash === "#help";
 </script>
 
 <svelte:window on:keypress={handleKeyPress}/>
-<main class="mdatools-app mdatools-app_{scale}" bind:this={appContainer}>
+<main class="mdatools-app">
 
    <div class="content">
-   <slot></slot>
+      <slot></slot>
    </div>
 
    {#if showHelp}
@@ -57,15 +37,13 @@
    font-family: Helvetica, Areal, Verdana, sans-serif;
    display: block;
    position: relative;
-   font-size: 18px;
+   font-size: max(14px, 1vw);
 
+   aspect-ratio: 16/9;
    min-width: 800px;
-   max-width: 2560px;
-   max-height: 1800px;
-   min-height: 720px;
 
    width: 100%;
-   height: 100%;
+   height: auto;
 
    box-sizing: border-box;
    padding: 1em;
@@ -118,27 +96,6 @@
    padding: 0 0 0.5em 0;
    line-height: 1.5em;
    font-size: 1.2em;
-}
-
-
-/* styles for medium app size - between 900 and 1200 */
-.mdatools-app_medium {
-   font-size: 14px;
-   max-height: 720px;
-   min-height: 540px;
-}
-
-/* styles for small app size */
-.mdatools-app_small {
-   max-height: 540px;
-   min-height: 450px;
-   font-size: 12px;
-}
-
-.mdatools-app_small :global(.axis-label) {
-   text-align: center;
-   font-weight: 500;
-   font-size: 1.25em;
 }
 
 </style>
