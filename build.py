@@ -8,7 +8,7 @@ import json
 import os
 
 SRC_DIR = "./apps/"
-DST_DIR = "../graasta.web.static/public/apps"
+DST_DIR = "../graasta-web-static/public/apps"
 
 # which blocks and apps to process
 app_blocks = [
