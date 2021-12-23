@@ -10,7 +10,7 @@
 
    export let clicked;
    export let labelStr = "# samples with µ inside CI";
-   export let xLabel = "Expected sample mean";
+   export let xLabel = "Expected population mean";
    export let reset = false;
    export let errmsg = "";
 
