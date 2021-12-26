@@ -11,7 +11,7 @@
 </script>
 
 <svelte:window on:keypress={handleKeyPress}/>
-<main class="mdatools-app">
+<main class="graasta-app">
 
    <div class="content">
       <slot></slot>
@@ -27,13 +27,17 @@
 
 <style>
 
-/* main styles for mdatools-app and children */
-:global(#mdatools-app-container) {
-   height: 100% !important;
+/* main styles for graasta-app and children */
+:global(body) {
+   height: max-content;
+}
+
+:global(#graasta-app-container) {
+   height: max-content;
    width: 100% !important;
 }
 
-.mdatools-app {
+.graasta-app {
    font-family: Helvetica, Areal, Verdana, sans-serif;
    display: block;
    position: relative;
@@ -51,17 +55,17 @@
    background: #fdfdfd;
 }
 
-.mdatools-app  * {
+.graasta-app  * {
    box-sizing: border-box;
    margin: 0;
    padding: 0;
 }
 
-.mdatools-app :glbal(.plot) {
+.graasta-app :glbal(.plot) {
    box-shadow: 0px 0px 5px  #30303020;
 }
 
-.mdatools-app .content {
+.graasta-app .content {
    width: 100%;
    height: 100%;
 }
