@@ -1,4 +1,4 @@
-# Interactive apps for teaching and learning statistics and chemometrics
+improvements t# Interactive apps for teaching and learning statistics and chemometrics
 
 A collection of interactive web applications, which can be used for teaching and learning of applied statistics (app name starts with `asta-`), design of experiments (`doe-`) and methods for multivariate data analysis (`mda-`). The initial version was made using R/Shiny but later has been replaced with the current version, written using [Svelte](https://svelte.dev), so every app is just a single JavaScript file (supplemented with CSS), which can be embedded into any HTML page and be used without a backend.
 
@@ -12,7 +12,7 @@ If you want to use any app in your project, do the following (here, for example,
  `asta-b101.css` — CSS styles for the app and `index.html` — simple HTML file which can be used
  to run the app locally.
 
-2. Move the first two files to the folders where you keep js and css files (here we assume it is `./js` and `./css`). Open your HTML file and add a DOM element (e.g. `<div>`) with ID `"mdatools-app-container"`.
+2. Move the first two files to the folders where you keep js and css files (here we assume it is `./js` and `./css`). Open your HTML file and add a DOM element (e.g. `<div>`) with ID `"graasta-app-container"`.
 
 After that just add two lines to the header of the HTML file (between tags `<head>...</head>`):
 
