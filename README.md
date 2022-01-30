@@ -1,8 +1,8 @@
-improvements t# Interactive apps for teaching and learning statistics and chemometrics
+# Interactive apps for teaching and learning statistics and chemometrics
 
 A collection of interactive web applications, which can be used for teaching and learning of applied statistics (app name starts with `asta-`), design of experiments (`doe-`) and methods for multivariate data analysis (`mda-`). The initial version was made using R/Shiny but later has been replaced with the current version, written using [Svelte](https://svelte.dev), so every app is just a single JavaScript file (supplemented with CSS), which can be embedded into any HTML page and be used without a backend.
 
-You can see the full list of all application as well as try them and download the app builds [here](https://graasta.com).
+You can see the full list of all application as well as try them and download the app builds [here](https://graasta.com). The project is currently in active developing more apps coming during spring 2022 as well as some extra features, e.g. videos for the apps.
 
 ## How to use
 
@@ -30,6 +30,8 @@ Here are some important notes about the use of the apps in your own projects:
 2. Smallest size the apps can scale down to is 800x450 pixels. Largest size is limited by 2560x1440 pixels. Anything in between will works just fine.
 
 3. The apps are tested in latest versions of Safari, Chrome and Firefox browsers. They should also work fine in all Chromium based browsers, e.g. Microsoft Edge. Any other browser which supports modern CSS standards and can run Javascript should also work.
+
+
 
 
 
