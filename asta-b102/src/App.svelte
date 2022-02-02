@@ -116,7 +116,7 @@
       <!-- control elements -->
       <div class="app-controls-area">
          <AppControlArea {errormsg}>
-            <AppControlSwitch id="variableName" label="Select property" bind:value={variableName} options={Object.keys(populations)} />
+            <AppControlSwitch id="variableName" label="Property" bind:value={variableName} options={Object.keys(populations)} />
             <AppControlRange id="sampleSize" label="Sample size" bind:value={sampleSize} min={3} max={30} step={1} decNum={0} />
             <AppControlButton id="newSample" label="Sample" text="Take new" on:click={takeNewSample} />
          </AppControlArea>

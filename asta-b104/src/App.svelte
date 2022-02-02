@@ -87,7 +87,7 @@
 
       <div class="app-controls-area">
          <AppControlArea>
-            <AppControlSwitch id="popLine" label="Population line" bind:value={showPopLine} options={["on", "off"]} />
+            <AppControlSwitch id="popLine" label="Population" bind:value={showPopLine} options={["on", "off"]} />
             <AppControlSwitch id="sampleSize" label="Sample size" bind:value={sampleSize} options={[4, 6, 9, 12]} />
             <AppControlButton id="newSample" label="Sample" text="Take new" on:click={() => sx = getSample(sampleSize)} />
          </AppControlArea>
