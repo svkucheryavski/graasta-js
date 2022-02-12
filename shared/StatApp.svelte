@@ -7,7 +7,7 @@
       if (e.key === 'h') toggleHelp();
    };
 
-   $: showHelp = window.location.hash === "#help";
+   // $: showHelp = window.location.hash === "#help";
 </script>
 
 <svelte:window on:keypress={handleKeyPress}/>

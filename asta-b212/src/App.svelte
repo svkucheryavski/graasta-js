@@ -118,7 +118,7 @@
       <h2>One way ANOVA (full)</h2>
       <p>
          This app is almost identical to the <code>asta-b211</code> but here we show calculations as they
-         are without sbstracting the global mean in advance. The results are absolutly identical but this time
+         are without substracting the global mean in advance. The results are absolutely identical but this time
          without additional step of unbiasing the values. Plus the app shows importance of QQ plot for residuals
          which helps to assess their normality.
       </p>
