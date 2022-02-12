@@ -14,7 +14,6 @@
 
    $: popQuartiles = popMeans.map(v => [v - popSigma, v, v + popSigma]);
    $: popRanges = popQuartiles.map(v => [v[0] - 1.5 * (v[2] - v[0]), v[2] + 1.5 * (v[2] - v[0])]);
-   $: console.log("zaebis")
 </script>
 
 <Axes {limX} {limY} >
