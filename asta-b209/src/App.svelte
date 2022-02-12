@@ -87,7 +87,7 @@
             <AppControlRange id="effect" label="Effect" bind:value={effectExpected} min={-10} max={10} step={1}
                decNum={0} />
             <AppControlRange id="noise" label="Noise (σ)" bind:value={noiseExpected} min={5} max={20} step={1} decNum={0} />
-            <AppControlSwitch id="sampSize" label="SampleSize" bind:value={sampSize} options={[3, 5, 10, 30]} />
+            <AppControlSwitch id="sampSize" label="Sample size" bind:value={sampSize} options={[3, 5, 10, 30]} />
             <AppControlButton id="newSample" label="Sample" text="Take new" on:click={takeNewSample} />
          </AppControlArea>
       </div>

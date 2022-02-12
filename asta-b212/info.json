@@ -1,5 +1,7 @@
 {
    "id": "asta-b212",
    "title": "One-way ANOVA (full)",
-   "info": "A more detailed app."
+   "info": "A more detailed app.",
+   "video": "https://www.youtube.com/embed/k738X17uNUc",
+   "help": "<h2>One way ANOVA (full)</h2> <p>This app is almost identical to the <code>asta-b211</code> but here we show calculations as they are without subtracting the global mean in advance. The results are absolutely identical but this time without additional step of unbiasing the values. Plus the app shows importance of QQ plot for residuals which helps to assess their normality.</p>"
 }

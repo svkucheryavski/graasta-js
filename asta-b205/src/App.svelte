@@ -80,7 +80,7 @@
    </div>
 
    <div slot="help">
-      <h2>What p-value is?</h2>
+      <h2>What is p-value?</h2>
       <p>
          This app helps to understand the meaning of a p-value in hypotheses testing:
       </p>

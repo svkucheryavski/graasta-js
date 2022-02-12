@@ -1,5 +1,7 @@
 {
    "id": "asta-b202",
    "title": "Sample based CI for proportion",
-   "info": "Confidence interval for proportion, based on sample statistic."
+   "info": "Confidence interval for proportion, based on sample statistic.",
+   "video": "https://www.youtube.com/embed/3lQRSkjL5ac",
+   "help": "<h2>Sample based confidence interval for proportion</h2> <p>This app is similar to <code>asta-b201</code>, but, in this case, confidence interval is computed based on sample proportion. This requires larger sample size, so for every category you need at least 10 individuals in your sample. For example, if proportion is 20%, you need sample size of at least n = 50 to make a reliable interval (20% of 50 is 10). For p = 10% the sample size should be n = 100.</p> <p>The app shows 95% confidence interval computed for current sample as a plot on the right side. So, every time you take a new sample, this also results in a new confidence interval. The vertical red line on this plot shows the population proportion, which in real life we do not know. If you take a new sample many times (say, 200-300) you can see how often the population proportion, π, was inside the interval. If sample size is large enough it should be close to 95% — the confidence level.</p>"
 }

@@ -1,5 +1,7 @@
 {
    "id": "asta-b102",
    "title": "Samples and populations",
-   "info": "How a sample taken from a population looks like."
+   "info": "How a sample taken from a population looks like.",
+   "video": "https://www.youtube.com/embed/hhGmFVMm5ZE",
+   "help": "<h2>Samples and populations</h2> <p>This app helps you to investigate how different a sample can be when it is being randomly taken from corresponding population.</p> <p>You can investigate this difference for one of the three parameters: Height, Age and IQ of a population of people. Each parameter has own distribution. Thus, <em>Age</em> is distributed uniformly, <em>IQ</em> is distributed normally and <em>Height</em> has distribution with two peaks (bimodal). You can also see how sample size influences the difference.</p>  <p>Plot series made for a population (histogram and boxplot on the left part and percentile plot on the right) are shown using gray colors. The size of the population is <em>N</em> = 50&nbsp;000. The plot series for current sample are shown in blue. A new sample is taken when you change any of the controls — select the population parameter or the sample size as well as when you force to take a new sample by clicking the specific button.</p>"
 }

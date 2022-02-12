@@ -1,5 +1,7 @@
 {
    "id": "asta-b205",
-   "title": "What p-value is?",
-   "info": "Explanation of p-value using coin experiment."
+   "title": "What is p-value?",
+   "info": "Explanation of p-value using coin experiment.",
+   "video": "https://www.youtube.com/embed/6O7rExp8tCQ",
+   "help": "<h2>What is p-value?</h2><p>This app helps to understand the meaning of a p-value in hypotheses testing:</p> <p><em>p-value is a chance to get a sample as extreme as the one you have or even more extreme assuming that the null hypothesis (H0) is true.</em></p> <p>In case if all outcomes of an experiment are equally likely, to compute a p-value we need to know: <em>N1</em> — number of possible outcomes which will be as extreme as the one we currently have, <em>N2</em> — number of outcomes which will be more extreme for given H0, and <em>N</em> — total number of all possible outcomes. In this case the p-value can be computed as: <strong>p = (N1 + N2)/N</strong>.</p> <p>However, when we deal with continuous variables, number of possible outcomes is infinite and different outcomes may have different probabilities, therefore we have to use theoretical distributions for computing chances, which will be also shown in next apps. But in this app we introduce p-values based on experiment with limited number of outcomes — tossing a balanced coin several times (4 or 6). So we can count <em>N1</em>, <em>N2</em> and <em>N</em> and compute the p-value manually.</p>"
 }

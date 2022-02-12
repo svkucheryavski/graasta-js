@@ -1,5 +1,7 @@
 {
    "id": "asta-b103",
    "title": "PDF, CDF and ICDF",
-   "info": "Main functions for theoretical distributions."
+   "info": "Main functions for theoretical distributions.",
+   "video": "https://www.youtube.com/embed/hhGmFVMm5ZE",
+   "help": "<h2>PDF, CDF, and ICDF</h2>  <p>This app lets you play with three main functions available for any theoretical distribution: <em>Probability Density Function</em> (PDF), <em>Cumulative Distribution Function</em> (CDF) and <em>Inverse Cumulative Distribution Function</em> (ICDF). The functions can be used for different purposes. Thus PDF shows a shape of distribution in form of a density of the values, the higher density — the bigger chance that your random value will be there. For example, in case of normal distribution, the highest density is around <em>mean</em>, so mean is the most expected value in this case.</p> <p>CDF function gives you a chance to get a value smaller than given. While the ICDF does the opposite — gives you a value for a given probability. The functions in this app can be used in \"Value\" mode, for a single value, as well as in \"Interval\" mode for an interval limited by two values.</p> <p>For example, we are talking about height of people, normally distributed with mean = 170 cm and std = 10 cm (initial settings of the app). What is a chance that a random person from this population will have height between 160 and 180 cm? Or, in other words, how many people in percent have height between these two values in the population? Just set <em>x</em><sub>1</sub> to 160 and <em>x</em><sub>2</sub> to 180 under the CDF plot and you will see the result (in this case the chance is around 0.683 or 68.3%).</p>"
 }

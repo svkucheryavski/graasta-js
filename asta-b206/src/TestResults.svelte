@@ -35,7 +35,7 @@
    // critical values
    $: dp = Math.abs(popProp - sampProp)
    $: crit = tail === "both" ? [popProp - dp, popProp + dp] : [sampProp];
-   $: H0LegendStr = `H0: π(<tspan font-weight=bold fill=#ff9900>o</tspan>) ${signs[tail]} ${popProp.toFixed(2)}`;
+   $: H0LegendStr = `H0: π(<tspan font-weight=bold fill=#336688>o</tspan>) ${signs[tail]} ${popProp.toFixed(2)}`;
 </script>
 
 {#if sd > 0}
