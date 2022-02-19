@@ -44,6 +44,10 @@
       isDragging = p * 100 > width - 5 && p * 100 < width + 5;
    }
 
+   const cancelChanging = (e) => {
+      isDragging = false;
+   }
+
    const stopChanging = (e) => {
       isDragging = false;
       const p = getRelativePosition(e);
@@ -70,8 +74,9 @@
       bind:this={sliderContainer}
       on:mousewheel={changing}
       on:mousemove={changing}
-      on:mouseup={stopChanging}
-      on:mousedown={startChanging}>
+      on:mousedown={startChanging}
+      on:mouseleave={cancelChanging}
+      on:mouseup={stopChanging}>
 
       <div class="rangeSlider" style="width:{width}%" bind:this={sliderElement}></div>
       <span>{value.toFixed(decNum)}</span>
