@@ -1,5 +1,4 @@
 <script>
-
    import { getContext } from 'svelte';
    import { mrange } from 'mdatools/stat';
    import { Colors } from './Colors';
@@ -37,12 +36,13 @@
    $: x = axes.scaleX(xValues, $xLim, $axesWidth);
    $: y = axes.scaleY(yValues, $yLim, $axesHeight);
    $: p = x !== undefined && y !== undefined ? x.map((v, i) => `${v},${y[i]}`).join(' ') : undefined;
-   $: lineStyleStr = `fill:transparent;stroke:${lineColor};stroke-width: ${lineWidth}px;stroke-dasharray:${axes.LINE_STYLES[$scale][lineType - 1]}`;
+   $: lineStyleStr = `fill:transparent;stroke:${lineColor};stroke-width: ${lineWidth}px;
+      stroke-dasharray:${axes.LINE_STYLES[$scale][lineType - 1]}`;
 </script>
 
 {#if p !== undefined}
-   <g class="series lineseries" style="{lineStyleStr}" title="{title}">
-   <polyline class="line" points="{p}"/>
+   <g class="series series_line" style={lineStyleStr} title={title}>
+      <polyline class="line" points={p}/>
    </g>
 {/if}
 

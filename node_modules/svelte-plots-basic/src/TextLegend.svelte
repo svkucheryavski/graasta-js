@@ -32,7 +32,7 @@
 {#if x !== undefined && y !== undefined && elements.length > 0}
    <text style={textStyleStr} x={x} y={y} dx={dx} dy={dy} dominant-baseline="middle" text-anchor="start">
       {#each elements as el, i}
-         <tspan x={x} dx={dx} dy={i === 0 ? 0 : dy}>{@html el}</tspan>
+         <tspan {x} {dx} dy={i === 0 ? 0 : dy}>{@html el}</tspan>
       {/each}
    </text>
 {/if}

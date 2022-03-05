@@ -11,6 +11,8 @@
    export let faceColor = Colors.PRIMARY;
    export let borderColor = faceColor;
    export let lineWidth = 1;
+   export let title = "";
+   export let style = "series_rect";
 
    // styles for bars and labels
    const barsStyleStr = `fill:${faceColor};stroke:${borderColor};stroke-width: ${lineWidth}px;`;
@@ -49,9 +51,11 @@
 </script>
 
 {#if rx !== undefined && ry !== undefined}
+   <g class="series {style}" title={title} style={barsStyleStr}>
    {#each left as v, i}
-      <rect x="{rx[i]}" y="{ry[i]}" width="{rw[i]}" height="{rh[i]}" style="{barsStyleStr}"></rect>
+      <rect x={rx[i]} y={ry[i]} width={rw[i]} height={rh[i]} />
    {/each}
+   </g>
 {/if}
 
 <style>

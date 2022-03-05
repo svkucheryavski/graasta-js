@@ -19,6 +19,7 @@
    //export let labels = yValues;
    //export let showLabels = "no"; // can be "no", "hover", "always"
 
+   /* constants for internal use */
    const markers = ["●", "◼", "▲", "▼", "⬥", "+", "*", "⨯"];
    let markerSymbol;
 
@@ -57,20 +58,23 @@
       const yValuesRange = mrange(yValues, 0.05);
       axes.adjustYAxisLimits(yValuesRange);
    }
-
 </script>
 
-<g class="series series_scatter" title="{title}">
-   <TextLabels {xValues} {yValues} labels="{markerSymbol}" textSize="{markerSize}" {faceColor} {borderColor} {borderWidth} />
-</g>
+<TextLabels
+   {xValues} {yValues} {faceColor} {borderColor} {borderWidth} {title}
+   style="series_scatter"
+   labels={markerSymbol}
+   textSize={markerSize}
+/>
 
 <style>
-:global(.marker) {
+
+:global(.series_scatter > text) {
    font-size: 1em;
    cursor: default;
 }
 
-:global(.marker:hover) {
+:global(.series_scatter > text:hover) {
    opacity: 90%;
 }
 

@@ -26,7 +26,7 @@
 </script>
 
 {#if $isOk}
-   <g class="mdaplot__axes-box">
+   <g style="pointer-events:none" class="mdaplot__axes-box">
       <Rectangles {left} {top} {width} {height} borderColor="{Colors.DARKGRAY}" faceColor="transparent"></Rectangles>
    </g>
 {/if}

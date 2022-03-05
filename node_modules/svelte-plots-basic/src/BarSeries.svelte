@@ -65,9 +65,7 @@
    }
 </script>
 
-<g class="series series_bar" title="{title}">
-   <Rectangles {left} {top} {width} {height} {borderColor} {faceColor} />
-</g>
+<Rectangles style="series_bar" {left} {top} {width} {height} {borderColor} {faceColor} {title} />
 
 <style>
    :global(.series_bar > rect){
