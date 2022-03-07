@@ -14,8 +14,6 @@
    export let title = "";
    export let style = "series_rect";
 
-   // styles for bars and labels
-   const barsStyleStr = `fill:${faceColor};stroke:${borderColor};stroke-width: ${lineWidth}px;`;
 
    // multiply width and height values if needed
    if (!Array.isArray(left) || !Array.isArray(top) || left.length < 1 || left.length != top.length) {
@@ -48,6 +46,10 @@
    $: ry = axes.scaleY(top, $yLim, $axesHeight);
    $: rw = axes.scaleX(width, $xLim, $axesWidth, true);
    $: rh = axes.scaleY(height, $yLim, $axesHeight, true);
+
+   // styles for bars and labels
+   $: barsStyleStr = `fill:${faceColor};stroke:${borderColor};stroke-width: ${lineWidth}px;`;
+
 </script>
 
 {#if rx !== undefined && ry !== undefined}
