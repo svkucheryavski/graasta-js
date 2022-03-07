@@ -72,7 +72,7 @@
 {/if}
 
 <style>
-   text {
+   text, text > :global(tspan) {
       dominant-baseline: middle;
    }
 </style>
