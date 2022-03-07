@@ -38,7 +38,7 @@
       }
 
    function covText(x, y, name) {
-      return name + ": cov(x, y) = <tspan style='font-weight:bold'>" + cov(x, y).toFixed(1) + "</tspan>";
+      return "<tspan style='fill:#a0a0a0'>" + name + ":</tspan> cov(x, y) = <tspan style='font-weight:bold'>" + cov(x, y).toFixed(1) + "</tspan>";
    }
 
    function handleAxesClick(e) {
@@ -87,8 +87,8 @@
    <TextLabels xValues={[sampMeanX]} yValues={[limY[1] - 5]} labels={[round(sampMeanY, 1)]} pos={2} textSize={0.85} faceColor="#a0a0a0"/>
 
    <!-- labels for covariance -->
-   <TextLabels xValues={[limX[0]]} yValues={[limY[1] - 5]} labels={[covText(sampX, sampY, "sample")]} pos={2} textSize={0.85} faceColor="#606060"/>
-   <TextLabels xValues={[limX[0]]} yValues={[limY[1] - 12]} labels={[covText(popX, popY, "pop")]} pos={2} textSize={0.85} faceColor="#606060"/>
+   <TextLabels xValues={[limX[0]]} yValues={[limY[1] - 5]} labels={[covText(popX, popY, "population")]} pos={2} textSize={0.9} faceColor="#606060"/>
+   <TextLabels xValues={[limX[0]]} yValues={[limY[1] - 12]} labels={[covText(sampX, sampY, "sample")]} pos={2} textSize={0.9} faceColor="#606060"/>
 
    <XAxis slot="xaxis" />
    <YAxis slot="yaxis" />
