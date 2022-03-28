@@ -1,5 +1,6 @@
 <script>
-   import {rnorm, subset, seq, mean, shuffle} from 'mdatools/stat';
+   import {rnorm, subset, cov, seq, mean, shuffle, max, min} from 'mdatools/stat';
+   import {TextLabels} from 'svelte-plots-basic';
 
    // shared components
    import {default as StatApp} from "../../shared/StatApp.svelte";
@@ -8,7 +9,9 @@
    import AppControlArea from "../../shared/controls/AppControlArea.svelte";
    import AppControlButton from "../../shared/controls/AppControlButton.svelte";
    import AppControlRange from "../../shared/controls/AppControlRange.svelte";
-   import AppPlot from "./AppPlot.svelte";
+   import CovariancePlot from "../../shared/plots/CovariancePlot.svelte";
+
+   // local components
    import AppTable from "./AppTable.svelte";
 
    // constant parameters
@@ -27,9 +30,16 @@
    let sample = [];
    let selectedPoint;
 
+   $: top = max(popY) - 5
+   $: left = min(popX) - 3
+
    function takeNewSample(popSize, sampSize) {
       sample = subset(shuffle(seq(1, popSize)), seq(1, sampSize));
       selectedPoint = -1;
+   }
+
+   function covText(x, y, name) {
+      return "<tspan style='fill:#a0a0a0'>" + name + ":</tspan> cov(x, y) = <tspan style='font-weight:bold'>" + cov(x, y).toFixed(1) + "</tspan>";
    }
 
    $: popY = popX.map((x, i) => (x - meanX) * popSlope + meanX + popNoise * popZ[i]);
@@ -49,8 +59,14 @@
    <div class="app-layout">
 
       <div class="app-plot-area">
-         <!-- original values table and the sign -->
-         <AppPlot bind:selectedPoint={selectedPoint} {popX} {sampX} {popY} {sampY} {indNeg} {indPos} {indNeu} {sampMeanX} {sampMeanY} />
+         <!-- scatter plot -->
+         <CovariancePlot bind:selectedPoint={selectedPoint} {popX} {sampX} {popY} {sampY} {indNeg} {indPos} {indNeu}>
+
+            <!-- labels for covariance -->
+            <TextLabels xValues={[left]} yValues={[top]} labels={[covText(popX, popY, "population")]} pos={2} textSize={0.9} faceColor="#606060"/>
+            <TextLabels xValues={[left]} yValues={[top - 4]} labels={[covText(sampX, sampY, "sample")]} pos={2} textSize={0.9} faceColor="#606060"/>
+
+         </CovariancePlot>
       </div>
       <div class="app-table-area">
          <AppTable {selectedPoint} {sampX} {sampY} {indNeg} {indPos} {indNeu} {sampMeanX} {sampMeanY} />
