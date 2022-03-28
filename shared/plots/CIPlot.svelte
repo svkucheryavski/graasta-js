@@ -46,7 +46,6 @@
       {name: "95% CI", value: `[${ci[0].toFixed(2)}, ${ci[1].toFixed(2)}]`},
       {name: labelStr, value: `${nSamplesInside}/${nSamples} (${(nSamplesInside/nSamples * 100).toFixed(1)}%)`}
    ])
-
 </script>
 
 <!-- plot with population based CI and position of current sample proportion -->
