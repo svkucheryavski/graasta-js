@@ -1,0 +1,7 @@
+{
+   "id": "asta-b303",
+   "title": "Correlation and sample based CI",
+   "info": "Pearson's correlation coefficient and sample based CI.",
+   "video": "",
+   "help": "<h2>Correlation and sample based confidence interval</h2> <p>This app is almost identical to the previous one (asta-b302) with one important difference: confidence interval in this app is computed based on statistics of a current sample. So, you can see how confidence interval vary from one sample to another and how often the correlation coefficient of population (or it's trasformed value, z') will be inside the interval.</p> <p>Because the confidence intervals in this app are computed for 95% confidence level, you can expect that in 95% of all cases sample will contain the population parameter inside the interval. However, you will see exactly 95%, only if you take a large amount of samples, several hundreds or even thousands. This is similar to confidence intervals computed for other statistics, e.g. mean or proportion.</p>"
+}
