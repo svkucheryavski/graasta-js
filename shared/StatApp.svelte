@@ -73,6 +73,8 @@
 /* help text and button */
 
 .helptext {
+   font-family: 'Open Sans', sans-serif;
+
    position: absolute;
    top: 0;
    width: 0;
@@ -93,13 +95,14 @@
 }
 
 .helptext :global(h2) {
-   padding: 0.25em 0 0.5em 0;
+   padding: 1.25em 0 1em 0;
+   font-size: 1.2em;
 }
 
 .helptext :global(p) {
    padding: 0 0 0.5em 0;
    line-height: 1.5em;
-   font-size: 1.2em;
+   font-size: 1em;
 }
 
 </style>
