@@ -18,14 +18,14 @@
 {#if horizontal }
    {#each variables as {label, values}, i}
    <tr class="datatable__row">
-      <td class="datatable__label">{label}</td>
+      <td class="datatable__label">{@html label}</td>
       <DataTableValues {values} decNum={decNum[i]} />
    </tr>
    {/each}
 {:else}
    <tr class="datatable__row">
       {#each variables as {label, values}}
-      <td class="datatable__label">{label}</td>
+      <td class="datatable__label">{@html label}</td>
       {/each}
    </tr>
    {#each variables[0].values as value, j}
