@@ -66,15 +66,17 @@
          selectionColor = "transparent";
       }
    }
+
+   $: console.log(indNeu)
 </script>
 
 <Axes on:axesclick={handleAxesClick} on:markerclick={handleMarkerClick} limX={limXLoc} limY={limYLoc} {title} {xLabel} {yLabel}>
 
 
    <ScatterSeries xValues={popX} borderColor={popColor} yValues={popY} />
+   <ScatterSeries title="neu" xValues={subset(sampX, indNeu)} yValues={subset(sampY, indNeu)} borderWidth={2} borderColor={neuColor}/>
    <ScatterSeries title="neg" xValues={subset(sampX, indNeg)} yValues={subset(sampY, indNeg)} borderWidth={2} borderColor={negColor}/>
    <ScatterSeries title="pos" xValues={subset(sampX, indPos)} yValues={subset(sampY, indPos)} borderWidth={2} borderColor={posColor}/>
-   <ScatterSeries title="neu" xValues={subset(sampX, indNeu)} yValues={subset(sampY, indNeu)} borderWidth={2} borderColor={neuColor}/>
 
    {#if selectedPoint > 0}
       <Rectangles faceColor={selectionColor + "40"} left={[left]} top={[top]} width={[width]} height={[height]} />

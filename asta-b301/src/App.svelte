@@ -95,7 +95,7 @@
          This app helps to understand covariance — a statistic which tells if two variables, <em>x</em> and <em>y</em> have a linear relationship (co-vary). If covariance is positive, then increasing <em>x</em> will likely lead to increasing of <em>y</em> value and vice versa. To compute the covariance, we first calculate distance from x- and y-value of a data point to corresponding means and then take a product of the two distances. The covariance is a sum of the distance products divided to the number of degrees of freedom (n - 1). You can see all these calculations in a table.
       </p>
       <p>
-         Try to change parameters of a population: amount of noise and a slope of best fit line which has mean values as the origin. You will see how this influences your sample, and the sample co-variance. If product of two distances is positive this point contributes positively to the covariance and such point and the corresponding row in the table is shown using red color. If product of the two distances is negative — blue color is used.
+         Try to change parameters of a population: amount of noise and a slope of best fit line which has mean values as the origin. You will see how this influences your sample, and the sample co-variance. If product of two distances is positive this point contributes positively to the covariance and such point and the corresponding row in the table is shown using red color. If product of the two distances is negative — blue color is used. You can also select any sample point and see the two distances and their products.
       </p>
    </div>
 </StatApp>
