@@ -1,5 +1,5 @@
 <script>
-   import {rnorm, gamma, subset, cov, seq, shuffle, dt} from 'mdatools/stat';
+   import {rnorm, subset, cov, seq, shuffle} from 'mdatools/stat';
    import {lmfit} from 'mdatools/models';
 
    // shared components
@@ -81,12 +81,13 @@
    </div>
 
    <div slot="help">
-      <h2>Covariance</h2>
+      <h2>Simple linear regression</h2>
       <p>
-         This app helps to understand covariance — a statistic which tells if two variables, <em>x</em> and <em>y</em> have a linear relationship (co-vary). If covariance is positive, then increasing <em>x</em> will likely lead to increasing of <em>y</em> value and vice versa. To compute the covariance, we first calculate distance from x- and y-value of a data point to corresponding means and then take a product of the two distances. The covariance is a sum of the distance products divided to the number of degrees of freedom (n - 1). You can see all these calculations in a table.
+         The app shows how to use simple linear regression for investigation of relationship beteween two variables (in this case heght and weight of adult female persons). The plot shows data points both for population (N = 500) and current sample (n = 10). Both sets
+         of points are fitted by a simple linear regression model, you can see both models in form of lines and the corresponding equations, as well as their characteristics (standard error of  prediction and coefficient of determination, R2). The table on the right part of the app shows rference y-values, values, predicted by the model, error of prediction and its square. Sum of squared errors is what is used to compute both standard error and R2.
       </p>
       <p>
-         Try to change parameters of a population: amount of noise and a slope of best fit line which has mean values as the origin. You will see how this influences your sample, and the sample co-variance. If product of two distances is positive this point contributes positively to the covariance and such point and the corresponding row in the table is shown using red color. If product of the two distances is negative — blue color is used.
+         The shaded area on the plot shows uncertainties. By default you see uncertainty from both fitting and sampling error. You can use the swicher to see uncertaity from one of the source. You can also change the amount of noise (the more noise, the less percent of y-variance can be predicted by the model) and see how it changes the uncertainties. Plus you can select any sample point on the plot and see the predicted value and the uncertainty interval for this point.
       </p>
    </div>
 </StatApp>

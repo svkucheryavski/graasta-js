@@ -3,5 +3,5 @@
    "title": "Simple linear regression",
    "info": "SLR and its main outcomes.",
    "video": "",
-   "help": ""
+   "help": "<h2>Simple linear regression</h2> <p>The app shows how to use simple linear regression for investigation of relationship between two variables (in this case height and weight of adult persons). The plot shows data points both for population (N = 500) and current sample (n = 10). Both sets of points are fitted by a simple linear regression model, you can see both models in form of lines and the corresponding equations, as well as their characteristics (standard error of  prediction and coefficient of determination, R2). The table on the right part of the app shows reference y-values, values, predicted by the model, error of prediction and its square. Sum of squared errors is what is used to compute both standard error and R2.</p> <p>The shaded area on the plot shows uncertainties. By default you see uncertainty from both fitting and sampling error. You can use the switch to see uncertainty from one of the source. You can also change the amount of noise (the more noise, the less percent of y-variance can be predicted by the model) and see how it changes the uncertainties. Plus you can select any sample point on the plot and see the predicted value and the uncertainty interval for this point.</p>"
 }

@@ -1,5 +1,5 @@
 <script>
-   import {max, min, sum, cor, seq, sd, subset, mrange, mean, qt, variance} from 'mdatools/stat';
+   import {max, min, seq, subset, mrange, mean, qt, variance} from 'mdatools/stat';
    import {lmpredict} from 'mdatools/models';
    import {Axes, XAxis, YAxis, Segments, ScatterSeries, AreaSeries, LineSeries, TextLegend} from 'svelte-plots-basic';
    import { colors } from "../../shared/graasta";
@@ -35,6 +35,7 @@
 
    // function to compute error margin
    function getErrorMargin(x, errorType, sampSE, sampMeanX, SSX) {
+
       if (errorType == "fitting") {
          return tCrit * sampSE
       }
@@ -74,7 +75,6 @@
    $: sampColor = colors.plots.SAMPLES[0] + (selectedPoint < 0 ? "" : "80");
 
    // fitting error for sample
-   $: console.log(lineX)
    $: errorX = seq(lineX[0], lineX[1], 100);
    $: errorY = lmpredict(sampModel, errorX);
    $: errorMargin = errorX.map(x => getErrorMargin(x, errorType, sampModel.stat.se, sampMeanX, SSX));
@@ -88,8 +88,6 @@
 
    $: errorUpper = errorY.map((v, i) => v + errorMargin[i]);
    $: errorLower = errorY.map((v, i) => v - errorMargin[i]);
-   $: console.log(selectedPoint)
-   $: console.log(selYp)
 </script>
 
 <Axes on:axesclick={handleAxesClick} on:markerclick={handleMarkerClick}
@@ -130,10 +128,9 @@
          lineType={3} lineColor={selectionColor} />
    {/if}
 
-
    <!-- statistics -->
    <TextLegend textSize={1.05} left={min(popX)} top={max(popY)} dx="1em" dy="1.35em" elements={popText} />
-   <TextLegend textSize={1.05} left={max(popX) - 0.2} top={min(popY) + 10} dx="1em" dy="1.35em" elements={sampText} />
+   <TextLegend textSize={1.05} left={min(popX) * 0.35 + max(popX) * 0.65} top={min(popY) * 0.8 + max(popY) * 0.2} dx="1em" dy="1.35em" elements={sampText} />
 
    <XAxis slot="xaxis" />
    <YAxis slot="yaxis" />
