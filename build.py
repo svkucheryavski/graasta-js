@@ -30,7 +30,7 @@ app_blocks = [
    },
    {
       "title": "Relationship between two variables",
-      "apps": ["asta-b301", "asta-b302", "asta-b303"]
+      "apps": ["asta-b301", "asta-b302", "asta-b303", "asta-b304"]
    }
 ]
 
