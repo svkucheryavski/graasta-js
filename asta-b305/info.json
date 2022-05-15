@@ -1,0 +1,7 @@
+{
+   "id": "asta-b305",
+   "title": "Sampling error and overfitting",
+   "info": "How sampling error depends on sample size and model complexity.",
+   "video": "",
+   "help": "<h2>Sampling error and overfitting</h2> <p>This app shows how sample size and complexity of a regression model influence the sampling error. Sampling error in this case can be defined as variation of regression coefficients of a model, trained on a sample, around the \"true\" regression coefficients of a model trained on the population points. This app uses polynomial model for regression — the higher polynomial degree the higher the model complexity.</p> <p>Just set the desired sample size and the polynomial degree and then start collecting new samples. Points and model for the current sample are shown using red color for better contrast. The models for all previous samples are kept on the main plot (they are also red but semi transparent), so you can see how big the variation of the models is.</p> <p>The small plot on the right shows regression coefficients. The semi-transparent blue bars show the \"true\" regression coefficients for the population. Red points are regression coefficients of current and all previous samples. So you can see how big the variation of the coefficients is and how it depends on sample size and model complexity.</p>"
+}
