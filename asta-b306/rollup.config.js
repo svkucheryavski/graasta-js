@@ -1,0 +1,1 @@
+../shared/rollup.config.js
