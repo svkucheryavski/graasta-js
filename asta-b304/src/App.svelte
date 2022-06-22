@@ -1,5 +1,5 @@
 <script>
-   import {rnorm, subset, cov, seq, shuffle} from '../../node_modules 2/mdatools/stat';
+   import {rnorm, subset, cov, seq, shuffle} from 'mdatools/stat';
    import {lmfit} from 'mdatools/models';
 
    // shared components
