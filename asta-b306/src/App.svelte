@@ -20,9 +20,10 @@
 
    // initial values for managable parameters
    let cvType = "random";
-   let pDegree = 1;
+   let pName = "line";
 
    // constant parameters
+   const pDegrees = {"line": 1, "quadratic": 2, "cubic": 3};
    const nSegments = 4;
    const sampSize = 12;
    const meanX = 0;
@@ -109,6 +110,8 @@
       statCV = getStat(sampY, yCV);
    }
 
+   $: pDegree = pDegrees[pName];
+
    // create global model for given polynomial degree
    $: globalModel = polyfit(sampX, sampY, pDegree);
 
@@ -131,14 +134,17 @@
          <!-- Control elements -->
          <AppControlArea>
             <AppControlSwitch
+               disable={indSeg > -1}
                id="cvType" label="CV"
                bind:value={cvType} options={["full", "random", "venetian"]}
             />
             <AppControlSwitch
+               disable={indSeg > -1}
                id="pDegree" label="Polynomial"
-               bind:value={pDegree} options={[1, 2, 3]}
+               bind:value={pName} options={Object.keys(pDegrees)}
             />
             <AppControlButton
+               disable={indSeg > -1}
                on:click={() => run()}
                id="runCV" label="" text="Run"></AppControlButton>
          </AppControlArea>
