@@ -6,6 +6,7 @@
 </script>
 
 <div class="app-control" class:hidden class:disable>
+   <div class="shield"></div>
    <label for={id}>{@html label}</label>
    <slot></slot>
 </div>
@@ -18,6 +19,7 @@
       display: flex;
       align-items: center;
       justify-content: flex-begin;
+      position: relative;
    }
 
 
@@ -30,6 +32,10 @@
 
    .app-control > slot {
       width: 100%;
+   }
+
+   .shield {
+      display: none;
    }
 
    @media(min-width: 959px) {
@@ -48,12 +54,21 @@
 
    /* disabled styles */
    .app-control.disable > label{
-      color: #a0a0a0;
+      color: #b0b0b0;
    }
 
    .app-control.hidden {
       visibility: hidden;
    }
 
-
+   .app-control.disable > .shield {
+      display: block;
+      background: #ffffff50;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 999;
+   }
 </style>

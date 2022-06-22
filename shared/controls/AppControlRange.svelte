@@ -9,6 +9,8 @@
    export let max;
    export let decNum = 1;
    export let step = +((max - min) / 100).toFixed(4);
+   export let disable = false;
+   export let hidden = false;
 
    if (value < min || value > max) {
       throw("The value is outside of the provided range.");
@@ -68,7 +70,7 @@
    $: dispatch("change", value);
 </script>
 
-<AppControl id={id} label={label}>
+<AppControl id={id} label={label} {disable} {hidden}>
    <div
       class="rangeSliderContainer"
       bind:this={sliderContainer}

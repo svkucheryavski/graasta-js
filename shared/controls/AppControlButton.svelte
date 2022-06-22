@@ -4,9 +4,12 @@
    export let id;
    export let label;
    export let text;
+   export let disable = false;
+   export let hidden = false;
+
 </script>
 
-<AppControl id={id} label={label} >
+<AppControl id={id} label={label} {disable} {hidden}>
    <button on:click>{text}</button>
 </AppControl>
 
