@@ -2223,7 +2223,7 @@ var app = (function () {
     		c: function create() {
     			div = element("div");
     			if (help_slot) help_slot.c();
-    			attr_dev(div, "class", "helptext svelte-11mbpxp");
+    			attr_dev(div, "class", "helptext svelte-zlnjf7");
     			add_location(div, file$e, 20, 3, 381);
     		},
     		m: function mount(target, anchor) {
@@ -2295,9 +2295,9 @@ var app = (function () {
     			if (default_slot) default_slot.c();
     			t = space();
     			if (if_block) if_block.c();
-    			attr_dev(div, "class", "content svelte-11mbpxp");
+    			attr_dev(div, "class", "content svelte-zlnjf7");
     			add_location(div, file$e, 15, 3, 307);
-    			attr_dev(main, "class", "graasta-app svelte-11mbpxp");
+    			attr_dev(main, "class", "graasta-app svelte-zlnjf7");
     			add_location(main, file$e, 13, 0, 276);
     		},
     		l: function claim(nodes) {
@@ -9595,7 +9595,24 @@ var app = (function () {
     	let div;
     	let h2;
     	let t1;
-    	let p;
+    	let p0;
+    	let t2;
+    	let em0;
+    	let sub;
+    	let t5;
+    	let t6;
+    	let p1;
+    	let t7;
+    	let em1;
+    	let t9;
+    	let em2;
+    	let t11;
+    	let em3;
+    	let t13;
+    	let em4;
+    	let t15;
+    	let t16;
+    	let p2;
 
     	const block = {
     		c: function create() {
@@ -9603,9 +9620,41 @@ var app = (function () {
     			h2 = element("h2");
     			h2.textContent = "Cross-validation";
     			t1 = space();
-    			p = element("p");
+    			p0 = element("p");
+    			t2 = text("Cross-validation is a way to estimate the sampling error without taking new samples from the population. The idea is to split your original observations to several segments and then, for each segment, make a local model by taking the segment observations out of the dataset, and use the rest for training the model. After that, the local model is used to predict\n         the response values of the excluded observations. The procedure is repeated for each segment, so at the end every observation will have a predicted response value (");
+    			em0 = element("em");
+    			em0.textContent = "y";
+    			sub = element("sub");
+    			sub.textContent = "cv";
+    			t5 = text(").");
+    			t6 = space();
+    			p1 = element("p");
+    			t7 = text("Splitting the observations into segments can be done in several ways. The simplest is to consider\n         every observation as individual segment. In this case the number of segments is equal to the number of observations and thus on every step one observation will be taking out, while the rest will be used for training the local model. This way is called ");
+    			em1 = element("em");
+    			em1.textContent = "leave-one-out";
+    			t9 = text(" or ");
+    			em2 = element("em");
+    			em2.textContent = "full cross-validation";
+    			t11 = text(". Alternatively you can assign two or more observations to each segment. This can be done randomly (");
+    			em3 = element("em");
+    			em3.textContent = "random segmented cross-validation";
+    			t13 = text(") or systematically by taking every k-th observation (");
+    			em4 = element("em");
+    			em4.textContent = "venetian blinds";
+    			t15 = text(").");
+    			t16 = space();
+    			p2 = element("p");
+    			p2.textContent = "This app shows how all three methods work for a simple dataset with 12 observations. If random or systematic split is selected, number of segments will be equal to 4. Cross-validation can help to detect overfitting, you can also test this in the app — try to use overfitted model, e.g. cubic polynomial and will see that despite the calibration error is getting smaller, the cross-validation error will be larger for overcomplicated models.";
     			add_location(h2, file, 148, 6, 4717);
-    			add_location(p, file, 149, 6, 4749);
+    			add_location(em0, file, 151, 173, 5298);
+    			add_location(sub, file, 151, 183, 5308);
+    			add_location(p0, file, 149, 6, 4749);
+    			add_location(em1, file, 155, 261, 5713);
+    			add_location(em2, file, 155, 287, 5739);
+    			add_location(em3, file, 155, 417, 5869);
+    			add_location(em4, file, 155, 513, 5965);
+    			add_location(p1, file, 153, 6, 5341);
+    			add_location(p2, file, 157, 6, 6009);
     			attr_dev(div, "slot", "help");
     			add_location(div, file, 147, 3, 4693);
     		},
@@ -9613,7 +9662,24 @@ var app = (function () {
     			insert_dev(target, div, anchor);
     			append_dev(div, h2);
     			append_dev(div, t1);
-    			append_dev(div, p);
+    			append_dev(div, p0);
+    			append_dev(p0, t2);
+    			append_dev(p0, em0);
+    			append_dev(p0, sub);
+    			append_dev(p0, t5);
+    			append_dev(div, t6);
+    			append_dev(div, p1);
+    			append_dev(p1, t7);
+    			append_dev(p1, em1);
+    			append_dev(p1, t9);
+    			append_dev(p1, em2);
+    			append_dev(p1, t11);
+    			append_dev(p1, em3);
+    			append_dev(p1, t13);
+    			append_dev(p1, em4);
+    			append_dev(p1, t15);
+    			append_dev(div, t16);
+    			append_dev(div, p2);
     		},
     		p: noop,
     		d: function destroy(detaching) {
