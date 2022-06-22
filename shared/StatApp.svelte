@@ -95,7 +95,7 @@
 }
 
 .helptext :global(h2) {
-   padding: 1.25em 0 1em 0;
+   padding: 1.25em 0 0.5em 0;
    font-size: 1.2em;
 }
 
