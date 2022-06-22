@@ -1,10 +1,12 @@
 <script>
    export let id;
    export let label;
+   export let disable = false;
+   export let hidden = false;
 </script>
 
-<div class="app-control">
-   <label for="{id}">{@html label}</label>
+<div class="app-control" class:hidden class:disable>
+   <label for={id}>{@html label}</label>
    <slot></slot>
 </div>
 
@@ -17,6 +19,7 @@
       align-items: center;
       justify-content: flex-begin;
    }
+
 
    .app-control > label {
       height: 1.5em;
@@ -42,5 +45,15 @@
          max-width: 150px;
       }
    }
+
+   /* disabled styles */
+   .app-control.disable > label{
+      color: #a0a0a0;
+   }
+
+   .app-control.hidden {
+      visibility: hidden;
+   }
+
 
 </style>

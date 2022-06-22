@@ -6,17 +6,17 @@
    export let label;
    export let options;
    export let value = options[0];
+   export let disable = false;
 </script>
 
-<AppControl id={id} label={label} >
+<AppControl {id} {label} {disable} >
 
    <div class="selector">
       {#each options as option (option)}
       <div on:click={() => value = option} class="option" class:selected={option==value}>{option}</div>
       {/each}
-
    </div>
-   <input name="{id}" bind:value="{value}">
+   <input name={id} bind:value={value}>
 </AppControl>
 
 <style>

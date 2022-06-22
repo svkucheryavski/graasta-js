@@ -6,9 +6,11 @@
    export let label;
    export let options;
    export let value = options[0];
+   export let disable = false;
+   export let hidden = false;
 </script>
 
-<AppControl id={id} label={label} >
+<AppControl {id} {label} {disable} {hidden} >
 
    <div class="selector">
       {#each options as option (option)}
