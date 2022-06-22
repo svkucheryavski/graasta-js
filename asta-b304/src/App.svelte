@@ -1,5 +1,5 @@
 <script>
-   import {rnorm, subset, cov, seq, shuffle} from 'mdatools/stat';
+   import {rnorm, subset, cov, seq, shuffle} from '../../node_modules 2/mdatools/stat';
    import {lmfit} from 'mdatools/models';
 
    // shared components
@@ -9,11 +9,11 @@
    import AppControlArea from "../../shared/controls/AppControlArea.svelte";
    import AppControlButton from "../../shared/controls/AppControlButton.svelte";
    import AppControlRange from "../../shared/controls/AppControlRange.svelte";
-   import AppPlot from "./AppPlot.svelte";
+   import AppControlSwitch from '../../shared/controls/AppControlSwitch.svelte';
 
    // local components
    import AppTable from "./AppTable.svelte";
-   import AppControlSwitch from '../../shared/controls/AppControlSwitch.svelte';
+   import AppPlot from "./AppPlot.svelte";
 
    // constant parameters
    const sampSize = 10;
@@ -34,10 +34,6 @@
    function takeNewSample(popSize, sampSize) {
       sample = subset(shuffle(seq(1, popSize)), seq(1, sampSize));
       selectedPoint = -1;
-   }
-
-   function covText(x, y, name) {
-      return "<tspan style='fill:#a0a0a0'>" + name + ":</tspan> cov(x, y) = <tspan style='font-weight:bold'>" + cov(x, y).toFixed(1) + "</tspan>";
    }
 
    // population coordinates and model
