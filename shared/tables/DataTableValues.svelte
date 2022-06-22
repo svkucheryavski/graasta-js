@@ -3,9 +3,9 @@
    export let decNum;
 </script>
 
-{#if decNum > 0}
+{#if decNum >= 0}
    {#each values as value}
-   <td class="datatable__value datatable__value_number">{value.toFixed(decNum)}</td>
+   <td class="datatable__value datatable__value_number">{isNaN(value) ? "" : value.toFixed(decNum)}</td>
    {/each}
 {:else}
    {#each values as value}
