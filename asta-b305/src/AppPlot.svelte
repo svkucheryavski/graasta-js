@@ -8,9 +8,11 @@
    export let sampModel;
    export let reset;
 
-   let popColor = colors.plots.POPULATIONS[0];
-   let sampColor = "#ff2222";
+   let popColor = "#f0f0f0";
+   let sampColor = colors.plots.SAMPLES[0];
    let popLineColor = "#a0a0a0";
+
+
    let sampLineY = [];
 
    // function to show model info
@@ -32,7 +34,7 @@
    $: popY = popModel.data.y;
    $: lineX = seq(min(popX), max(popX), 100);
    $: popLineY = polypredict(popModel, lineX);
-   $: popText = getStatString(popModel, "Population", "blue");
+   $: popText = getStatString(popModel, "Population", "#a0a0a0");
 
    // points and statistics for sample
    $: sampX = sampModel.data.X[0];
@@ -44,7 +46,7 @@
 <Axes limX={mrange(popX)} limY={mrange(popY)} xLabel="Predictor (x), mean centred" yLabel="Response (y)">
 
 
-   <ScatterSeries title="population" xValues={popX} borderColor={popColor} yValues={popY} />
+   <ScatterSeries title="population" xValues={popX} borderColor={popColor} faceColor={popColor} yValues={popY} />
    <LineSeries xValues={lineX} yValues={popLineY} lineColor={popLineColor}></LineSeries>
 
    <ScatterSeries

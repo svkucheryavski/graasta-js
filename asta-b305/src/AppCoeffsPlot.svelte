@@ -8,8 +8,8 @@
    export let reset;
 
 
-   let popColor = colors.plots.POPULATIONS[0];
-   let sampColor = "#ff2222";
+   let popColor = "#d8d8d8";
+   let sampColor = colors.plots.SAMPLES[0];
    let sampY = [];
 
    // population and sample regression lines
