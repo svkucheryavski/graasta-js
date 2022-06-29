@@ -1,7 +1,8 @@
 <script>
-   import {max, min, seq, subset, mrange, mean, qt, variance} from 'mdatools/stat';
    import {lmpredict} from 'mdatools/models';
+   import {max, min, seq, subset, mrange, mean, qt, variance} from 'mdatools/stat';
    import {Axes, XAxis, YAxis, Segments, ScatterSeries, AreaSeries, LineSeries, TextLegend} from 'svelte-plots-basic';
+
    import { colors } from "../../shared/graasta";
 
    export let popModel;
@@ -10,7 +11,7 @@
    export let errorType;
 
 
-   let popColor = colors.plots.POPULATIONS[0];
+   let popColor = "#f0f0f0";
    let popLineColor = "#a0a0a0";
    let selectionColor = "transparent";
    let selX, selY, selYp, selErrMargin;
@@ -48,10 +49,10 @@
    }
 
    // function to show model info
-   function getStatString(m, name) {
+   function getStatString(m, name, color) {
       return [`<tspan font-weight=bold>${name}:</tspan>`,
-      `y =  <tspan fill="#ff0000" font-weight=bold>${m.coeffs.estimate[0].toFixed(2)}</tspan> +
-            <tspan fill="#ff0000" font-weight=bold>${m.coeffs.estimate[1].toFixed(2)}</tspan> x`,
+      `y =  <tspan fill="${color}" font-weight=bold>${m.coeffs.estimate[0].toFixed(2)}</tspan> +
+            <tspan fill="${color}" font-weight=bold>${m.coeffs.estimate[1].toFixed(2)}</tspan> x`,
       `s(e) =  <tspan font-weight=bold>${m.stat.se.toFixed(2)}</tspan>`,
       `R2 =  <tspan font-weight=bold>${m.stat.R2.toFixed(2)}</tspan>`];
    }
@@ -63,14 +64,14 @@
    $: popY = popModel.data.y;
    $: lineX = [min(popX), max(popX)];
    $: popLineY = lmpredict(popModel, lineX);
-   $: popText = getStatString(popModel, "Population");
+   $: popText = getStatString(popModel, "Population", "#a0a0a0");
 
    // points and statistics for sample
    $: sampX = sampModel.data.X[0];
    $: sampY = sampModel.data.y;
    $: sampMeanX = mean(sampX);
    $: SSX = variance(sampX) * (sampX.length - 1);
-   $: sampText = getStatString(sampModel, "Sample");
+   $: sampText = getStatString(sampModel, "Sample", colors.plots.SAMPLES[0]);
    $: sampLineY = lmpredict(sampModel, lineX);
    $: sampColor = colors.plots.SAMPLES[0] + (selectedPoint < 0 ? "" : "80");
 
@@ -94,7 +95,7 @@
    limX={mrange(popX)} limY={mrange(popY)} xLabel="Height, m" yLabel="Weigh, kg">
 
 
-   <ScatterSeries title="population" xValues={popX} borderColor={popColor} yValues={popY} />
+   <ScatterSeries title="population" xValues={popX} borderColor={popColor} faceColor={popColor} yValues={popY} />
    <LineSeries xValues={lineX} yValues={popLineY} lineColor={popLineColor}></LineSeries>
 
 
