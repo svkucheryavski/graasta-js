@@ -65,8 +65,8 @@
 }
 
 :global(.datatable .datatable__row.selected .datatable__value) {
-   background: #aa222222;
-   color: #991111;
+   background: #33668820;
+   color: #336688;
 }
 
 

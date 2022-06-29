@@ -10,9 +10,13 @@
    export let segments;
    export let statCV;
 
-   const colorGlobal = colors.plots.SAMPLES[0] + "60";
-   const colorLocal = colors.plots.SAMPLES[0] ;
-   const colorLocalVal = "#ff0000";
+   const colorGlobal = colors.plots.SAMPLES[0] + "70";
+   const colorLocal = colors.plots.SAMPLES[0] + "50";
+   const colorLocalVal = colors.plots.SAMPLES[0];
+
+   // const colorGlobal = colors.plots.SAMPLES[0] + "60";
+   // const colorLocal = colors.plots.SAMPLES[0] ;
+   // const colorLocalVal = "#ff0000";
 
    let xLocal = [];
    let yLocal = [];
@@ -22,11 +26,11 @@
    let lineYLocal = []
 
    // function for getting strings with model info
-   function getModelString(m, name) {
+   function getModelString(m, name, color) {
       return [`<tspan font-weight=bold>${name}:</tspan>`,
             'y =  ' + m.coeffs.estimate.map((b, p) =>
             (p > 0 ? '+' : '') +
-            ' <tspan fill="#0000ff" font-weight=bold>' + b.toFixed(2) + '</tspan>' +
+            ' <tspan fill="' + color + '" font-weight=bold>' + b.toFixed(2) + '</tspan>' +
             (p > 0 ? '<tspan font-weight=bold>x</tspan>' : '') +
             (p > 1 ? '<tspan font-size="70%" baseline-shift = "super">' + p + '</tspan>' : '')
             ).join(" ")
@@ -44,14 +48,14 @@
    $: xGlobal = globalModel.data.X[0];
    $: yGlobal = globalModel.data.y;
    $: lineX = seq(min(xGlobal), max(xGlobal), 100);
-   $: textGlobal = getModelString(globalModel, "Global model").concat(getStatString(globalModel.stat));
+   $: textGlobal = getModelString(globalModel, "Global model", colorLocalVal + "a0").concat(getStatString(globalModel.stat));
    $: lineYGlobal = polypredict(globalModel, lineX);
 
    // points and statistics for current local model
    $: if (localModel !== undefined) {
       xLocal = localModel.data.X[0];
       yLocal = localModel.data.y;
-      textLocal = indSeg >= 0 ? getModelString(localModel, "Local model") :
+      textLocal = indSeg >= 0 ? getModelString(localModel, "Local model", colorLocalVal) :
          ["<tspan font-weight=bold>CV performance:</tspan>"].concat(getStatString(statCV));
       lineYLocal = polypredict(localModel, lineX);
       xLocalVal = subset(xGlobal, segments.val[indSeg]);
@@ -62,17 +66,23 @@
 
 <Axes limX={mrange(xGlobal)} limY={mrange(yGlobal)} xLabel="x" yLabel="y">
 
-   <!-- global model -->
-   <ScatterSeries xValues={xGlobal} yValues={yGlobal} borderWidth={1} faceColor={colorGlobal} borderColor={colorGlobal}/>
-   <LineSeries xValues={lineX} yValues={lineYGlobal} lineColor={colorGlobal}></LineSeries>
+   <!-- text for global model -->
    <TextLegend textSize={1.05} left={min(xGlobal)} top={max(yGlobal)} dx="1em" dy="1.35em" elements={textGlobal} />
 
    <!-- local model -->
    {#if localModel !== undefined && indSeg >= 0}
-   <ScatterSeries xValues={xLocal} yValues={yLocal} markerSize={1.2} borderWidth={2} borderColor={colorLocal}/>
-   <ScatterSeries xValues={xLocalVal} yValues={yLocalVal} borderWidth={2} markerSize={1.2} borderColor={colorLocalVal}/>
-   <LineSeries xValues={lineX} yValues={lineYLocal} lineColor={colorLocal}></LineSeries>
+      <!-- line and points for global model shown pale -->
+      <LineSeries xValues={lineX} yValues={lineYGlobal} lineColor={colorLocal}></LineSeries>
+      <ScatterSeries xValues={xGlobal} yValues={yGlobal} borderWidth={1} faceColor={colorLocal} borderColor={colorLocal}/>
+
+      <!-- line, text and validation points for local model  -->
+      <ScatterSeries xValues={xLocalVal} yValues={yLocalVal} borderWidth={2} markerSize={1.2} borderColor={colorLocalVal}/>
+      <LineSeries xValues={lineX} yValues={lineYLocal} lineColor={colorLocalVal}></LineSeries>
       <TextLegend textSize={1.05} left={min(xGlobal) * 0.55 + max(xGlobal) * 0.45} top={min(yGlobal) * 0.8 + max(yGlobal) * 0.2} dx="1em" dy="1.35em" elements={textLocal} />
+   {:else}
+      <!-- global model -->
+      <ScatterSeries xValues={xGlobal} yValues={yGlobal} borderWidth={1} faceColor={colorGlobal} borderColor={colorGlobal}/>
+      <LineSeries xValues={lineX} yValues={lineYGlobal} lineColor={colorGlobal}></LineSeries>
    {/if}
 
    <!-- CV performance for the loop is over -->
@@ -82,7 +92,4 @@
 
    <XAxis slot="xaxis" />
    <YAxis slot="yaxis" />
-   <slot>
-
-   </slot>
 </Axes>
