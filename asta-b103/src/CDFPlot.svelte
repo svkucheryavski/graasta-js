@@ -1,6 +1,5 @@
 <script>
    import {Axes, XAxis, YAxis, Box, Segments, ScatterSeries, TextLabels, LineSeries} from "svelte-plots-basic";
-
    export let x;
    export let y;
    export let limX;
@@ -10,6 +9,7 @@
    export let varName;
    export let lineColor;
    export let selectedLineColor;
+   export let xTicks;
 
    $: xs = [x[intInd[0]], x[intInd[1]]];
    $: ys = [y[intInd[0]], y[intInd[1]]];
@@ -20,7 +20,7 @@
 
 <!-- control elements -->
 <Axes title="CDF" xLabel={varName} yLabel="Probability, p" {limX} {limY} >
-   <XAxis slot="xaxis" showGrid={true}></XAxis>
+   <XAxis slot="xaxis" showGrid={true} ticks={xTicks}></XAxis>
    <YAxis slot="yaxis" showGrid={true}></YAxis>
    <Box slot="box"></Box>
 

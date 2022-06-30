@@ -18,7 +18,8 @@
 
    // constant parameters
    const size = 1301;
-   const limX = [100, 230];
+   const limX = [90, 230];
+   const xTicks = [100, 120, 140, 160, 180, 200, 220];
    const varName = "Height, cm";
    const lineColor = colors.plots.POPULATIONS[0];
    const selectedLineColor = colors.plots.SAMPLES[0];
@@ -95,7 +96,7 @@
 <StatApp>
    <div class="app-layout">
       <div class="app-layout-column pdf-area">
-         <PDFPlot x={x} y={d} {varName} {intInd} p={p[intInd[1]] - p[intInd[0]]} {lineColor} {selectedLineColor} limX={limX} limY={distr.limY} />
+         <PDFPlot x={x} y={d} {xTicks} {varName} {intInd} p={p[intInd[1]] - p[intInd[0]]} {lineColor} {selectedLineColor} limX={limX} limY={distr.limY} />
          <div class="app-control-area">
             <AppControlArea>
                <AppControlSwitch
@@ -122,7 +123,7 @@
          </div>
       </div>
       <div class="app-layout-column cdf-area">
-         <CDFPlot x={x} y={p} {varName} {mode} {intInd} limX={limX} {lineColor} {selectedLineColor} limY={[-0.05, 1.1]} />
+         <CDFPlot x={x} y={p} {xTicks} {varName} {mode} {intInd} limX={limX} {lineColor} {selectedLineColor} limY={[-0.05, 1.1]} />
          <div class="app-control-area">
             <AppControlArea>
                {#if mode === "Interval"}
