@@ -63,7 +63,7 @@
                {label: "Sample proportion:", values: [sampPropStr]},
                {label: "p-value:", values: [pValStr]},
             ]}
-            decNum={[0, 0, 0]}
+            decNum={[-1, -1, -1]}
             horizontal={true}
          />
       </div>
