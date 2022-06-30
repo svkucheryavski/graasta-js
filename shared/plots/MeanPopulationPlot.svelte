@@ -12,7 +12,7 @@
    export let limX = [80, 120];
 
    // left position of the legend
-   $: left = limX[0] + 0.75 * (limX[1] - limX[0]);
+   $: left = limX[0] + 0.65 * (limX[1] - limX[0]);
 
    // parameters of PDF curve
    $: popX = seq(popMean - 3.5 * popSD, popMean + 3.5 * popSD, 100);
