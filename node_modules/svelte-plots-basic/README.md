@@ -44,9 +44,9 @@ Just create a new Svelte app following the [quick start guide](https://svelte.de
          showLabels="no"
          faceColor="#e0e0e0"
          edgeColor="#e0e0e0"
-         labels="{years}"
-         xValues="{years}"
-         yValues="{amount}"
+         labels={years}
+         xValues={years}
+         yValues={amount}
       />
    </Axes>
 </div>
@@ -67,35 +67,36 @@ Example below shows how to create a plot with axis, box and grid as well as how 
 
 <div class="plot">
    <Axes>
-      // x and y axis with automatic ticks and grid lines
-      <XAxis showGrid="{true}"></XAxis>
-      <YAxis showGrid="{true}"></YAxis>
 
       // bar, line and marker series with the same data values
       <BarSeries
          showLabels="no"
          faceColor="#eee"
          edgeColor="#eee"
-         xValues="{years}"
-         yValues="{amount}"
+         xValues={years}
+         yValues={amount}
       />
       <LineSeries
          lineColor="blue"
-         lineWidth="{2}"
-         xValues="{years}"
-         yValues="{amount}"
+         lineWidth={2}
+         xValues={years}
+         yValues={amount}
       />
       <ScatterSeries
          marker="✺"
          showLabels="hover"
          markerColor="blue"
-         labels="{years}"
-         xValues="{years}"
-         yValues="{amount}"
+         labels={years}
+         xValues={years}
+         yValues={amount}
       />
 
+      // x and y axis with automatic ticks and grid lines
+      <XAxis showGrid={true} slot="xaxis" />
+      <YAxis showGrid={true} slot="yaxis" />
+
       // box around the axes
-      <Box />
+      <Box slot="box" />
    </Axes>
 </div>
 ```
@@ -125,6 +126,7 @@ Each component is responsible for visualization of the corresponding axis. The a
 * `ticks` — vector with ticks
 * `tickLabels` — vector with values to be shown as labels beside each tick
 * `showGrid` — a logical parameter, which allows to show grid lines on the plot
+* `slot` — name of the slot, `"xaxis"` or `"yaxis"`
 
 The components must be placed in a particular slot of the parent `Axes` component.
 

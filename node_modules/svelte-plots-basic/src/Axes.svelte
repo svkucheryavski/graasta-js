@@ -1,5 +1,5 @@
 <script>
-	import { onMount, setContext, createEventDispatcher } from 'svelte';
+	import { setContext, createEventDispatcher } from 'svelte';
 	import { writable } from 'svelte/store';
 
    /* input parameters */
@@ -34,6 +34,7 @@
       "large": 20
    };
 
+
    // line styles for different scales and types
    const LINE_STYLES = {
       small: ["0", "3,3", "1,1", "3,1"],
@@ -45,7 +46,8 @@
    const clipPathID = "plottingArea" + Math.round(Math.random() * 10000);
 
    /* parameters for internal use inside the component */
-   let axesWrapper;                                   // pointer to axes wrapper DOM element
+   let plotWidth;                                     // width of plot
+   let plotHeight;                                    // height of plot
    let axesMargins = [0.034, 0.034, 0.034, 0.034];    // initial margins (will be multiplied to FACTORS)
 
    /* reactive parameters to be shared with children via context */
@@ -263,19 +265,8 @@
 
 	setContext('axes', context);
 
-   /* observer for the plotting area size */
-   var ro = new ResizeObserver(entries => {
-      for (let entry of entries) {
-         const cr = entry.contentRect;
-         width.update(x => cr.width);
-         height.update(x => cr.height);
-         scale.update(x => getScale(cr.width, cr.height));
-      }
-   });
-
-   onMount(() => {
-      ro.observe(axesWrapper);
-   });
+   // update plot scale based on its size
+   $: scale.update(x => getScale(plotWidth, plotHeight));
 
 
    // handle click on plot elements and dispatch manual events
@@ -332,7 +323,7 @@
 </script>
 
 
-<div class="plot {'plot_' + $scale}"  class:plot_error="{!$isOk}">
+<div class="plot {'plot_' + $scale}"  bind:clientHeight={plotHeight} bind:clientWidth={plotWidth} class:plot_error="{!$isOk}">
 
    <!-- plot title and axis labels -->
    {#if title !== ""}<div class="axes__title">{@html title}</div>{/if}
@@ -340,7 +331,7 @@
    {#if xLabel !== ""}<div class="axes__xlabel"><span>{@html xLabel}</span></div>{/if}
 
    <!-- axes (coordinate system) -->
-   <div class="axes-wrapper" bind:this={axesWrapper} >
+   <div class="axes-wrapper" bind:clientHeight={$height} bind:clientWidth={$width} >
       <svg on:click={handleClick} preserveAspectRatio="none" class="axes">
 
          <!-- define clipping path -->
