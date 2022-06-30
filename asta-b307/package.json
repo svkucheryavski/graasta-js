@@ -19,6 +19,6 @@
   },
   "dependencies": {
     "mdatools": "^0.5.3",
-    "svelte-plots-basic": "^1.0.7"
+    "svelte-plots-basic": "^1.1.0"
   }
 }
