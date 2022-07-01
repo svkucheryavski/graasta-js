@@ -1,5 +1,5 @@
 <script>
-	import { setContext, createEventDispatcher } from 'svelte';
+	import { setContext, createEventDispatcher, onMount } from 'svelte';
 	import { writable } from 'svelte/store';
 
    /* input parameters */
@@ -46,8 +46,8 @@
    const clipPathID = "plottingArea" + Math.round(Math.random() * 10000);
 
    /* parameters for internal use inside the component */
-   let plotWidth;                                     // width of plot
-   let plotHeight;                                    // height of plot
+   let plotElement;
+   let axesElement;
    let axesMargins = [0.034, 0.034, 0.034, 0.034];    // initial margins (will be multiplied to FACTORS)
 
    /* reactive parameters to be shared with children via context */
@@ -265,10 +265,6 @@
 
 	setContext('axes', context);
 
-   // update plot scale based on its size
-   $: scale.update(x => getScale(plotWidth, plotHeight));
-
-
    // handle click on plot elements and dispatch manual events
    function dispatchClickEvent(eventName, el) {
       dispatch(eventName, {seriesTitle: el.parentNode.getAttribute('title'), elementID: el.dataset.id});
@@ -320,10 +316,27 @@
    // computes coordinates for clip path box
    $: cpx = $isOk ? scaleX($xLim, $xLim, $width) : [0, 1];
    $: cpy = $isOk ? scaleY($yLim, $yLim, $height) : [1, 0];
+
+   /* observer for the plotting area size */
+    var ro = new ResizeObserver(entries => {
+       for (let entry of entries) {
+
+         const pcr = plotElement.getBoundingClientRect();
+         const acr = axesElement.getBoundingClientRect();
+
+         width.update(x => acr.width);
+         height.update(x => acr.height);
+         scale.update(x => getScale(pcr.width, pcr.height));
+       }
+    });
+
+    onMount(() => {
+       ro.observe(plotElement);
+    });
 </script>
 
 
-<div class="plot {'plot_' + $scale}"  bind:clientHeight={plotHeight} bind:clientWidth={plotWidth} class:plot_error="{!$isOk}">
+<div class="plot {'plot_' + $scale}"  bind:this={plotElement} class:plot_error="{!$isOk}">
 
    <!-- plot title and axis labels -->
    {#if title !== ""}<div class="axes__title">{@html title}</div>{/if}
@@ -331,7 +344,7 @@
    {#if xLabel !== ""}<div class="axes__xlabel"><span>{@html xLabel}</span></div>{/if}
 
    <!-- axes (coordinate system) -->
-   <div class="axes-wrapper" bind:clientHeight={$height} bind:clientWidth={$width} >
+   <div class="axes-wrapper" bind:this={axesElement} >
       <svg on:click={handleClick} preserveAspectRatio="none" class="axes">
 
          <!-- define clipping path -->
