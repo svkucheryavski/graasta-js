@@ -69,11 +69,11 @@
    {#if plotType == "r"}
    <CIPlot {clicked} {reset} x={rx} f={rf} limX={[-1, 1]} cix={cirx} cif={cirf} ci={rci}
       ciStat={popCor} xLabel="Expected ρ for population"
-      labelStr="# samples with ρ inside:"/>
+      labelStr="# samples with ρ inside"/>
    {:else}
    <CIPlot {clicked} {reset} x={zx} f={zf} limX={[-5, 5]} cix={cizx} cif={cizf} ci={zci}
       ciStat={popZ} xLabel="Expected z' for population"
-      labelStr="# samples with z' inside:"/>
+      labelStr="# samples with z' inside"/>
    {/if}
 </div>
 
