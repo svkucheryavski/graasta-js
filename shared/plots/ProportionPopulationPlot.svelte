@@ -32,12 +32,12 @@
    $: samp2Index = sample.filter(v => groups[v - 1] == 2);
 
    // X and Y coordinates of sample points from group 1
-   $: samp1X = subset(pop[0], samp1Index);
-   $: samp1Y = subset(pop[1], samp1Index);
+   $: samp1X = samp1Index.length > 0 ? subset(pop[0], samp1Index) : [];
+   $: samp1Y = samp1Index.length > 0 ? subset(pop[1], samp1Index) : [];
 
    // X and Y coordinates of sample points from group 2
-   $: samp2X = subset(pop[0], samp2Index);
-   $: samp2Y = subset(pop[1], samp2Index);
+   $: samp2X = samp2Index.length > 0 ? subset(pop[0], samp2Index) : [];
+   $: samp2Y = samp2Index.length > 0 ? subset(pop[1], samp2Index) : [];
 </script>
 
 <Axes title="Population (N = {popSize})" limX={mrange(pop[0], 0.1)} limY={mrange(pop[1], 0.05)} >
@@ -49,10 +49,13 @@
       borderColor={populationColors[1]} faceColor={populationColors[1] }/>
 
    <!-- sample points on top  -->
+   {#if samp1Index.length > 0}
    <ScatterSeries xValues={samp1X} yValues={samp1Y} borderWidth={2.75} markerSize={1.65}
       borderColor={sampleColors[0]} faceColor={"white"}/>
+   {/if}
+   {#if samp2Index.length > 0}
    <ScatterSeries xValues={samp2X} yValues={samp2Y} borderWidth={2.75} markerSize={1.65}
       borderColor={sampleColors[1]} faceColor={"white"}/>
-
+   {/if}
 </Axes>
 
