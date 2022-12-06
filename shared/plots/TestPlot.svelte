@@ -32,7 +32,7 @@
    $: areaColor = lineColor + "40";
    $: statColor = lineColor + "90";
 
-   $: limYLocal = limY === null ? [0, max(f) * (showLegend ? 1.45 : 1.2)] : limY;
+   $: limYLocal = limY === null ? [0, max(f) * (showLegend ? 1.5 : 1.2)] : limY;
 
    // cumulative statistics
    $: {
