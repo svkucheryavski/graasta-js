@@ -29,8 +29,8 @@ app_blocks = [
       "apps": ["asta-b209", "asta-b210", "asta-b211", "asta-b212"]
    },
    {
-      "title": "Relationship between two variables",
-      "apps": ["asta-b301", "asta-b302", "asta-b303", "asta-b304", "asta-b305", "asta-b306", "asta-b307"]
+      "title": "Covariance and regression",
+      "apps": ["asta-b301", "asta-b302", "asta-b303", "asta-b304", "asta-b305", "asta-b306", "asta-b307", "asta-b308"]
    }
 ]
 
