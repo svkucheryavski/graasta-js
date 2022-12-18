@@ -28,10 +28,6 @@
 <style>
 
 /* main styles for graasta-app and children */
-:global(body) {
-   height: max-content;
-}
-
 :global(#graasta-app-container) {
    height: max-content;
    width: 100% !important;
