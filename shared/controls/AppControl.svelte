@@ -28,6 +28,9 @@
       line-height: 1.5em;
       flex: 0 0 90px;
       max-width: 90px;
+      user-select: none;
+      -webkit-user-select: none;
+      cursor: default
    }
 
    .app-control > slot {
