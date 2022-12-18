@@ -10,6 +10,8 @@
    export let lineColor = Colors.PRIMARY;
    export let lineType = 1;
    export let lineWidth = 1;
+   export let title = "";
+   export let style = "series_seg";
 
    /* sanity check for input parameters */
    if (!Array.isArray(xStart) || !Array.isArray(xEnd) || !Array.isArray(yStart) || !Array.isArray(yEnd)) {
@@ -39,9 +41,11 @@
 </script>
 
 {#if x1 !== undefined && y1 !== undefined}
+   <g class="series {style}" title={title} style={lineStyleStr}>
    {#each x1 as v, i}
-      <line x1="{x1[i]}" x2="{x2[i]}" y1="{y1[i]}" y2="{y2[i]}" style="{lineStyleStr}"></line>
+      <line x1={x1[i]} x2={x2[i]} y1={y1[i]} y2={y2[i]}></line>
    {/each}
+   </g>
 {/if}
 
 <style>

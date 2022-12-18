@@ -67,19 +67,3 @@
    textSize={markerSize}
 />
 
-<style>
-
-:global(.series_scatter > text) {
-   font-size: 1em;
-   cursor: default;
-}
-
-:global(.series_scatter > text:hover) {
-   opacity: 90%;
-}
-
-:global(.series_scatter > *:hover + .labels_hover) {
-   visibility: visible;
-   opacity: 1;
-}
-</style>

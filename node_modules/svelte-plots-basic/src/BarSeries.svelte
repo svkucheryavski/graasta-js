@@ -66,13 +66,3 @@
 </script>
 
 <Rectangles style="series_bar" {left} {top} {width} {height} {borderColor} {faceColor} {title} />
-
-<style>
-   :global(.series_bar > rect){
-      stroke-width: 1px;
-   }
-
-   :global(.series_bar > rect:hover){
-      opacity: 90%;
-   }
-</style>

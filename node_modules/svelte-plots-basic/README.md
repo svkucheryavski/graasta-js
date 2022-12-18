@@ -2,9 +2,8 @@
 
 ## Description
 
-`svelte-plots-basic` is a [Svelte](https://svelte.dev) component library for creating very simple 2D plots/charts. It is currently under active development and breaking changes may occur. In its current state (v. 1.1.3) it allows to create bar, scatter, area and line charts as well as any combination of the four. The charts are created using [SVG](https://en.wikipedia.org/wiki/Scalable_Vector_Graphics) and are re-scalable.
+`svelte-plots-basic` is a [Svelte](https://svelte.dev) component library for creating very simple 2D plots/charts. It is currently under active development and breaking changes may occur. In its current state (v. 1.1.4) it allows to create bar, scatter, area and line charts as well as any combination of the four. The charts are created using [SVG](https://en.wikipedia.org/wiki/Scalable_Vector_Graphics) and are re-scalable.
 
-The description is not complete yet and will be updated during February-March of 2022.
 
 ## Installation
 
@@ -52,7 +51,7 @@ Just create a new Svelte app following the [quick start guide](https://svelte.de
 </div>
 ```
 
-Then run `npm run dev` in terminal and open `localhost:5000` in browser. That is it.
+Then run `npm run dev` in terminal and open the URL provided by npm in browser. That is it.
 
 Example below shows how to create a plot with axis, box and grid as well as how to combine several plot series together.
 

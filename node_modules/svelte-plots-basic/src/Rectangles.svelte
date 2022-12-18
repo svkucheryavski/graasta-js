@@ -48,7 +48,7 @@
    $: rh = axes.scaleY(height, $yLim, $axesHeight, true);
 
    // styles for bars and labels
-   $: barsStyleStr = `fill:${faceColor};stroke:${borderColor};stroke-width: ${lineWidth}px;`;
+   $: barsStyleStr = `fill:${faceColor};stroke:${borderColor};stroke-width:${lineWidth}px;`;
 
 </script>
 
