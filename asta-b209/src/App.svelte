@@ -135,7 +135,7 @@
       "popplot testplot"
       "popplot controls"
       "popplot .";
-   grid-template-rows: max(125px, 20%) max(190px, 35%) 1fr min-content;
+   grid-template-rows: max(150px, 30%) max(190px, 35%) 1fr min-content;
    grid-template-columns: 65% 35%;
 }
 

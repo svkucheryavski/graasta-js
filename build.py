@@ -51,9 +51,9 @@ for block in app_blocks:
 
         # copy the files
         os.makedirs(os.path.join(SRC_DIR, app), exist_ok = True)
-        copyfile(app + "/public/" + app + ".css", SRC_DIR + app + "/" + app + ".css")
-        copyfile(app + "/public/" + app + ".js", SRC_DIR + app + "/" + app + ".js")
-        copyfile(app + "/public/" + "index.html", SRC_DIR + app + "/index.html")
+#        copyfile(app + "/public/" + app + ".css", SRC_DIR + app + "/" + app + ".css")
+        copyfile(app + "/dist/" + app + ".js", SRC_DIR + app + "/" + app + ".js")
+        copyfile(app + "/" + "index.html", SRC_DIR + app + "/index.html")
 
         # make archive
         make_archive(SRC_DIR + app, 'zip', SRC_DIR + app)

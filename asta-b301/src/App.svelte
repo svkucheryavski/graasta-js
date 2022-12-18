@@ -1,6 +1,6 @@
 <script>
    import {rnorm, subset, cov, seq, mean, shuffle, max, min} from 'mdatools/stat';
-   import {TextLabels} from 'svelte-plots-basic';
+   import {TextLegend} from 'svelte-plots-basic';
 
    // shared components
    import {default as StatApp} from "../../shared/StatApp.svelte";
@@ -30,8 +30,8 @@
    let sample = [];
    let selectedPoint;
 
-   $: top = max(popY) - 5
-   $: left = min(popX) - 3
+   $: top = max(popY) - 4
+   $: left = min(popX)
 
    function takeNewSample(popSize, sampSize) {
       sample = subset(shuffle(seq(1, popSize)), seq(1, sampSize));
@@ -63,8 +63,7 @@
          <CovariancePlot bind:selectedPoint={selectedPoint} {popX} {sampX} {popY} {sampY} {indNeg} {indPos} {indNeu}>
 
             <!-- labels for covariance -->
-            <TextLabels xValues={[left]} yValues={[top]} labels={[covText(popX, popY, "population")]} pos={2} textSize={0.9} faceColor="#606060"/>
-            <TextLabels xValues={[left]} yValues={[top - 4]} labels={[covText(sampX, sampY, "sample")]} pos={2} textSize={0.9} faceColor="#606060"/>
+            <TextLegend left={left} top={top} dy="1.5em" elements={[covText(popX, popY, "population"), covText(sampX, sampY, "sample")]} pos={2} textSize={0.9} faceColor="#606060"/>
 
          </CovariancePlot>
       </div>
