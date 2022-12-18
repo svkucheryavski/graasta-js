@@ -1,8 +1,12 @@
 <script>
    export let errormsg = undefined;
+   export let legend = "";
 </script>
 
 <fieldset class="app-control-area">
+   {#if legend !== ""}
+   <legend>{legend}</legend>
+   {/if}
    <slot></slot>
    {#if errormsg}<div class="app-control-error">{errormsg}</div>{/if}
 </fieldset>
@@ -17,8 +21,19 @@
    fieldset {
       background: #f4f4f4;
       margin: 0;
-      padding: 0.5em;
       box-shadow: 0px 0px 2px  #30303020;
       border: none;
+      padding: 0.5em;
+   }
+
+   legend {
+      color: #606060;
+      float: left;
+      width: 100%;
+      display: block;
+      margin: 0;
+      padding: 0.25em 0em;
+      font-size: 1.1em;
+      font-weight: bold;
    }
 </style>

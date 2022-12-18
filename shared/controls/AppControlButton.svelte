@@ -27,6 +27,7 @@ button {
    border: none;
    border-radius: 3px;
    white-space: nowrap;
+   user-select: none;
 }
 
 button:hover {

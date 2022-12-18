@@ -15,7 +15,7 @@
 
    <div class="selector">
       {#each options as option (option)}
-      <div on:click={() => value = option} class="option" class:selected={option==value}>{option}</div>
+      <div on:click={() => value = option} on:keydown={() => value = option} class="option" class:selected={option==value}>{@html option}</div>
       {/each}
    </div>
    <input name={id} bind:value={value}>
