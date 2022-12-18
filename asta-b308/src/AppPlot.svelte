@@ -68,10 +68,11 @@
 
 <div  bind:this={plotPane}
       on:mousewheel={zoomScene}
-      on:mousemove={rotate}
-      on:mousedown={startRotation}
-      on:mouseleave={stopRotation}
-      on:mouseup={stopRotation}
+
+      on:pointermove={rotate}
+      on:pointerdown={startRotation}
+      on:pointerleave={stopRotation}
+      on:pointerup={stopRotation}
 >
    <Axes {limX} {limY} {limZ} {zoom} {phi} {theta}>
       <slot></slot>

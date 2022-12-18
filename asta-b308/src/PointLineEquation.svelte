@@ -77,7 +77,7 @@
    .eq {
       display: flex;
       flex-direction: row;
-      font-size: 1.5em;
+      font-size: 1.35em;
       align-items: stretch;
       justify-content: center;
       margin: 0.5em;

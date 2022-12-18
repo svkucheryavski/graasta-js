@@ -17,7 +17,7 @@
    // constant parameters
    const X1Range = [1, 4];
    const X2Range = [1, 4];
-   const modelColor = colors.plots.POPULATIONS[0];
+   const modelColor = "#a0a0ef70";
    const pointColor = colors.plots.SAMPLES[0];
 
    // axes limits (a bit wider the X range)
@@ -45,11 +45,11 @@
 
 <StatApp>
    <div class="app-layout">
-
-      <div class="app-plot-area">
+      <div class="app-eq-area">
          <!-- Line equation for selected point -->
          <PointLineEquation {pX1} {pX2} {coeffs} {showLines} />
-
+      </div>
+      <div class="app-plot-area">
          <!-- 3D plot -->
          <AppPlot {limX} {limY} {limZ}>
             <PointPlot color={pointColor} {coeffs} {pX1} {pX2} {X1Range} {X2Range} {showLines} />
@@ -96,9 +96,14 @@
    position: relative;
    display: grid;
    grid-template-areas:
+      "eq controls"
       "plot controls";
-   grid-template-rows: 100%;
+   grid-template-rows: min-content 1fr;
    grid-template-columns: 65% minmax(350px, 35%);
+}
+
+.app-eq-area {
+   grid-area: eq;
 }
 
 .app-plot-area {

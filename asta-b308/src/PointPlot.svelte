@@ -62,6 +62,7 @@
    xEnd={X2End[0]} zEnd={X2End[1]} yEnd={X2End[2]}
    lineColor={color}
 />
+{/if}
 
 <!-- lines for point X1 and X2 -->
 <ScatterSeries borderColor={"#b0b0b0"} faceColor={"#b0b0b0"} xValues={[pX1]} zValues={[pX2]} yValues={[0]} />
@@ -74,4 +75,3 @@
    lineColor="#b0b0b0"
 />
 
-{/if}
