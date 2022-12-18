@@ -1,7 +1,7 @@
 {
    "id": "asta-b308",
-   "title": "Multiple linear regression",
-   "info": "Multiple linear regression.",
+   "title": "Multiple Linear Regression",
+   "info": "Multiple Linear Regression.",
    "video": "",
-   "help": ""
+   "help": "<h2>Multiple linear regression model</h2> <p>This app helps to understand a Multiple Linear Regression model, where a response variable (<em>y</em>) depends on two predictors (<em>X</em><sub>1</sub> and <em>X</em><sub>2</sub>) as well as on their interaction. The model is represented by a set of four coefficients, <em>b</em><sub>0</sub> (bias or intercept), <em>b</em><sub>1</sub> (effect of <em>X</em><sub>1</sub>), <em>b</em><sub>2</sub> (effect of <em>X</em><sub>2</sub>) and <em>b</em><sub>12</sub> (effect of interaction between <em>X</em><sub>1</sub> and <em>X</em><sub>2</sub>). You can change the values of the coefficients using corresponding controls.</p><p>The model is visualized as a surface in (<em>X</em><sub>1</sub>, <em>X</em><sub>2</sub>, <em>y</em>) Cartesian space as it is shown on the 3D plot. The model surface is represented by a two sets of parallel straight lines. One set of lines shows how <em>y</em> depends on <em>X</em><sub>1</sub>, when <em>X</em><sub>2</sub> has different fixed values (one line for each fixed <em>X</em><sub>2</sub>). The second set of lines, which is orthogonal to the first set, shows how <em>y</em> depends on <em>X</em><sub>2</sub> when <em>X</em><sub>1</sub> has different fixed values. You can show both sets or only one of them by using control element \"Show lines\".</p> <p>The 3D scene can be rotated and zoomed in/out. You can do it with a mouse (drag for rotation and scroll for zooming) or by keyboard (arrows for rotation and \"+\", \"-\" for zooming). You can also see a selected point whose X-coordinates you can change. As well as the equation, which shows how y-value of this point is computed using the current model.</p>"
 }

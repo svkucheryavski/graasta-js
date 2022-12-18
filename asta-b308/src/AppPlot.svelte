@@ -1,33 +1,61 @@
 <script>
+   // shared components - 3d plot elements
    import Axes from '../../shared/plots3d/Axes.svelte';
    import XAxis from '../../shared/plots3d/XAxis.svelte';
    import YAxis from '../../shared/plots3d/YAxis.svelte';
    import ZAxis from '../../shared/plots3d/ZAxis.svelte';
-   import Segments from '../../shared/plots3d/Segments.svelte';
-   import ScatterSeries from '../../shared/plots3d/ScatterSeries.svelte';
 
-   import {expandGrid, rep, seq} from 'mdatools/stat';
-   import { mdot, transpose, matrix, vmult, mmult } from 'mdatools/matrix';
+   export let limX;
+   export let limY;
+   export let limZ;
 
-   const b = [[1, 0, 0, 0]];
+   // initial orientation
+   let phi = -25.264 / 180 * Math.PI
+   let theta = 215 / 180 * Math.PI;
+   let zoom = 0.5;
 
-   const X11 = seq(1, 5);
-   const X12 = [1, 5];
+   // drugging settings
+   let isDragging = false;
+   let draggingStartPosition = [];
+   let plotPane;
 
-   const X1Start = [rep(1, X11.length), X11, rep(-5, X11.length), vmult(X11, -5)];
-   const Y1Start = mdot(X1Start, b);
+   const zoomScene = (e) => {
+      zoom = zoom + e.deltaY / 100
+      if (zoom < 0.1) zoom = 0.1;
+      if (zoom > 2.0) zoom = 2.0;
+   }
 
-   const X1End = [rep(1, X11.length), X11, rep(5, X11.length), vmult(X11, 5)];
-   const Y1End = mdot(X1End, b);
+   const startRotation = (e) => {
+      draggingStartPosition = [e.clientX, e.clientY];
+      isDragging = true;
+   }
 
-   let pX = 2;
-   let pZ = 2;
-   let pY = mdot([[1], [pX], [pZ], [pX * pZ]], b);
+   const stopRotation = (e) => {
+      isDragging = false;
+   }
 
-   let phi = 0;
-   let theta = 0;
-   let zoom = 0.85;
+   const rotate = (e) => {
+      if (!isDragging || !plotPane) return;
 
+      // get size of plot pane and coordinates of current mouse position
+      const width = plotPane.getBoundingClientRect().width;
+      const height = plotPane.getBoundingClientRect().height;
+      const currentPosition = [e.clientX, e.clientY];
+      if (width < 100) return;
+
+      // compute angle for horizontal rotation
+      const dx = currentPosition[0] - draggingStartPosition[0];
+      phi = phi + (dx / width * Math.PI)
+
+      // compute angle for vertical rotation
+      const dy = currentPosition[1] - draggingStartPosition[1];
+      theta = theta + (dy / height * Math.PI)
+
+      // update start moust position
+      draggingStartPosition = currentPosition;
+   }
+
+   /* rotate and move plot by keyboard */
    document.onkeydown = function (event) {
       if (event.key == "ArrowLeft") phi = phi - 0.05;
       if (event.key == "ArrowRight") phi = phi + 0.05;
@@ -38,25 +66,25 @@
    }
 </script>
 
-<div class="plot-container">
-   <Axes limY={[0, 5]} limZ={[0, 5]} {zoom} {phi} {theta}>
-   <!-- <Axes {zoom} {phi} {theta}> -->
-      <Segments
-         xStart={X1Start[1]} zStart={X1Start[2]} yStart={Y1Start[0]}
-         xEnd={X1End[1]} zEnd={X1End[2]} yEnd={Y1End[0]}
-         lineColor={"#4466ff60"}
-      />
-      <ScatterSeries xValues={[pX]} yValues={[pY]} zValues={[pZ]} />
-      <ScatterSeries xValues={[pX]} yValues={[0]} zValues={[pZ]} />
-      <Segments
-         xStart={[pX]} zStart={[0]} yStart={[0]}
-         xEnd={[pX]} zEnd={[pZ]} yEnd={[0]}
-         lineColor={"#4466ff60"}
-      />
+<div  bind:this={plotPane}
+      on:mousewheel={zoomScene}
+      on:mousemove={rotate}
+      on:mousedown={startRotation}
+      on:mouseleave={stopRotation}
+      on:mouseup={stopRotation}
+>
+   <Axes {limX} {limY} {limZ} {zoom} {phi} {theta}>
+      <slot></slot>
       <XAxis showGrid={true} title="X1" slot="xaxis" />
       <YAxis showGrid={true} title="Y" slot="yaxis" />
       <ZAxis showGrid={true} title="X2" slot="zaxis" />
    </Axes>
 </div>
 
-
+<style>
+   div {
+      display: block;
+      width: 100%;
+      height: 100%;
+   }
+</style>
