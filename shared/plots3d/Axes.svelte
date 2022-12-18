@@ -235,18 +235,18 @@
    /*****************************************/
 
    // projection matrix (step 1)
-   $: P1 = [
+   $: P2 = [
          [1, 0, 0, 0],
-         [0, -Math.cos(theta), Math.sin(theta), 0],
-         [0, -Math.sin(theta),  -Math.cos(theta), 0],
+         [0, Math.cos(theta), Math.sin(theta), 0],
+         [0, -Math.sin(theta),  Math.cos(theta), 0],
          [0, 0, 0, 1],
    ];
 
    // projection matrix (step 2)
-   $: P2 = [
-         [ Math.cos(phi), 0, Math.sin(phi), 0],
+   $: P1 = [
+         [ Math.cos(phi), 0, -Math.sin(phi), 0],
          [0, 1, 0, 0],
-         [-Math.sin(phi), 0, Math.cos(phi), 0],
+         [Math.sin(phi), 0, Math.cos(phi), 0],
          [0, 0, 0, 1]
       ];
 
@@ -353,7 +353,7 @@
    <div class="axes-wrapper" bind:this={axesElement} >
       <slot name="title"></slot>
 
-      <svg style="background: beige" vector-effect="non-scaling-stroke" preserveAspectRatio="none" class="axes">
+      <svg vector-effect="non-scaling-stroke" preserveAspectRatio="none" class="axes">
          <!-- axis and box -->
          <slot name="xaxis"></slot>
          <slot name="yaxis"></slot>
@@ -382,7 +382,7 @@
 <style>
 
    /* Plot (main container) */
-   :global(.plot) {
+   .plot {
       font-family: Arial, Helvetica, sans-serif;
 
       display: grid;
@@ -394,7 +394,6 @@
          ". xlab";
 
       box-sizing: border-box;
-      background: #fefefe;
       min-width: 100px;
       min-height: 50px;
       width: 100%;
@@ -423,7 +422,7 @@
       display: none;
    }
 
-   :global(.message_error) {
+   .message_error {
       font-size: 1.2em;
       color: crimson;
       padding: 20px;
@@ -443,11 +442,12 @@
       margin: 0;
    }
 
-   :global(.axes) {
+   .axes {
       display: block;
       box-sizing: border-box;
       position:absolute;
-
+      user-select: none;
+      cursor: default;
       padding: 0;
       margin: 0;
       height: 100%;
@@ -456,6 +456,12 @@
       max-width: 100%;
       min-height: 100%;
       min-width: 100%;
+   }
+
+   .axes :global(text) {
+       -webkit-user-select: none;
+      user-select: none;
+      cursor: default;
    }
 
    :global(.axes-content) {
