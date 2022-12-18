@@ -58,6 +58,13 @@
       value = computeValue(p);
    }
 
+   const changingByWheel = (e) => {
+      let newValue = value + step * e.deltaY * 0.1;
+      if (newValue < min) newValue = min;
+      if (newValue > max) newValue = max;
+      value = newValue;
+   }
+
    const changing = (e) => {
       if (!isDragging) return;
       const p = getRelativePosition(e);
@@ -74,7 +81,7 @@
    <div
       class="rangeSliderContainer"
       bind:this={sliderContainer}
-      on:mousewheel={changing}
+      on:mousewheel|preventDefault={changingByWheel}
       on:mousemove={changing}
       on:mousedown={startChanging}
       on:mouseleave={cancelChanging}
@@ -118,7 +125,6 @@
       user-select: none;
       -webkit-user-select: none;
       -moz-user-select: none;
-
    }
 
    .rangeSliderContainer span {
