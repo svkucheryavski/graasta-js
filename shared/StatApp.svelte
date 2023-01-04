@@ -29,7 +29,7 @@
 
 /* main styles for graasta-app and children */
 :global(#graasta-app-container) {
-   height: max-content;
+   height: 100% !important;
    width: 100% !important;
 }
 
@@ -39,16 +39,14 @@
    position: relative;
    font-size: max(14px, 1vw);
 
-   aspect-ratio: 16/9;
+   width: auto;
    min-width: 800px;
-
-   width: 100%;
-   height: auto;
+   height: 100%;
+   aspect-ratio: 16/9;
 
    box-sizing: border-box;
    padding: 0;
    margin: 0 auto;
-   background: #fdfdfd;
 }
 
 .graasta-app  * {

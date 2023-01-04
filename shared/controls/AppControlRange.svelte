@@ -59,10 +59,10 @@
    }
 
    const changingByWheel = (e) => {
-      let newValue = value + step * e.deltaY * 0.1;
+      let newValue = value + step * e.deltaY * 0.5;
       if (newValue < min) newValue = min;
       if (newValue > max) newValue = max;
-      value = newValue;
+      value = +(Math.round(newValue / step) * step).toFixed(4);
    }
 
    const changing = (e) => {

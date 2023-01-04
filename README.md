@@ -8,16 +8,13 @@ You can see the full list of all application as well as try them and download th
 
 If you want to use any app in your project, do the following (here, for example, it is assumed that you selected app *asta-b101*, which is the first app in the list):
 
-1. Download `asta-b101.zip` from the [graasta.com](https://graasta.com). The archive contents a folder `asta-b101` with three files: `asta-b101.js` — the JavaScript code of the app, minified,
- `asta-b101.css` — CSS styles for the app and `index.html` — simple HTML file which can be used
- to run the app locally.
+1. Download `asta-b101.zip` from the [graasta.com](https://graasta.com). The archive contents a folder `asta-b101` with two files: `asta-b101.js` — the JavaScript code of the app with all styles, minified, and `index.html` — simple HTML file which can be used to run the app locally.
 
-2. Move the first two files to the folders where you keep js and css files (here we assume it is `./js` and `./css`). Open your HTML file and add a DOM element (e.g. `<div>`) with ID `"graasta-app-container"`.
+2. Move the first file to the folders where you keep js files (here we assume it is `./js`). Open your HTML file and add a DOM element (e.g. `<div>`) with ID `"graasta-app-container"`.
 
 After that just add two lines to the header of the HTML file (between tags `<head>...</head>`):
 
 ```html
-<link rel='stylesheet' href='/css/asta-b101.css'>
 <script defer src='/js/asta-b101.js'></script>
 ```
 

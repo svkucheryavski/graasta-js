@@ -15,21 +15,21 @@
    import PointLineEquation from './PointLineEquation.svelte';
 
    // constant parameters
-   const X1Range = [1, 4];
-   const X2Range = [1, 4];
+   const X1Range = [0, 4];
+   const X2Range = [0, 4];
    const modelColor = "#a0a0ef70";
    const pointColor = colors.plots.SAMPLES[0];
 
    // axes limits (a bit wider the X range)
-   const limX = [0, 5];
+   const limX = [-1, 5];
    const limY = [0, 15];
-   const limZ = [0, 5];
+   const limZ = [-1, 5];
 
 
    // regression coefficients
-   let b0 = 10;
-   let b1 = 0.1;
-   let b2 = 0.1;
+   let b0 = 10.0;
+   let b1 = 0.0;
+   let b2 = 0.0;
    let b12 = 0.00;
 
    // coordinates of the selected point
@@ -61,16 +61,16 @@
          <!-- Control elements for point -->
          <AppControlArea>
             <AppControlSelect id="showLines" label="Show lines" bind:value={showLines} options={["X1", "X2", "Both"]} />
-            <AppControlRange id="pX1" label="point X<sub>1</sub>" bind:value={pX1} min={1} max={4} step={0.1} decNum={1}/>
-            <AppControlRange id="pX2" label="point X<sub>2</sub>" bind:value={pX2} min={1} max={4} step={0.1} decNum={1}/>
+            <AppControlRange id="pX1" label="point X<sub>1</sub>" bind:value={pX1} min={0} max={4} step={0.1} decNum={1}/>
+            <AppControlRange id="pX2" label="point X<sub>2</sub>" bind:value={pX2} min={0} max={4} step={0.1} decNum={1}/>
          </AppControlArea>
 
          <!-- Control elements for model -->
          <AppControlArea>
-            <AppControlRange id="b0" label="b<sub>0</sub>" bind:value={b0} min={5} max={15}  step={0.1} decNum={1}/>
-            <AppControlRange id="b1" label="b<sub>1</sub>" bind:value={b1} min={-1} max={1}  step={0.1} decNum={1}/>
-            <AppControlRange id="b2" label="b<sub>2</sub>" bind:value={b2} min={-1} max={1}  step={0.1} decNum={1}/>
-            <AppControlRange id="b12" label="b<sub>12</sub>" bind:value={b12} min={-0.5} max={0.5} step={0.02} decNum={2} />
+            <AppControlRange id="b0" label="b<sub>0</sub>" bind:value={b0} min={10} max={15}  step={0.1} decNum={1}/>
+            <AppControlRange id="b1" label="b<sub>1</sub>" bind:value={b1} min={-1.0} max={1.0}  step={0.02} decNum={2}/>
+            <AppControlRange id="b2" label="b<sub>2</sub>" bind:value={b2} min={-1.0} max={1.0}  step={0.02} decNum={2}/>
+            <AppControlRange id="b12" label="b<sub>12</sub>" bind:value={b12} min={-0.50} max={0.50} step={0.02} decNum={2} />
          </AppControlArea>
       </div>
    </div>
