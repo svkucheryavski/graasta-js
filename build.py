@@ -30,7 +30,7 @@ app_blocks = [
    },
    {
       "title": "Covariance and regression",
-      "apps": ["asta-b301", "asta-b302", "asta-b303", "asta-b304", "asta-b305", "asta-b306", "asta-b307", "asta-b308"]
+      "apps": ["asta-b301", "asta-b302", "asta-b303", "asta-b304", "asta-b305", "asta-b306", "asta-b307", "asta-b308", "asta-b309"]
    }
 ]
 
