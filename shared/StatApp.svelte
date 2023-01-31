@@ -41,7 +41,9 @@
 
    width: auto;
    min-width: 800px;
-   height: 100%;
+   min-height: 450px;
+   height: auto;
+   width: auto;
    aspect-ratio: 16/9;
 
    box-sizing: border-box;

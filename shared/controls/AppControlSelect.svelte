@@ -50,7 +50,7 @@
 
    .option {
       cursor: default;
-      padding: 0 1em;
+      padding: 0 0.75em;
       margin: 0 1px;
       color: #606060;
       transition: background-color 0.5s ease;
