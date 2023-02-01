@@ -5,8 +5,12 @@
    export let popCoeffs;
    export let sampCoeffs;
    export let corr;
+   export let sampSize;
+   export let yErr;
 
    let oldCorr = corr;
+   let oldSampSize = sampSize;
+   let oldYErr = yErr;
    let popColor = "#d8d8d8";
    let sampY = [];
 
@@ -14,8 +18,10 @@
 
    $: xValues = seq(1, popCoeffs.length);
    $: popY = popCoeffs;
-   $: if (corr !== oldCorr) {
+   $: if (corr !== oldCorr || yErr !== oldYErr || sampSize !== oldSampSize) {
       oldCorr = corr;
+      oldYErr = yErr;
+      oldSampSize = sampSize;
       sampY = [];
    }
 
