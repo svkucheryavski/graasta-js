@@ -23,7 +23,7 @@
 
    <!-- b1 -->
    <div class="eq_term eq_term__op">
-      <span>{@html popCoeffs[1] < 0 ? '&minus;' : '+'}</span><span>+</span>
+      <span>{@html popCoeffs[1] < 0 ? '&minus;' : '+'}</span><span>{@html sampCoeffs[1] < 0 ? '&minus;' : '+'}</span>
    </div>
    <div class="eq_term eq_term__coeff">
       <span>{Math.abs(popCoeffs[1]).toFixed(2)}</span><span>{Math.abs(sampCoeffs[1]).toFixed(2)}</span>
@@ -38,7 +38,7 @@
 
    <!-- b2 -->
    <div class="eq_term eq_term__op">
-      <span>{@html popCoeffs[2] < 0 ? '&minus;' : '+'}</span><span>+</span>
+      <span>{@html popCoeffs[2] < 0 ? '&minus;' : '+'}</span><span>{@html sampCoeffs[2] < 0 ? '&minus;' : '+'}</span>
    </div>
    <div class="eq_term eq_term__coeff">
       <span>{Math.abs(popCoeffs[2]).toFixed(2)}</span><span>{Math.abs(sampCoeffs[2]).toFixed(2)}</span>
