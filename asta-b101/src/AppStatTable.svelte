@@ -1,24 +1,16 @@
 <script>
-   import {quantile, mean} from 'mdatools/stat';
-   import DataTable from "../../shared/tables/DataTable.svelte";
-
-   export let values;
-
-   $: Q1 = quantile(values, 0.25);
-   $: Q2 = quantile(values, 0.50);
-   $: Q3 = quantile(values, 0.75);
-   $: m = mean(values);
-   $: sampleSize = values.length;
+   import DataTable from '../../shared/tables/DataTable.svelte';
+   export let stats;
 </script>
 
 <DataTable
    variables={[
-      {label: "min", values:[values[0]] },
-      {label: "Q1", values: [Q1]},
-      {label: "Q2", values: [Q2]},
-      {label: "mean", values: [m]},
-      {label: "Q3", values: [Q3]},
-      {label: "max", values:[values[sampleSize - 1]] }
+      {label: "min", values: [stats.min] },
+      {label: "Q1",  values: [stats.quartiles[0]]},
+      {label: "Q2",  values: [stats.quartiles[1]]},
+      {label: "mean",values: [stats.mean]},
+      {label: "Q3",  values: [stats.quartiles[2]]},
+      {label: "max", values: [stats.max] }
    ]}
    decNum={[1, 1, 1, 1, 1, 1, 1]}
    horizontal={true}

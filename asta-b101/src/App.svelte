@@ -1,7 +1,9 @@
 <script>
-   import {max, rnorm, sort, min} from 'mdatools/stat';
+   // misc from mdatools
+   import { range, quantile, mean, min, max } from 'mdatools/stat';
+   import { Vector } from 'mdatools/arrays';
 
-   // shared components
+   // shared components - app
    import {default as StatApp} from '../../shared/StatApp.svelte';
 
    // shared components - controls
@@ -9,7 +11,7 @@
    import AppControlButton from '../../shared/controls/AppControlButton.svelte';
    import AppControlArea from '../../shared/controls/AppControlArea.svelte';
 
-   // local components - controls
+   // local components
    import Plot from './AppPlot.svelte';
    import DataTable from './AppDataTable.svelte';
    import StatTable from './AppStatTable.svelte';
@@ -21,53 +23,83 @@
    let minRange = [0, 0];
    let maxRange = [0, 0];
 
-   const getSample = function(n) {
+   /**
+    * Take n randomly distributed values as a sample and adjust min and max range limits for controls
+    * @param {number} n - sample size.
+    *
+    * @return {Vector} vector with sample values.
+    */
+   function getSample(n) {
       // take random normally distributed values and sort them
-      let values = sort(rnorm(n, popMean, popStd));
+      let values = Vector.randn(n, popMean, popStd).sort();
 
       // half of the range of the values
-      const dv = (max(values) - min(values)) * 0.5;
+      const rn = range(values);
+      const dv = (rn[1] - rn[0]) * 0.5;
 
       // compute range for min and max controllers
-      minRange = [values[0] - dv, values[1] - (values[1] - values[0]) * 0.10];
-      maxRange = [values[n - 2] + (values[n - 1] - values[n - 2]) * 0.10, values[n - 1] + dv];
+      minRange = [values.v[0] - dv, values.v[1] - (values.v[1] - values.v[0]) * 0.10];
+      maxRange = [values.v[n - 2] + (values.v[n - 1] - values.v[n - 2]) * 0.10, values.v[n - 1] + dv];
+
+      return values;
+   }
+
+   /**
+    * Compute main statistics.
+    *
+    * @param {Vector} values - vector with sample values.
+    *
+    * @return {Objects} JSON with main statistics.
+    */
+   function getstats(values) {
 
       // return object with ranks, values and percentiles
-      return({
-         i: Array.from({length: n}, (v, i) => i + 1),
-         x: values,
-         p: Array.from({length: n}, (v, i) => (i + 0.5) / n),
-      });
+      const Q1 = quantile(values, 0.25);
+      const Q2 = quantile(values, 0.50);
+      const Q3 = quantile(values, 0.75);
+      const IQR = Q3 - Q1;
+
+      return {
+         range: range(values.filter(v => v >= Q1 - 1.5 * IQR && v <= Q3 + 1.5 * IQR)),
+         quartiles: [Q1, Q2, Q3],
+         mean: mean(values),
+         min: min(values),
+         max: max(values),
+         outliers: values.filter(v => v < Q1 - 1.5 * IQR || v > Q3 + 1.5 * IQR)
+      }
    }
 
    $: sample = getSample(sampleSize);
-   $: errormsg = sampleSize < 3 || sampleSize > 30 ? "Sample size should be between 3 and 30." : "";
+   $: stats = getstats(sample);
 </script>
 
 <StatApp>
    <div class="app-layout">
 
-      <!-- dot with data points and statistics -->
+      <!-- plot with data points, box and whiskers, statistics and limits -->
       <div class="app-plot-area">
-         <Plot values={sample.x} />
+         <Plot {sample} {stats} />
       </div>
 
-      <!-- data table -->
+      <!-- table with values, ranks and percentages -->
       <div class="app-datatable-area">
          <DataTable {sample} />
       </div>
 
       <!-- table with statistics -->
       <div class="app-stattable-area">
-         <StatTable values={sample.x} />
+         <StatTable {stats} />
       </div>
 
       <!-- control elements -->
       <div class="app-controls-area">
-         <AppControlArea {errormsg}>
-            <AppControlRange id="minValue" label="Change min:" step={0.1} bind:value={sample.x[0]} min={minRange[0]} max={minRange[1]} />
-            <AppControlRange id="maxValue" label="Change max:" step={0.1} bind:value={sample.x[sampleSize - 1]} min={maxRange[0]} max={maxRange[1]} />
-            <AppControlButton id="getSample" label="Sample:" text="Take new" on:click={() => sample = getSample(sampleSize)} />
+         <AppControlArea>
+            <AppControlRange id="min" label="Change min:" step={0.1} bind:value={sample.v[0]}
+               min={minRange[0]} max={minRange[1]} />
+            <AppControlRange id="max" label="Change max:" step={0.1} bind:value={sample.v[sampleSize - 1]}
+               min={maxRange[0]} max={maxRange[1]} />
+            <AppControlButton id="getsample" label="Sample:" text="Take new"
+               on:click={() => sample = getSample(sampleSize)} />
          </AppControlArea>
       </div>
    </div>
@@ -76,15 +108,13 @@
       <h2>Quantiles, quartiles, percentiles</h2>
       <p>
          This app shows calculation of main non-parametric descriptive statistics: <i>min</i>, <i>max</i>, <i>quartiles</i> and
-         <i>percentils</i>. The plot contains current sample values as points and the traditional box and whiskers plot. The dashed line inside
-         the box shows the mean. The red elements represent boundaries for detection of outliers (based on ±1.5IQR rule).
+         <i>percentiles</i>. The plot contains current sample values as points and the traditional box and whiskers plot. The dashed line inside the box shows the mean. The red elements represent boundaries for detection of outliers (based on ±1.5IQR rule).
       </p>
       <p>
          Try to change the smallest (<i>min</i>) or the largest (<i>max</i>) values of your current sample using the sliders in order to see what happens to the boxplot if one of the values will be outside the boundaries. You can also pay attention which statistics are changing and which remain stable in this case.
       </p>
       <p>
-         The table in the bottom shows the current values (<i>x</i>) ordered from smallest to largest, their rank (<i>i</i>), as well
-         as their percentiles (<i>p</i>) also known as <em>sample quantiles</em>. The percentiles are computed using <code>(i - 0.5)/n</code> rule. The table on the right side shows the computed statistics.
+         The table in the bottom shows the current values (<i>x</i>) ordered from smallest to largest, their rank (<i>i</i>), as well as their percentiles (<i>p</i>) also known as <em>sample quantiles</em>. The percentiles are computed using <code>(i - 0.5)/n</code> rule. The table on the right side shows the computed statistics.
       </p>
    </div>
 </StatApp>
