@@ -47,7 +47,7 @@
    aspect-ratio: 16/9;
 
    box-sizing: border-box;
-   padding: 0;
+   padding: 0.5em;
    margin: 0 auto;
 }
 

@@ -1,6 +1,7 @@
 <script>
-   import { min, diff } from "mdatools/stat";
-   import DataTableValues from "./DataTableValues.svelte";
+   import { isvector } from 'mdatools/arrays';
+   import { min, diff } from 'mdatools/stat';
+   import DataTableValues from './DataTableValues.svelte';
 
    export let variables = [];
    export let horizontal = false;
@@ -19,7 +20,7 @@
    {#each variables as {label, values}, i}
    <tr class="datatable__row">
       <td class="datatable__label">{@html label}</td>
-      <DataTableValues {values} decNum={decNum[i]} />
+      <DataTableValues values={isvector(values) ? values.v : values} decNum={decNum[i]} />
    </tr>
    {/each}
 {:else}
