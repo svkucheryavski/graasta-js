@@ -1,9 +1,11 @@
 <script>
-   import {seq, dnorm, dunif, pnorm, punif, closestIndex} from "mdatools/stat";
+   import { Vector } from 'mdatools/arrays';
+   import { dnorm, dunif, pnorm, punif } from 'mdatools/distributions';
+   import { closestind } from 'mdatools/misc';
 
    // shared components
-   import {default as StatApp} from '../../shared/StatApp.svelte';
-   import {colors} from "../../shared/graasta";
+   import { default as StatApp } from '../../shared/StatApp.svelte';
+   import { colors } from '../../shared/graasta';
 
    // shared components - controls
    import AppControlArea from '../../shared/controls/AppControlArea.svelte';
@@ -17,86 +19,156 @@
    import ICDFPlot from './ICDFPlot.svelte';
 
    // constant parameters
-   const size = 1301;
-   const limX = [90, 230];
+   const size = 14001;
+   const limX = [100, 230];
    const xTicks = [100, 120, 140, 160, 180, 200, 220];
-   const varName = "Height, cm";
    const lineColor = colors.plots.POPULATIONS[0];
    const selectedLineColor = colors.plots.SAMPLES[0];
+   const x = Vector.seq(limX[0], limX[1], (limX[1] - limX[0]) / size);
+   const varName = 'Height, cm';
 
-   let mode = "Value";
+   // mode and indices of x and p values for interval
+   let mode = 'Value';
+   let intInd = [0, Math.round(size/2) + 1];
 
+   // parameters and settings for distributions
    let distrs = {
-      "Normal": {
+      'Normal': {
          params: [170, 10],
-         paramLabels: ["Mean", "Std"],
-         paramLimits: [[160, 180], [5,15]],
+         paramLabels: ['Mean', 'Std'],
+         paramLimits: [[160, 180], [5, 15]],
          pdf: dnorm,
          cdf: pnorm,
          limY: [-0.001, 0.06]
       },
-      "Uniform": {
+      'Uniform': {
          params: [135, 205],
-         paramLabels: ["Min", "Max"],
-         paramLimits: [[120, 150], [180,220]],
+         paramLabels: ['Min', 'Max'],
+         paramLimits: [[120, 150], [180, 220]],
          pdf: dunif,
          cdf: punif,
          limY: [-0.001, 0.04]
       }
    }
 
-   let intInd = [0, Math.round(size/2) + 1];
-
-   function changeValues(x, a, b, mode) {
-
-      if (mode === "Value") {
-         intInd = [0, closestIndex(x, b)];
-         x1 = x[0];
-      } else {
-         a = (a > b) ? b : a;
-         x1 = a;
-         intInd = [closestIndex(x, a), closestIndex(x, b)];
-      }
-
-      p1 = p[intInd[0]];
-      p2 = p[intInd[1]];
-   }
-
-   function changeProbabilities (p, pa, pb, mode) {
-
-      if (mode === "Value") {
-         intInd = [0, closestIndex(p, pb)];
-         p1 = p[0];
-      } else {
-         pa = (pa > pb) ? pb : pa;
-         p1 = pa;
-         intInd = [closestIndex(p, pa), closestIndex(p, pb)];
-      }
-
-      x1 = x[intInd[0]];
-      x2 = x[intInd[1]];
-   }
-
+   // initial x- and p-values for the interval
    let x1 = 100;
    let x2 = 170;
-   let p1 = 0;
+   let p1 = 0.0;
    let p2 = 0.5;
 
-   let selectedName = "Normal";
+   // initial name of distribution
+   let selectedName = 'Normal';
+
+
+   /**
+    * Handler of event when left interval boundary is changed.
+    *
+    * @param x - vector with x-values.
+    * @param a - the new value for left boundary.
+    * @param mode - app mode ('Values' or 'Interval').
+    *
+    */
+   function changeValue1(x, a, mode) {
+
+      if (mode === 'Value') {
+         intInd = [0, intInd[1]];
+         x1 = x.v[0];
+         p1 = p.v[0];
+      } else {
+         a = a > x2 ? x2 : a;
+         x1 = a;
+         intInd = [closestind(x, a), intInd[1]];
+         p1 = p.v[intInd[0]];
+      }
+   }
+
+
+   /**
+    * Handler of event when right interval boundary is changed.
+    *
+    * @param x - vector with x-values.
+    * @param b - the new value for right boundary.
+    * @param mode - app mode ('Values' or 'Interval').
+    *
+    */
+   function changeValue2(x, b, mode) {
+
+      if (mode === 'Value') {
+         intInd = [0, intInd[1]];
+         x1 = x.v[0];
+         p1 = p.v[0];
+      } else {
+         b = b < x1 ? x1 : b;
+         x2 = b;
+      }
+
+      intInd = [intInd[0], closestind(x, b)];
+      p2 = p.v[intInd[1]];
+   }
+
+   /**
+    * Handler of event when probability value for left interval boundary is changed.
+    *
+    * @param p - vector with probability values.
+    * @param pa - the new value for left boundary probability.
+    * @param mode - app mode ('Values' or 'Interval').
+    *
+    */
+   function changeProb1(p, pa, mode) {
+
+      if (mode === 'Value') {
+         intInd = [0, intInd[1]];
+         x1 = x.v[0];
+         p1 = p.v[0];
+      } else {
+         pa = pa > p2 ? p2 : pa;
+         p1 = pa;
+         intInd = [closestind(p, pa), intInd[1]];
+         x1 = x.v[intInd[0]];
+      }
+   }
+
+   /**
+    * Handler of event when probability value for right interval boundary is changed.
+    *
+    * @param p - vector with probability values.
+    * @param pb - the new value for right boundary probability.
+    * @param mode - app mode ('Values' or 'Interval').
+    *
+    */
+   function changeProb2(p, pb, mode) {
+
+      if (mode === 'Value') {
+         intInd = [0, intInd[1]];
+         x1 = x.v[0];
+         p1 = p.v[0];
+      } else {
+         pb = pb < p1 ? p1 : pb;
+         p2 = pb;
+      }
+
+      intInd = [intInd[0], closestind(p, pb)];
+      x2 = x.v[intInd[1]];
+   }
+
+
+   // reactive expressions
 
    $: distr = distrs[selectedName];
-   $: x = seq(limX[0], limX[1], size);
    $: d = distr.pdf(x, distr.params[0], distr.params[1]);
    $: p = distr.cdf(x, distr.params[0], distr.params[1]);
 
-   $: changeValues(x, x1, x2, mode);
-   $: changeProbabilities(p, p1, p2, mode);
+   $: changeValue1(x, x1, mode);
+   $: changeValue2(x, x2, mode);
+   $: changeProb1(p, p1, mode);
+   $: changeProb2(p, p2, mode);
 </script>
 
 <StatApp>
    <div class="app-layout">
       <div class="app-layout-column pdf-area">
-         <PDFPlot x={x} y={d} {xTicks} {varName} {intInd} p={p[intInd[1]] - p[intInd[0]]} {lineColor} {selectedLineColor} limX={limX} limY={distr.limY} />
+         <PDFPlot x={x} y={d} {xTicks} {varName} {intInd} p={p.v[intInd[1]] - p.v[intInd[0]]} {lineColor} {selectedLineColor} limX={limX} limY={distr.limY} />
          <div class="app-control-area">
             <AppControlArea>
                <AppControlSwitch
@@ -166,8 +238,7 @@
       <h2>PDF, CDF, and ICDF</h2>
 
       <p>
-         This app lets you play with three main functions available for any theoretical distribution: <em>Probability Density Function</em> (PDF), <em>Cumulative Distribution Function</em> (CDF) and <em>Inverse Cumulative Distribution Function</em> (ICDF).
-         The functions can be used for different purposes. Thus PDF shows a shape of distribution in form of a density of the values, the higher density — the bigger chance that your random value will be there. For example, in case of normal distribution, the higest density is around <em>mean</em>, so mean is the most expected value in this case.
+         This app lets you play with three main functions available for any theoretical distribution: <em>Probability Density Function</em> (PDF), <em>Cumulative Distribution Function</em> (CDF) and <em>Inverse Cumulative Distribution Function</em> (ICDF). The functions can be used for different purposes. Thus PDF shows a shape of distribution in form of a density of the values, the higher density — the bigger chance that your random value will be there. For example, in case of normal distribution, the highest density is around <em>mean</em>, so mean is the most expected value in this case.
       </p>
 
       <p>

@@ -1,6 +1,7 @@
 <script>
    import { mean } from 'mdatools/stat';
-   import {Axes, XAxis, YAxis, Box, Segments, AreaSeries, TextLabels, LineSeries} from "svelte-plots-basic";
+   import { c, vector, Index } from 'mdatools/arrays';
+   import { Axes, XAxis, YAxis, Box, Segments, Area, TextLabels, Lines } from 'svelte-plots-basic/2d';
 
    export let x;
    export let y;
@@ -13,22 +14,30 @@
    export let selectedLineColor;
    export let xTicks;
 
-   $: xs = [x[intInd[0]], x[intInd[1]]];
-   $: ys = [y[intInd[0]], y[intInd[1]]];
-   $: xi = x.filter( (v, i) => i >= intInd[0] & i <= intInd[1]);
-   $: yi = y.filter( (v, i) => i >= intInd[0] & i <= intInd[1]);
+   // compute coordinates for the interval boundaries
+   $: xs = [x.v[intInd[0]], x.v[intInd[1]]];
+   $: ys = [y.v[intInd[0]], y.v[intInd[1]]];
+
+   // compute coordinates of points inside the interval
+   $: xi = x.subset(Index.seq(intInd[0] + 1, intInd[1] + 1));
+   $: yi = y.subset(Index.seq(intInd[0] + 1, intInd[1] + 1));
+
+   // add additional coordinates to make area plot
+   $: xia = c(xi, vector([xs[1]]));
+   $: yia = c(yi, vector([0]));
 </script>
 
 <!-- control elements -->
-<Axes title="PDF" xLabel={varName} yLabel="Density" {limX} {limY}>
+<Axes title="PDF" xLabel={varName} yLabel="Density" {limX} {limY} margins={[1, 1, 0.5, 0.5]}>
+
+   <Lines lineColor={lineColor} lineWidth={2} xValues={x} yValues={y} />
+   <Segments lineColor={selectedLineColor} xStart={xs} yStart={[0, 0]} xEnd={xs} yEnd={ys} />
+
+   <Lines lineColor={selectedLineColor} lineWidth={2} xValues={xi} yValues={yi} />
+   <Area fillColor={selectedLineColor} lineColor="transparent" lineWidth={2} xValues={xia} yValues={yia} opacity={0.35}/>
+   <TextLabels faceColor={selectedLineColor} xValues={[mean(xs)]} yValues={[0]} labels={[p.toFixed(3)]} pos={3} />
+
    <XAxis slot="xaxis" showGrid={true} ticks={xTicks}></XAxis>
    <YAxis slot="yaxis" showGrid={true}></YAxis>
    <Box slot="box"></Box>
-
-   <LineSeries lineColor={lineColor} lineWidth={2} xValues={x} yValues={y} />
-   <Segments lineColor={selectedLineColor} xStart={xs} yStart={[0, 0]} xEnd={xs} yEnd={ys} />
-
-   <LineSeries lineColor={selectedLineColor} lineWidth={2} xValues={xi} yValues={yi} />
-   <AreaSeries fillColor={selectedLineColor} lineColor="transprent" lineWidth={2} xValues={xi} yValues={yi} opacity={0.35}/>
-   <TextLabels faceColor={selectedLineColor} xValues={[mean(xs)]} yValues={[0]} labels={[p.toFixed(3)]} pos={3} />
 </Axes>
