@@ -1,21 +1,22 @@
 <script>
-   import {max, count, rnorm, runif, split, quantile, min, getOutliers} from 'mdatools/stat';
+   import { max, range, count, split, quantile, min } from 'mdatools/stat';
+   import { c, vector, Vector, Index } from 'mdatools/arrays';
 
    // shared components
-   import {default as StatApp} from "../../shared/StatApp.svelte";
+   import {default as StatApp} from '../../shared/StatApp.svelte';
 
    // shared components - controls
-   import AppControlArea from "../../shared/controls/AppControlArea.svelte";
-   import AppControlButton from "../../shared/controls/AppControlButton.svelte";
-   import AppControlSwitch from "../../shared/controls/AppControlSwitch.svelte";
-   import AppControlRange from "../../shared/controls/AppControlRange.svelte";
+   import AppControlArea from '../../shared/controls/AppControlArea.svelte';
+   import AppControlButton from '../../shared/controls/AppControlButton.svelte';
+   import AppControlSwitch from '../../shared/controls/AppControlSwitch.svelte';
+   import AppControlRange from '../../shared/controls/AppControlRange.svelte';
 
    // local components
-   import HistPlot from "./AppHistPlot.svelte";
-   import PercentilePlot from "./AppPercentilePlot.svelte";
+   import HistPlot from './AppHistPlot.svelte';
+   import PercentilePlot from './AppPercentilePlot.svelte';
 
    let sampleSize = 6;
-   let variableName = "Height";
+   let variableName = 'Height';
 
    const nBins = 30;
    const populationSize = 50000;
@@ -24,15 +25,15 @@
    const getHeightValues = function(n) {
       const n1 = Math.round(n/2);
       const n2 = n - n1;
-      return rnorm(n1, 160, 7).concat(rnorm(n2, 178, 6)).sort((a, b) => a - b);
+      return c(Vector.randn(n1, 160, 7), Vector.randn(n2, 178, 6)).sort();
    }
 
    const getIQValues = function(n) {
-      return rnorm(n, 110, 5).sort((a, b) => a - b);
+      return Vector.randn(n, 110, 5).sort();
    }
 
    const getAgeValues = function(n) {
-      return runif(n, 18, 65).map( v => Math.round(v * 10) / 10).sort((a, b) => a - b);
+      return Vector.rand(n, 18, 65).apply(v => Math.round(v * 10) / 10).sort();
    }
 
    const takeNewSample = () => {
@@ -50,10 +51,12 @@
       const Q1 = quantile(values, 0.25);
       const Q2 = quantile(values, 0.50);
       const Q3 = quantile(values, 0.75);
-      const outliers = getOutliers(values, Q1, Q3);
+      const IQR = Q3 - Q1;
+      const outLeft = Q1 - 1.5 * IQR;
+      const outRight = Q3 + 1.5 * IQR;
 
-      const mn = min(outliers.length > 0 ? values.filter(v => !outliers.some(o => o == v)) : values);
-      const mx = max(outliers.length > 0 ? values.filter(v => !outliers.some(o => o == v)) : values);
+      const rn = range(values.filter(v => v >= outLeft && v <= outRight))
+      const outliers = values.filter(v => v < outLeft || v > outRight)
 
       const gmn = min(values);
       const gmx = max(values);
@@ -65,39 +68,42 @@
          hist: {
             xLim: [gmn - dx, gmx + dx],
             yLim: [0, 1.3],
-            counts: counts.map(v => v / countsMode),
+            counts: counts.divide(countsMode),
             bins: bins
          },
          bw: {
             positions: [1.2, 1.1],
             size: 0.05,
             quartiles: [Q1, Q2, Q3],
-            range: [mn, mx],
+            range: rn,
             outliers: outliers
          },
          ps: {
             position: 0.075,
-            xValues: values.filter((v, i) => i % 10 == 0),
-            yValues: Array.from({length: populationSize}, (v, i) => i / populationSize).filter((v, i) => i % 10 == 0)
+            xValues: values.subset(Index.seq(1, populationSize, 100)),
+            yValues: Vector.seq(1/populationSize, 1, 100/populationSize)
          }
       };
    }
 
    const populations = {
-      Height: createPopulation("Height, cm", getHeightValues),
-      Age: createPopulation("Age, years", getAgeValues),
-      IQ: createPopulation("IQ", getIQValues),
+      Height: createPopulation('Height, cm', getHeightValues),
+      Age: createPopulation('Age, years', getAgeValues),
+      IQ: createPopulation('IQ', getIQValues),
    };
 
    const getSample = function(population, size) {
       size = Math.round(size);
-      return({x: population.generator(size), y: Array.from({length: size}, () => population.ps.position), p: Array.from({length: size}, (v, i) => (i + 0.5) / sampleSize)});
+      return({
+         x: population.generator(size),
+         y: vector([population.ps.position]).rep(size),
+         p: Vector.seq(1, size).apply(v => (v - 0.5) / size)
+      });
    }
 
    $: population = populations[variableName];
    $: sample = getSample(population, sampleSize);
-   $: errormsg = sampleSize < 3 || sampleSize > 30 ? "Sample size should be between 3 and 30." : "";
-
+   $: errormsg = sampleSize < 3 || sampleSize > 30 ? "Sample size should be between 3 and 30." : "";
 </script>
 
 <StatApp>

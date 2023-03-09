@@ -75,7 +75,6 @@
       on:pointerup={stopRotation}
 >
    <Axes {limX} {limY} {limZ} {zoom} {phi} {theta}>
-      <slot></slot>
       <XAxis showGrid={true} title="X1" slot="xaxis" />
       <YAxis showGrid={true} title="Y" slot="yaxis" />
       <ZAxis showGrid={true} title="X2" slot="zaxis" />
