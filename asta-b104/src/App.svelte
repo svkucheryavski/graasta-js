@@ -1,25 +1,27 @@
 <script>
-   import {ppoints, sd, seq, pnorm, rnorm, skewness, kurtosis, mean} from 'mdatools/stat';
-   import {LineSeries} from "svelte-plots-basic";
+   import { qnorm } from 'mdatools/distributions';
+   import { ppoints, sd, skewness, kurtosis, mean } from 'mdatools/stat';
+   import { Vector } from 'mdatools/arrays';
+   import { Lines } from 'svelte-plots-basic/2d';
+   import { QQPlot } from 'mdatools-plots/stat';
 
    // shared components
-   import {default as StatApp} from "../../shared/StatApp.svelte";
-   import { colors } from "../../shared/graasta";
+   import {default as StatApp} from '../../shared/StatApp.svelte';
+   import { colors } from '../../shared/graasta';
 
    // shared components - contrls
-   import AppControlArea from "../../shared/controls/AppControlArea.svelte";
-   import AppControlButton from "../../shared/controls/AppControlButton.svelte";
-   import AppControlSwitch from "../../shared/controls/AppControlSwitch.svelte";
-
-   // shared components - plots
-   import QQPlot from "../../shared/plots/QQPlot.svelte";
+   import AppControlArea from '../../shared/controls/AppControlArea.svelte';
+   import AppControlButton from '../../shared/controls/AppControlButton.svelte';
+   import AppControlSwitch from '../../shared/controls/AppControlSwitch.svelte';
 
    // shared tables
-   import DataTable from "../../shared/tables/DataTable.svelte";
+   import DataTable from '../../shared/tables/DataTable.svelte';
 
-   let showPopLine = "off";
+   let showPopLine = 'off';
    let sampleSize = 6;
 
+   const yLabel = 'Height, cm';
+   const xLabel = 'Standard score, z';
    const sampleColor = colors.plots.SAMPLES[0];
    const populationColor = colors.plots.POPULATIONS[0];
 
@@ -28,21 +30,13 @@
    const limX = [-3.5, 3.5];
    const limY = [popMean - 3.5 * popStd, popMean + 3.5 * popStd];
 
-   const zseq = seq(-5, 5, 100000);
-   const pseq = pnorm(zseq);
-
-   const closestIndex = (x, a) => {
-      const c =  x.reduce((prev, curr) => Math.abs(curr - a) < Math.abs(prev - a) ? curr : prev);
-      return x.indexOf(c);
-   }
-
    const getSample = function(n) {
-      return(rnorm(n, popMean, popStd).sort((a, b) => a - b));
+      return Vector.randn(n, popMean, popStd).sort();
    }
 
-   $: si = Array.from({length: sampleSize}, (v, i) => i + 1);
+   $: si = Vector.seq(1, sampleSize);
    $: sp = ppoints(sampleSize);
-   $: sz = sp.map((v, i) => zseq[closestIndex(pseq, v)]);
+   $: sz = qnorm(sp);
    $: sx = getSample(sampleSize);
 </script>
 
@@ -51,9 +45,9 @@
 
       <!-- QQ plot with corresponding data  -->
       <div class="app-qqplot-area">
-         <QQPlot {limX} {limY} sample={sx} yLabel="Height, cm" xLabel="Standard score, z">
-            {#if showPopLine === "on"}
-            <LineSeries xValues={limX} yValues={limY} lineType={1} lineWidth={2} lineColor={populationColor} />
+         <QQPlot {limX} {limY} values={sx} lineColor={sampleColor} borderColor={sampleColor} {xLabel} {yLabel} >
+            {#if showPopLine === 'on'}
+            <Lines xValues={limX} yValues={limY} lineType={1} lineWidth={2} lineColor={populationColor} />
             {/if}
          </QQPlot>
       </div>
@@ -80,7 +74,7 @@
                {label: "Sample", values: [mean(sx), sd(sx), skewness(sx), kurtosis(sx)]},
                {label: "Population", values: [popMean, popStd, 0, 3.0]}
             ]}
-            decNum={[0, 1, 1]}
+            decNum={[-1, 1, 1]}
             horizontal={false}
          />
       </div>
@@ -107,7 +101,7 @@
       <p>
          First, for every value <em>x</em> we compute probability <em>p</em>, to get a value even smaller,
          similar to what we did when computed percentiles. In this case we use <code>p = (i - 0.5) / n</code>.
-         But if sample size is smaller than 10, the formulla is slightly
+         But if sample size is smaller than 10, the formula is slightly
          different: <code>p = (i - 0.375) / (n + 0.25)</code>. For example, if sample size = 6, then the
          first value (i = 1) will have the following p: <code>p = (1 - 0.375) / (6 + 0.25) = 0.100</code>.
       </p>
