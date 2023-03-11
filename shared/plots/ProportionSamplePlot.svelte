@@ -16,8 +16,8 @@
    $: sampIndexVec = Vector.seq(1, sample.length);
    $: sampGroups = groups.subset(sample);
    $: labelText = formatLabels({
-      name: "Sample proportion",
-      value: (sum(sampGroups.apply(v => v == 1)) / sample.length).toFixed(3)
+      name: 'Sample proportion',
+      value: (1 - sum(sampGroups) / sample.length).toFixed(3)
    });
 
    // indices of points for each group
