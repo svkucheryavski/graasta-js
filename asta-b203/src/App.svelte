@@ -1,19 +1,21 @@
 <script>
-   import {rnorm} from 'mdatools/stat';
+   import { Vector } from 'mdatools/arrays';
 
    // shared components
-   import {default as StatApp} from "../../shared/StatApp.svelte";
-   import { colors } from "../../shared/graasta.js"
+   import {default as StatApp} from '../../shared/StatApp.svelte';
+   import { colors } from '../../shared/graasta.js';
 
    // shared components - controls
-   import AppControlButton from "../../shared/controls/AppControlButton.svelte";
-   import AppControlSwitch from "../../shared/controls/AppControlSwitch.svelte";
-   import AppControlRange from "../../shared/controls/AppControlRange.svelte";
-   import AppControlArea from "../../shared/controls/AppControlArea.svelte";
+   import AppControlButton from '../../shared/controls/AppControlButton.svelte';
+   import AppControlSwitch from '../../shared/controls/AppControlSwitch.svelte';
+   import AppControlRange from '../../shared/controls/AppControlRange.svelte';
+   import AppControlArea from '../../shared/controls/AppControlArea.svelte';
+
+   // shared components - plots
+   import PopulationPlot from '../../shared/plots/MeanPopulationPlot.svelte';
 
    // local components
-   import PopulationPlot from "../../shared/plots/MeanPopulationPlot.svelte";
-   import CIPlot from "./MeanCIPlot.svelte";
+   import CIPlot from './MeanCIPlot.svelte';
 
    // size of population and vector with element indices
    const popColor = colors.plots.POPULATIONS[0];
@@ -43,7 +45,7 @@
    }
 
    function takeNewSample() {
-      sample = rnorm(sampSize, popMean, popSD);
+      sample = Vector.randn(sampSize, popMean, popSD);
       clicked = Math.random();
    }
 
