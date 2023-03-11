@@ -1,19 +1,19 @@
 <script>
-   import {rnorm} from 'mdatools/stat';
+   import { Vector } from 'mdatools/arrays';
 
    // shared components
-   import {default as StatApp} from "../../shared/StatApp.svelte";
-   import { colors } from "../../shared/graasta.js";
+   import {default as StatApp} from '../../shared/StatApp.svelte';
+   import { colors } from '../../shared/graasta.js';
 
    // shared components - controls
-   import AppControlArea from "../../shared/controls/AppControlArea.svelte";
-   import AppControlButton from "../../shared/controls/AppControlButton.svelte";
-   import AppControlSwitch from "../../shared/controls/AppControlSwitch.svelte";
-   import AppControlRange from "../../shared/controls/AppControlRange.svelte";
+   import AppControlArea from '../../shared/controls/AppControlArea.svelte';
+   import AppControlButton from '../../shared/controls/AppControlButton.svelte';
+   import AppControlSwitch from '../../shared/controls/AppControlSwitch.svelte';
+   import AppControlRange from '../../shared/controls/AppControlRange.svelte';
 
    // local components
-   import PopulationPlot from "../../shared/plots/MeanPopulationPlot.svelte";
-   import CIPlot from "./MeanCIPlot.svelte";
+   import PopulationPlot from '../../shared/plots/MeanPopulationPlot.svelte';
+   import CIPlot from './MeanCIPlot.svelte';
 
    // size of population and vector with element indices
    const popColor = colors.plots.POPULATIONS[0];
@@ -43,7 +43,7 @@
    }
 
    function takeNewSample() {
-      sample = rnorm(sampSize, popMean, popSD);
+      sample = Vector.randn(sampSize, popMean, popSD);
       clicked = Math.random();
    }
 
@@ -80,8 +80,7 @@
       <p>
          This app is similar to <code>asta-b203</code>, but in this case confidence interval for mean is computed using
          sample statistics, so we pretend we do not know the population mean and want to estimate it as a value located
-         inside this interval. Thus on the right plot you see distribution
-         and 95% confidence interval computed for current sample. The population mean (which in real life is unknown) is shown as a vertical line.
+         inside this interval. Thus on the right plot you see distribution and 95% confidence interval computed for current sample. The population mean (which in real life is unknown) is shown as a vertical line.
       </p>
       <p>
          Try to take many samples and see how often mean of the population will be inside confidence interval

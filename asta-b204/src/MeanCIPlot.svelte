@@ -1,18 +1,21 @@
 <script>
-   import {seq, sd, dt, qt, mean} from "mdatools/stat";
-   import  CIPlot from "../../shared/plots/CIPlot.svelte";
+   import { Vector } from 'mdatools/arrays';
+   import { dt, qt } from 'mdatools/distributions';
+   import { sd, mean } from 'mdatools/stat';
 
-   export let lineColor = "#000000";
-   export let mainColor = "#6f6666";
+   import  CIPlot from '../../shared/plots/CIPlot.svelte';
+
+   export let lineColor = '#000000';
+   export let mainColor = '#6f6666';
 
    export let popMean;
    export let sample;
 
    export let clicked;
-   export let labelStr = "# samples with µ inside CI";
-   export let xLabel = "Expected population mean";
+   export let labelStr = '# samples with µ inside CI';
+   export let xLabel = 'Expected population mean';
    export let reset = false;
-   export let errmsg = "";
+   export let errmsg = '';
 
    $: sampSize = sample.length;
    $: DoF = sampSize - 1;
@@ -21,15 +24,15 @@
    $: ciStat = popMean;
 
    // PDF curve
-   $: t = seq(-5, 5, 200);
-   $: x = t.map(v => v * ciSD + ciCenter);
+   $: t = Vector.seq(-5, 5, 0.01);
+   $: x = t.apply(v => v * ciSD + ciCenter);
    $: f = dt(t, DoF);
 
    // CI and CI area
    $: tCrit = qt(0.975, sample.length - 1)
    $: ci = [ciCenter - tCrit * ciSD, ciCenter + tCrit * ciSD];
-   $: cit = seq(-tCrit, tCrit, 200);
-   $: cix = cit.map(v => v * ciSD + ciCenter);
+   $: cit = Vector.seq(-tCrit, tCrit, 0.01);
+   $: cix = cit.apply(v => v * ciSD + ciCenter);
    $: cif = dt(cit, DoF);
 </script>
 
