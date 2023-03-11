@@ -1,8 +1,8 @@
 <script>
-   import { max} from 'mdatools/stat';
+   import { c, vector } from 'mdatools/arrays';
+   import { max } from 'mdatools/stat';
    import { Axes, XAxis, Lines, Area, TextLegend, Segments } from 'svelte-plots-basic/2d';
    import { formatLabels } from '../../shared/graasta';
-
 
    export let x;
    export let f;
@@ -25,6 +25,7 @@
 
    let nSamples = 0;
    let nSamplesInside = 0;
+   let cixa, cifa;
 
    $: {
 
@@ -39,6 +40,10 @@
 
       nSamples = nSamples + 1;
       nSamplesInside = nSamplesInside + (ciStat >= ci[0] && ciStat <= ci[1] ? 1 : 0);
+
+      const n = cix.length;
+      cixa = c(vector([cix.v[0]]), cix, vector([cix.v[n - 1]]));
+      cifa = c(vector([0]), cif, vector([0]));
    }
 
    // text values for stat table
@@ -54,8 +59,8 @@
       <!-- legend -->
       <TextLegend textSize={1.15} left={limX[0]} top={max(f) * 1.40} dx="1.25em" elements = {labelsStr} />
 
-      <!-- PDF and intervaæ  -->
-      <Area xValues={cix} yValues={cif} lineColor={mainColor + "40"} fillColor={mainColor + "40"}/>
+      <!-- PDF and interval  -->
+      <Area xValues={cixa} yValues={cifa} lineColor={mainColor + "40"} fillColor={mainColor + "40"}/>
       <Lines xValues={x} yValues={f} lineColor={mainColor + "40"} />
 
       <!-- vertical line with statistic-->

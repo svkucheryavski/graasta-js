@@ -25,9 +25,8 @@
 
       // CI and CI area
       ci = [max([0, ciCenter - 1.96 * ciSD]), min([1, ciCenter + 1.96 * ciSD])];
-      const cixd = Vector.seq(ci[0], ci[1], (ci[1] - ci[0]) / 100);
-      cix = c(vector([ci[0]]), cixd, vector([ci[1]]));
-      cif = c(vector([0]), dnorm(cixd, ciCenter, ciSD), vector([0]));
+      cix = Vector.seq(ci[0], ci[1], (ci[1] - ci[0]) / 100);
+      cif = dnorm(cix, ciCenter, ciSD);
    } else {
       errmsg = 'The sample contains individuals only from one group, can not compute standard error.';
    }
