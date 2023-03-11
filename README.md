@@ -2,7 +2,7 @@
 
 A collection of interactive web applications, which can be used for teaching and learning of applied statistics (app name starts with `asta-`), design of experiments (`doe-`) and methods for multivariate data analysis (`mda-`). The initial version was made using R/Shiny but later has been replaced with the current version, written using [Svelte](https://svelte.dev), so every app is just a single JavaScript file (supplemented with CSS), which can be embedded into any HTML page and be used without a backend.
 
-You can see the full list of all application as well as try them and download the app builds [here](https://graasta.com). The project is currently in active developing more apps coming during spring 2022 as well as some extra features, e.g. videos for the apps.
+You can see the full list of all application as well as try them and download the app builds [here](https://graasta.com).
 
 ## How to use
 
