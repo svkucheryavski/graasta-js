@@ -1,5 +1,6 @@
 <script>
-   import {seq, subset, rep, sum, shuffle} from "mdatools/stat";
+   import { sum } from 'mdatools/stat';
+   import { Vector, Index, c } from 'mdatools/arrays';
 
    // shared components
    import {default as StatApp} from '../../shared/StatApp.svelte';
@@ -18,29 +19,34 @@
 
    // size of population and vector with element indices
    const popSize = 1600;
-   const popIndex = seq(1, popSize, popSize);
+   const popIndex = Index.seq(1, popSize);
    const sampleColors = colors.plots.SAMPLES;
    const populationColors = colors.plots.POPULATIONS;
-   const xLabel = "Expected population proportion";
+   const xLabel = 'Expected population proportion';
 
    // variable parameters
    let popProp = 0.50;
    let sampSize = 10;
    let sampSizeOld = sampSize;
    let popPropOld = popProp;
-   let sample = [];
    let reset = false;
+   let sample = [];
 
    // this is needed to force CI plot stats when two consequent samples are the same
    let clicked;
 
    function takeNewSample() {
-      sample = subset(shuffle(popIndex), seq(1, sampSize, sampSize));
+      sample = popIndex.shuffle().subset(Index.seq(1, sampSize));
       clicked = Math.random()
    }
 
    // generate groups of population randomly
-   $: groups = shuffle(rep(1, Math.round(popProp * popSize)).concat(rep(2, Math.round((1 - popProp) * popSize))));
+   let groups;
+   $: {
+      const n1 = Math.round(popProp * popSize);
+      const n2 = popSize - n1;
+      groups = c(Vector.zeros(n1), Vector.ones(n2)).shuffle();
+   }
 
    // when sample size has changed - reset statistics
    $: {
@@ -55,7 +61,7 @@
    }
 
    // proportion of current sample
-   $: sampProp = 1 - sum(subset(groups, sample).map(v => v - 1)) / sampSize;
+   $: sampProp = 1 - sum(groups.subset(sample)) / sampSize;
 
    // standard error for CI
    $: sampSD = Math.sqrt((1 - sampProp) * sampProp / sampSize);
@@ -106,8 +112,8 @@
          The app shows 95% confidence interval computed for current sample as a plot on the right side. So,
          every time you take a new sample, this also results in a new confidence interval. The vertical red line
          on this plot shows the population proportion, which in real life we do not know. If you take a new
-         sampe many times (say, 200-300) you can see how often the population proportion, π, was inside the
-         interval. If sample size is large enough it should be close to 95% — the confidence level.
+         sample many times (say, 200-300) you can see how often the population proportion, π, was inside the
+         interval. If sample size is large enough it should be close to 95% — the confidence level.
       </p>
    </div>
 </StatApp>
