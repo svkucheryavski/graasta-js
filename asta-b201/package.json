@@ -1,6 +1,6 @@
 {
   "name": "asta-b201",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -14,7 +14,8 @@
     "vite": "^3.2.4"
   },
   "dependencies": {
-    "mdatools": "^0.6.1",
-    "svelte-plots-basic": "^1.1.4"
+    "mdatools": "../mdatools-js/",
+    "svelte-plots-basic": "../svelte-plots-basic/",
+    "mdatools-plots": "../mdatools-plots/"
   }
 }

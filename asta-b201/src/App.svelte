@@ -1,5 +1,6 @@
 <script>
-   import {seq, subset, rep, sum, shuffle} from "mdatools/stat";
+   import { sum } from 'mdatools/stat';
+   import { Vector, Index, c } from 'mdatools/arrays';
 
    // shared components
    import {default as StatApp} from '../../shared/StatApp.svelte';
@@ -18,13 +19,13 @@
 
    // size of population and vector with element indices
    const popSize = 1600;
-   const popIndex = seq(1, popSize, popSize);
+   const popIndex = Index.seq(1, popSize);
    const sampleColors = colors.plots.SAMPLES;
    const populationColors = colors.plots.POPULATIONS;
-   const labelStr = "# samples inside CI";
-   const xLabel = "Expected sample proportion";
+   const labelStr = '# samples inside CI';
+   const xLabel = 'Expected sample proportion';
 
-   // variable parameters
+   // variable parameters$
    let popProp = 0.50;
    let sampSize = 10;
    let sampSizeOld = sampSize;
@@ -36,12 +37,17 @@
    let clicked;
 
    function takeNewSample() {
-      sample = subset(shuffle(popIndex), seq(1, sampSize, sampSize));
+      sample = popIndex.shuffle().subset(Index.seq(1, sampSize));
       clicked = Math.random();
    }
 
    // generate groups of population randomly
-   $: groups = shuffle(rep(1, Math.round(popProp * popSize)).concat(rep(2, Math.round((1 - popProp) * popSize))));
+   let groups;
+   $: {
+      const n1 = Math.round(popProp * popSize);
+      const n2 = popSize - n1;
+      groups = c(Vector.zeros(n1), Vector.ones(n2)).shuffle();
+   }
 
    // when sample size or population proportion changed - reset statistics and take new sample
    $: {
@@ -56,7 +62,7 @@
    }
 
    // proportion of current sample
-   $: sampProp = 1 - sum(subset(groups, sample).map(v => v - 1)) / sampSize;
+   $: sampProp = 1 - sum(groups.subset(sample)) / sampSize;
    $: popSD = Math.sqrt((1 - popProp) * popProp / sampSize);
 
    // take first sample
