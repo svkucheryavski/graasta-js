@@ -1,10 +1,10 @@
 <script>
-   import { mrange, max } from "mdatools/stat";
-   import { TextLegend } from "svelte-plots-basic";
+   import { mrange, max } from 'mdatools/stat';
+   import { TextLegend } from 'svelte-plots-basic/2d';
 
    // graasta shared components
    import DistributionPlot from '../../shared/plots/DistributionPlot.svelte';
-   import { formatLabels } from "../../shared/graasta.js";
+   import { formatLabels } from '../../shared/graasta.js';
 
    export let x;
    export let f;
@@ -15,22 +15,22 @@
    export let clicked;
 
    export let showLegend = true;
-   export let H0LegendStr = "";
-   export let xLabel = "";
+   export let H0LegendStr = '';
+   export let xLabel = '';
 
    export let reset = false;
    export let limX = mrange(x, 0.1);
    export let limY = null;
 
-   export let mainColor = "#b0b0b0";
-   export let testFailColor = "#ff8866";
+   export let mainColor = '#b0b0b0';
+   export let testFailColor = '#ff8866';
 
    let nSamples = 0;
    let nSamplesBelowAlpha = 0;
 
    $: lineColor = pValue < alpha ? testFailColor : mainColor;
-   $: areaColor = lineColor + "40";
-   $: statColor = lineColor + "90";
+   $: areaColor = lineColor + '40';
+   $: statColor = lineColor + '90';
 
    $: limYLocal = limY === null ? [0, max(f) * (showLegend ? 1.5 : 1.2)] : limY;
 
@@ -52,8 +52,8 @@
    // text values for stat table
    $: labelsStr = formatLabels([
       {
-         name: H0LegendStr + ", p",
-         value: `<tspan ${pValue < alpha ? "fill=" + testFailColor : ""}>${pValue.toFixed(3)}</tspan>`
+         name: H0LegendStr + ', p',
+         value: `<tspan ${pValue < alpha ? 'fill=' + testFailColor : ''}>${pValue.toFixed(3)}</tspan>`
       },
       {
          name: `# samples p < ${alpha}`,

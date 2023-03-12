@@ -1,5 +1,5 @@
 <script>
-   import { Vector, Index } from 'mdatools/arrays';
+   import { Vector } from 'mdatools/arrays';
    import { mrange } from 'mdatools/stat';
    import { expandgrid } from 'mdatools/misc';
    import { Axes, Points } from 'svelte-plots-basic/2d';
@@ -31,7 +31,6 @@
    // indices of sample points for each group
 
    // indices and groups of sample individuals
-   $: sampIndex = Index.seq(1, sample.length);
    $: sampGroups = groups.subset(sample);
 
    // indices of points for each group
