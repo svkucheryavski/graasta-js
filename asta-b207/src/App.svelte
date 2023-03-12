@@ -1,19 +1,20 @@
 <script>
-   import {rnorm, tTest1} from 'mdatools/stat';
+   import { Vector } from 'mdatools/arrays';
+   import { ttest } from 'mdatools/tests';
 
    // shared components
-   import {default as StatApp} from "../../shared/StatApp.svelte";
-   import { colors } from "../../shared/graasta.js";
+   import {default as StatApp} from '../../shared/StatApp.svelte';
+   import { colors } from '../../shared/graasta.js';
 
    // shared components - controls
-   import AppControlArea from "../../shared/controls/AppControlArea.svelte";
-   import AppControlButton from "../../shared/controls/AppControlButton.svelte";
-   import AppControlSwitch from "../../shared/controls/AppControlSwitch.svelte";
-   import AppControlRange from "../../shared/controls/AppControlRange.svelte";
+   import AppControlArea from '../../shared/controls/AppControlArea.svelte';
+   import AppControlButton from '../../shared/controls/AppControlButton.svelte';
+   import AppControlSwitch from '../../shared/controls/AppControlSwitch.svelte';
+   import AppControlRange from '../../shared/controls/AppControlRange.svelte';
 
-   // shared components - здщеы
-   import PopulationPlot from "../../shared/plots/MeanPopulationPlot.svelte";
-   import TTestPlot from "../../shared/plots/TTestPlot.svelte";
+   // shared components - plots
+   import PopulationPlot from '../../shared/plots/MeanPopulationPlot.svelte';
+   import TTestPlot from '../../shared/plots/TTestPlot.svelte';
 
    const popColor = colors.plots.POPULATIONS[0];
    const popAreaColor = colors.plots.POPULATIONS_PALE[0];
@@ -23,20 +24,22 @@
    // variable parameters
    let popSD = 3;
    let sampSize = 5;
-   let tail = "left";
+   let tail = 'left';
    let sample = [];
    let sampSizeOld;
    let popSDOld;
+   let tailOld;
    let reset = false;
    let clicked;
 
 
    // when sample size or population SD changed - reset statistics and take new sample
    $: {
-      if (sample && (sampSizeOld !== sampSize || popSDOld !== popSD)) {
+      if (sample && (tailOld !== tail || sampSizeOld !== sampSize || popSDOld !== popSD)) {
          reset = true;
          sampSizeOld = sampSize;
          popSDOld = popSD;
+         tailOld = tail;
          takeNewSample()
       } else {
          reset = false;
@@ -44,11 +47,11 @@
    }
 
    function takeNewSample() {
-      sample = rnorm(sampSize, popMean, popSD);
+      sample = Vector.randn(sampSize, popMean, popSD);
       clicked = Math.random();
    }
 
-   $: testRes = tTest1(sample, popMean, 0.05, tail);
+   $: testRes = ttest(sample, popMean, 0.05, tail);
 
    // take first sample
    takeNewSample()
@@ -64,7 +67,7 @@
 
       <!-- confidence intervals and statistic table -->
       <div class="app-ci-plot-area">
-         <TTestPlot {clicked} {reset} {testRes}  />
+         <TTestPlot {clicked} {reset} {testRes} xLabel="Expected sample mean" />
       </div>
 
       <!-- control elements -->
@@ -84,17 +87,13 @@
       <p>
          This app helps to understand how does the one sample t-test work. Here we have a normally distributed
          population — concentration of Chloride in different parts of a water source. The null hypothesis in this case
-         is made about the population mean, µ, and, depending on a tail, you have the following options — "both": H0: µ = 100 mg/L,
-         "left": µ ≥ 100 mg/L, and "right": µ ≤ 100 mg/L.
-         The population in this app has µ exactly equal to 100 mg/L, so all three hypothesis are true in this case.
-         You have a possibility to change the standard deviation of the population, which by default is set to 3 mg/L
-         but you will see, that it does not influence the outcome of the test.
+         is made about the population mean, µ, and, depending on a tail, you have the following options — "both": H0: µ = 100 mg/L, "left": µ ≥ 100 mg/L, and "right": µ ≤ 100 mg/L. The population in this app has µ exactly equal to 100 mg/L, so all three hypothesis are true in this case. You have a possibility to change the standard deviation of the population, which by default is set to 3 mg/L but you will see, that it does not influence the outcome of the test.
       </p>
       <p>
          Then you can take a random sample from this population and see how far the mean of the sample
          is from the mean of the population. The app computes a chance to get a sample as extreme as given or even
          more extreme assuming that H0 is correct — the <strong>p-value</strong>. Usually p-value is used to assess how
-         extreme your particlar sample is for being taken from population where H0 is true. If p-value is small,
+         extreme your particular sample is for being taken from population where H0 is true. If p-value is small,
          it is considered as unlikely event and H0 is rejected.
       </p>
       <p>
