@@ -14,6 +14,7 @@
    export let popAreaColor;
    export let sampColor;
    export let limX = [78, 122];
+   export let limY = undefined;
 
    // left position of the legend
    $: left = limX[0] + 0.65 * (limX[1] - limX[0]);
@@ -26,8 +27,6 @@
    $: sampY = vector([max(popY) * 0.05]).rep(sample.length);
    $: sampMean = mean(sample);
 
-   // limits for y-axis
-   $: limY = mrange(popY, 0.01);
 
    // text values for legend
    $: labelsStr = formatLabels([
@@ -37,7 +36,7 @@
 </script>
 
 <Axes title={`Population: µ = ${popMean}, σ = ${popSD.toFixed(1)}`} xLabel="Chloride in water [mg/L]"
-   {limX} {limY} margins={[0.75, 0.025, 0.025, 0.025]}>
+   {limX} limY={limY === undefined ? mrange(popY, 0.01) : limY} margins={[0.75, 0.025, 0.025, 0.025]}>
 
    <slot></slot>
 
