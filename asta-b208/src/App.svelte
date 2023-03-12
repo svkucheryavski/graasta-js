@@ -1,19 +1,19 @@
 <script>
-   import {rnorm} from 'mdatools/stat';
+   import { Vector } from 'mdatools/arrays';
 
    // shared components
-   import {default as StatApp} from "../../shared/StatApp.svelte";
-   import { colors } from "../../shared/graasta.js";
+   import {default as StatApp} from '../../shared/StatApp.svelte';
+   import { colors } from '../../shared/graasta.js';
 
    // shared components - controls
-   import AppControlArea from "../../shared/controls/AppControlArea.svelte";
-   import AppControlButton from "../../shared/controls/AppControlButton.svelte";
-   import AppControlSwitch from "../../shared/controls/AppControlSwitch.svelte";
-   import AppControlRange from "../../shared/controls/AppControlRange.svelte";
+   import AppControlArea from '../../shared/controls/AppControlArea.svelte';
+   import AppControlButton from '../../shared/controls/AppControlButton.svelte';
+   import AppControlSwitch from '../../shared/controls/AppControlSwitch.svelte';
+   import AppControlRange from '../../shared/controls/AppControlRange.svelte';
 
    // local components
-   import PopulationPlot from "./PopulationPlot.svelte";
-   import TestResults from "./TestResults.svelte";
+   import PopulationPlot from './PopulationPlot.svelte';
+   import TestResults from './TestResults.svelte';
 
    // colors for population
    const colorsPop = {
@@ -25,9 +25,9 @@
 
    // colors for H0
    const colorsH0 = {
-      line: "#c0c0c0",
-      area: "#c0c0c020",
-      stat: "606060"
+      line: '#c0c0c0',
+      area: '#c0c0c020',
+      stat: '606060'
    };
 
    // size of population and vector with element indices
@@ -38,7 +38,7 @@
    let popSD = 3;
    let sampSize = 5;
    let sample = [];
-   let tail = "right";
+   let tail = 'right';
 
    let sampSizeOld = sampSize;
    let popSDOld = popSD;
@@ -62,7 +62,7 @@
    }
 
    function takeNewSample() {
-      sample = rnorm(sampSize, popMean, popSD);
+      sample = Vector.randn(sampSize, popMean, popSD);
       clicked = Math.random();
    }
 
@@ -117,7 +117,7 @@
          different power. Second, it depends on the <strong>size of effect</strong> — difference between H0 mean and the real
          population mean (H1). E.g. if H0 assumes that µ ≤ 100 and the real µ = 105, this difference is 5. Finally, power also
          depends on standard deviation of your population as well as on the sample size. The last has very important consequence
-         — the smaller effect you want to detect, the larger sample size shpuld be.
+         — the smaller effect you want to detect, the larger sample size should be.
       </p>
    </div>
 </StatApp>
