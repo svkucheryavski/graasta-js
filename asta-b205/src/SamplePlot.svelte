@@ -1,6 +1,6 @@
 <script>
-   import {Axes} from "svelte-plots-basic";
-   import SampleSeries from "./SampleSeries.svelte";
+   import {Axes} from 'svelte-plots-basic/2d';
+   import SampleSeries from './SampleSeries.svelte';
 
    export let sample = [];
 </script>

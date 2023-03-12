@@ -1,8 +1,9 @@
 <script>
-   import {seq, rep, sum} from 'mdatools/stat'
-   import {ScatterSeries} from "svelte-plots-basic"
+   import { sum } from 'mdatools/stat';
+   import { vector, Vector, Index } from 'mdatools/arrays';
+   import { Points } from 'svelte-plots-basic/2d';
 
-   import { colors } from "../../shared/graasta.js";
+   import { colors } from '../../shared/graasta.js';
 
    export let yPos = 0;
    export let sample = [];
@@ -14,26 +15,27 @@
 
    // sample size and coordinates for its elements
    $: n = sample.length;
-   $: x = seq(1, n);
-   $: y = rep(yPos, n);
+   $: x = Vector.seq(1, n);
+   $: y = vector([yPos]).rep(n);
 
-   // number and coordiantes of tails
+   // number and coordinates of tails
    $: nT = sum(sample);
-   $: xT = x.filter((v, i) => sample[i]);
-   $: yT = y.filter((v, i) => sample[i]);
+   $: iT = Index.bool2ind(sample);
+   $: xT = x.subset(iT);
+   $: yT = y.subset(iT);
 
-   // number and coordiantes of heads
+   // number and coordinates of heads
    $: nH = n - nT;
-   $: xH = x.filter((v, i) => !sample[i]);
-   $: yH = y.filter((v, i) => !sample[i]);
-
+   $: iH = Index.bool2ind(sample.map(v => !v));
+   $: xH = x.subset(iH);
+   $: yH = y.subset(iH);
 </script>
 
 {#if nT > 0}
-   <ScatterSeries xValues={xT} yValues={yT} {markerSize} {borderWidth} faceColor={bgColors[0]} borderColor={lineColors[0]} />
+   <Points xValues={xT} yValues={yT} {markerSize} {borderWidth} faceColor={bgColors[0]} borderColor={lineColors[0]} />
 {/if}
 
 {#if nH > 0}
-   <ScatterSeries xValues={xH} yValues={yH} {markerSize} {borderWidth} faceColor={bgColors[1]} borderColor={lineColors[1]} />
+   <Points xValues={xH} yValues={yH} {markerSize} {borderWidth} faceColor={bgColors[1]} borderColor={lineColors[1]} />
 {/if}
 

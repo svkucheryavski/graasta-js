@@ -1,10 +1,27 @@
 <script>
-   import { seq, sum, min } from 'mdatools/stat';
-   import OutcomesColumn from "./OutcomesColumn.svelte";
+   import { sum, min } from 'mdatools/stat';
+   import OutcomesColumn from './OutcomesColumn.svelte';
 
    export let sample;
    export let tail;
    export let value;
+
+   /**
+    * Compute array of all possible outcomes for given sample size.
+    *
+    * @param {number} n - sample size.
+    *
+    * @return {Array} array with 2^n outcomes.
+    *
+    */
+   function getOutcomes(n) {
+      const l = 2 ** n;
+      outcomes = new Array(l);
+      for (let i = 0; i < l; i++) {
+         outcomes[i] = [...(i>>>0).toString(2).padStart(n, '0')].map(v => v === '1');
+      }
+      return outcomes;
+   }
 
    // sample size, number of heads and tails
    $: n = sample.length;
@@ -12,9 +29,7 @@
    $: nT = n - nH;
 
    // create all possible outcomes for given sample size
-   let outcomes = [];
-   $: outcomes = seq(0, 2 ** n - 1).map(v => [...((v>>>0).toString(2).padStart(n, "0"))].map(v => v === "1"));
-   $: N = outcomes.length;
+   $: outcomes = getOutcomes(n);
 
    // find extremes for head (head means true)
    // both:  H0: P(H) =  0.5

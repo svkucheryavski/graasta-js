@@ -1,35 +1,36 @@
 <script>
-   import {runif, sum, subset} from 'mdatools/stat';
+   import { Vector } from 'mdatools/arrays';
+   import { sum } from 'mdatools/stat';
 
    // shared components
-   import {default as StatApp} from "../../shared/StatApp.svelte";
+   import { default as StatApp } from '../../shared/StatApp.svelte';
 
    // shared components - controls
-   import AppControlArea from "../../shared/controls/AppControlArea.svelte";
-   import AppControlButton from "../../shared/controls/AppControlButton.svelte";
-   import AppControlSwitch from "../../shared/controls/AppControlSwitch.svelte";
+   import AppControlArea from '../../shared/controls/AppControlArea.svelte';
+   import AppControlButton from '../../shared/controls/AppControlButton.svelte';
+   import AppControlSwitch from '../../shared/controls/AppControlSwitch.svelte';
 
    // shared components - tables
-   import DataTable from "../../shared/tables/DataTable.svelte";
+   import DataTable from '../../shared/tables/DataTable.svelte';
 
    // local components
    import OutcomesPlot from './OutcomesPlot.svelte';
    import SamplePlot from './SamplePlot.svelte';
 
-   // signs for differen H0 tails
-   const signs = {"both": "=", "left": "≥", "right": "≤"};
+   // signs for different H0 tails
+   const signs = {'both': '=', 'left': '≥', 'right': '≤'};
 
    // variable parameters
    let sampSize = 4;
    let sample;
-   let tail = "both";
+   let tail = 'both';
 
    // number of outcomes [same extreme, more extreme, less extreme] - is binded
    let N = [];
 
    // function to get a new sample based on uniform distribution
    function takeNewSample() {
-      return runif(sampSize).map(x => x > 0.5);
+      return Vector.rand(sampSize).v.map(x => (x > 0.5));
    }
 
    // take new sample when sample size is changed
@@ -38,8 +39,8 @@
    // strings for statistics table
    $: h0Str = `π(<span style="color:#336688">o</span>) ${signs[tail]} 0.5`;
    $: sampPropStr = (sum(sample) / sample.length).toFixed(3);
-   $: pValStr = N.length == 3 ? `
-      (${N[1]} + ${N[0]}) / (${N[1]} + ${N[0]} + ${N[2]}) = ${(sum(subset(N, [1, 2]))/sum(N)).toFixed(3)}` : "";
+   $: pValStr = N.length == 3 ? `(${N[1]}+${N[0]})/(${N[1]}+${N[0]}+${N[2]}) =
+      ${((N[1] + N[0]) / sum(N)).toFixed(3)}` : "";
 </script>
 
 <StatApp>

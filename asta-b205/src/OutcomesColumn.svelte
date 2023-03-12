@@ -1,10 +1,11 @@
 <script>
-   import {Axes, TextLabels } from "svelte-plots-basic";
+   import { Axes, TextLabels } from 'svelte-plots-basic/2d';
    import { formatLabels } from "../../shared/graasta.js";
-   import SampleSeries from "./SampleSeries.svelte";
+
+   import SampleSeries from './SampleSeries.svelte';
 
    export let outcomes;
-   export let name = "xxx";
+   export let name = '';
    export let sampSize;
    export let mSize;
 
@@ -19,6 +20,7 @@
    {#each outcomes as outcome, i}
    <SampleSeries sample={outcome} yPos={i} markerSize={mSize} />
    {/each}
-   <TextLabels textSize={1 + (mSize + 1) /10} xValues={[sampSize/2 + 0.5]} yValues={mYPos} labels={formatLabels([{name: name, value: N}])} />
+   <TextLabels textSize={1 + (mSize + 1) /10} xValues={[sampSize/2 + 0.5]} yValues={mYPos}
+      labels={formatLabels([{name: name, value: N}])} />
 </Axes>
 
