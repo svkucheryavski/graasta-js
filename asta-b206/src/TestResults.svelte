@@ -1,7 +1,10 @@
 <script>
-   import {sum, seq, round, subset, getPValue, dnorm, pnorm} from "mdatools/stat";
+   import { sum } from 'mdatools/stat';
+   import { Vector } from 'mdatools/arrays';
+   import { getpvalue } from 'mdatools/tests';
+   import { dnorm, pnorm } from 'mdatools/distributions';
 
-   import TestPlot from "../../shared/plots/TestPlot.svelte";
+   import TestPlot from '../../shared/plots/TestPlot.svelte';
 
    export let groups;
    export let sample;
@@ -10,32 +13,32 @@
    export let clicked;
 
    // sign symbols for hypothesis tails
-   const signs = {"both": "=", "left": "≥", "right": "≤"};
+   const signs = {'both': '=', 'left': '≥', 'right': '≤'};
    const alpha = 0.05;
-   const xLabel = "Possible sample proportion";
-   const mainColor = "#6f6666";
+   const xLabel = 'Possible sample proportion';
+   const mainColor = '#6f6666';
 
    // proportions
    let popProp;
    let sampProp;
 
    // proportion of current sample
-   $: sampProp = round(1 - sum(subset(groups, sample).map(v => v - 1)) / sample.length, 2);
-   $: popProp = 1 - sum(groups.map(v => v - 1)) / groups.length;
+   $: sampProp = 1 - sum(groups.subset(sample)) / sample.length;
+   $: popProp = 1 - sum(groups) / groups.length;
 
    // standard error for CI
-   $: sd = round(Math.sqrt((1 - sampProp) * sampProp / sample.length), 3);
+   $: sd = Math.sqrt((1 - sampProp) * sampProp / sample.length);
 
    // PDF curve for sampling distribution
-   $: x = seq(0, 1, 100);
+   $: x = Vector.seq(0, 1, 0.01);
    $: f = dnorm(x, popProp, sd);
-   $: pValue = getPValue(pnorm, sampProp, tail, [popProp, sd]);
+   $: pValue = getpvalue(pnorm, sampProp, tail, [popProp, sd]);
 
 
    // critical values
    $: dp = Math.abs(popProp - sampProp)
-   $: crit = tail === "both" ? [popProp - dp, popProp + dp] : [sampProp];
-   $: H0LegendStr = `H0: π(<tspan font-weight=bold fill=#336688>o</tspan>) ${signs[tail]} ${popProp.toFixed(2)}`;
+   $: crit = tail === 'both' ? [popProp - dp, popProp + dp] : [sampProp];
+   $: H0LegendStr = `<tspan>H0: π(</tspan><tspan font-weight=bold fill=#336688>o</tspan><tspan>) ${signs[tail]} ${popProp.toFixed(2)}</tspan>`;
 </script>
 
 {#if sd > 0}

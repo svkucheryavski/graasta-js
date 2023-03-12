@@ -1,33 +1,33 @@
 <script>
-   import {seq, subset, rep, shuffle} from 'mdatools/stat';
+   import { Vector, Index, c } from 'mdatools/arrays';
 
    // shared components
-   import { default as StatApp } from "../../shared/StatApp.svelte";
-   import { colors } from "../../shared/graasta";
+   import { default as StatApp } from '../../shared/StatApp.svelte';
+   import { colors } from '../../shared/graasta';
 
    // shared components - controls
-   import AppControlArea from "../../shared/controls/AppControlArea.svelte";
-   import AppControlButton from "../../shared/controls/AppControlButton.svelte";
-   import AppControlSwitch from "../../shared/controls/AppControlSwitch.svelte";
-   import AppControlRange from "../../shared/controls/AppControlRange.svelte";
+   import AppControlArea from '../../shared/controls/AppControlArea.svelte';
+   import AppControlButton from '../../shared/controls/AppControlButton.svelte';
+   import AppControlSwitch from '../../shared/controls/AppControlSwitch.svelte';
+   import AppControlRange from '../../shared/controls/AppControlRange.svelte';
 
    // shared components - from app asta-b201
-   import PopulationPlot from "../../shared/plots/ProportionPopulationPlot.svelte";
-   import SamplePlot from "../../shared/plots/ProportionSamplePlot.svelte";
+   import PopulationPlot from '../../shared/plots/ProportionPopulationPlot.svelte';
+   import SamplePlot from '../../shared/plots/ProportionSamplePlot.svelte';
 
    // local components
    import TestResults from './TestResults.svelte';
 
    // size of population and vector with element indices
    const popSize = 1600;
-   const popIndex = seq(1, popSize);
+   const popIndex = Index.seq(1, popSize);
    const sampleColors = colors.plots.SAMPLES;
    const populationColors = colors.plots.POPULATIONS;
 
    // variable parameters
    let popProp = 0.50;
    let sampSize = 20;
-   let tail = "left";
+   let tail = 'left';
    let sample = [];
 
    let oldTail = tail;
@@ -41,7 +41,7 @@
    let clicked;
 
    $: {
-      if (sample && (oldTail !== tail || oldPopProp !== popProp || oldSampSize !== sampSize)) {
+      if (sample && (oldTail !== tail || oldPopProp !== popProp || oldSampSize !== sampSize)) {
          reset = true;
          oldTail = tail;
          oldPopProp = popProp;
@@ -55,12 +55,17 @@
 
    // function to take a new sample from population ising a shuffle function
    function takeNewSample() {
-      sample = subset(shuffle(popIndex), seq(1, sampSize));
+      sample = popIndex.shuffle().subset(Index.seq(1, sampSize));
       clicked = Math.random();
    }
 
    // generate red and blue points for population and shuffle them
-   $: groups = shuffle(rep(1, Math.round(popProp * popSize)).concat(rep(2, Math.round((1 - popProp) * popSize))));
+   let groups;
+   $: {
+      const n1 = Math.round(popProp * popSize);
+      const n2 = popSize - n1;
+      groups = c(Vector.zeros(n1), Vector.ones(n2)).shuffle();
+   }
 
    // take first sample
    takeNewSample();
@@ -106,7 +111,7 @@
          proportions around π using the computed standard error and normal distribution. After that it evaluates how extreme your sample is and results in a p-value — chance to get a sample with proportion like you have or even more extreme assuming that H0 is true. If you take many samples, e.g. 200 or 300, then only 5% will have a p-value below 0.05, you can see all statistics right on the plot.
       </p>
       <p>
-         However, this will work only if sample size is large enough. Try to set the population proportion to π = 0.05 or 0.95. You will see that in this case even sample with n = 40 is too small for the test — sampling distribution curve will be truncated on one side. This leads to two problems — you will see an exreme p-value more often than expected and you have a chance to get a sample with members only from one grop, so the sample proportion will be either 0 or 1. In this case standard error is 0 and there is no possibility to make a test. You need much larger sample to make a reliable test for such cases.
+         However, this will work only if sample size is large enough. Try to set the population proportion to π = 0.05 or 0.95. You will see that in this case even sample with n = 40 is too small for the test — sampling distribution curve will be truncated on one side. This leads to two problems — you will see an extreme p-value more often than expected and you have a chance to get a sample with members only from one group, so the sample proportion will be either 0 or 1. In this case standard error is 0 and there is no possibility to make a test. You need much larger sample to make a reliable test for such cases.
       </p>
    </div>
 </StatApp>
