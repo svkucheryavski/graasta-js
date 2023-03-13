@@ -1,13 +1,13 @@
 <script>
-   import { subset, tTest2 } from 'mdatools/stat';
+   import { ttest2 } from 'mdatools/tests';
 
    // shared components - plots
-   import DataTable  from "../../shared/tables/DataTable.svelte";
-   import CIPlot from "../../shared/plots/CIPlotSimple.svelte";
+   import DataTable  from '../../shared/tables/DataTable.svelte';
+   import CIPlot from '../../shared/plots/CIPlotSimple.svelte';
    import TTestPlot from '../../shared/plots/TTestPlot.svelte';
 
    // local components
-   import TestColumnTable from "./TestColumnTable.svelte";
+   import TestColumnTable from './TestColumnTable.svelte';
 
    export let labels;
    export let samples;
@@ -15,24 +15,24 @@
    export let p;
 
    // compute statistics, t- and p-values
-   $: testRes = tTest2(samples[0], samples[1], alpha);
+   $: testRes = ttest2(samples[0], samples[1], alpha);
    $: p = testRes.pValue;
 
    // switch main color for plots when p < alpha
-   $: mainColor = testRes.pValue < alpha ? "#ff8866" : "#66aa88";
+   $: mainColor = testRes.pValue < alpha ? '#ff8866' : '#66aa88';
    $: xLabel = `Expected value for m${labels[0]} – m${labels[1]}`;
 </script>
 
 <div class="test-column" class:fail={testRes.pValue < alpha}>
 
    <!-- table with sample values-->
-   <TestColumnTable labels={subset(labels, [1,2])} samples={subset(samples, [1, 2])} />
+   <TestColumnTable labels={[labels[0], labels[1]]} samples={[samples[0], samples[1]]} />
 
    <!-- table with statistics-->
    <DataTable variables={[
-      {label: "Effect", values: [testRes.effectObserved]},
-      {label: "t-value", values: [testRes.tValue]},
-      {label: "p-value", values: [testRes.pValue]}
+      {label: 'Effect', values: [testRes.effectObserved]},
+      {label: 't-value', values: [testRes.tValue]},
+      {label: 'p-value', values: [testRes.pValue]}
    ]} decNum={[1, 1, 3]} horizontal={true} />
 
    <!-- CI plot and plot with sampling distribution and p-value area -->
@@ -42,7 +42,7 @@
       ci={testRes.ci}
       se={testRes.se}
       ciColor={mainColor}
-      expectedEffectColor={"#202020"}
+      expectedEffectColor="#202020"
       effectObserved={testRes.effectObserved}
       effectExpected={testRes.effectExpected}
    />

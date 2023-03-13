@@ -1,27 +1,27 @@
 <script>
-   import {subset, rnorm} from 'mdatools/stat';
+   import { Vector } from 'mdatools/arrays';
 
    // shared components
-   import {default as StatApp} from "../../shared/StatApp.svelte";
+   import {default as StatApp} from '../../shared/StatApp.svelte';
 
    // shared components - controls
-   import AppControlArea from "../../shared/controls/AppControlArea.svelte";
-   import AppControlButton from "../../shared/controls/AppControlButton.svelte";
-   import AppControlRange from "../../shared/controls/AppControlRange.svelte";
+   import AppControlArea from '../../shared/controls/AppControlArea.svelte';
+   import AppControlButton from '../../shared/controls/AppControlButton.svelte';
+   import AppControlRange from '../../shared/controls/AppControlRange.svelte';
    import AppControlSwitch from '../../shared/controls/AppControlSwitch.svelte';
 
    // local components
-   import TestColumnPlot from "./TestColumnPlot.svelte";
-   import TestColumnTable from "./TestColumnTable.svelte";
-   import TestColumn from "./TestColumn.svelte";
+   import TestColumnPlot from './TestColumnPlot.svelte';
+   import TestColumnTable from './TestColumnTable.svelte';
+   import TestColumn from './TestColumn.svelte';
 
    // constant parameters
    const globalMean = 100;
    const sampSize = 5;
-   const labels = ["A", "B", "C"];
+   const labels = ['A', 'B', 'C'];
 
    // parameters, which can vary
-   let correction = "off";
+   let correction = 'off';
    let noiseExpected = 10;
    let alpha = 0.05
    let samples;
@@ -30,15 +30,15 @@
    function takeNewSample(reset = false) {
       if (reset) p = [];
       samples = [
-         rnorm(sampSize, globalMean, noiseExpected),
-         rnorm(sampSize, globalMean, noiseExpected),
-         rnorm(sampSize, globalMean, noiseExpected),
+         Vector.randn(sampSize, globalMean, noiseExpected),
+         Vector.randn(sampSize, globalMean, noiseExpected),
+         Vector.randn(sampSize, globalMean, noiseExpected),
       ];
    }
 
    // take a new sample when population parameters have been changed
-   $: noiseExpected | correction ? takeNewSample(true)  : null;
-   $: alpha = correction === "on" ? 0.05/3 : 0.05;
+   $: noiseExpected || correction ? takeNewSample(true)  : null;
+   $: alpha = correction === 'on' ? 0.05/3 : 0.05;
 </script>
 
 <StatApp>
@@ -69,15 +69,15 @@
       </div>
 
       <div class="app-test-data-area">
-         <TestColumn labels={subset(labels, [1, 2])} {alpha} bind:p={p[0]} samples={subset(samples, [1, 2])} />
+         <TestColumn labels={['A', 'B']} {alpha} bind:p={p[0]} samples={[samples[0], samples[2]]} />
       </div>
 
       <div class="app-test-data-area">
-         <TestColumn labels={subset(labels, [1, 3])} {alpha} bind:p={p[1]} samples={subset(samples, [1, 3])} />
+         <TestColumn labels={['A', 'C']} {alpha} bind:p={p[1]} samples={[samples[0], samples[2]]} />
       </div>
 
       <div class="app-test-data-area">
-         <TestColumn labels={subset(labels, [2, 3])} {alpha} bind:p={p[2]} samples={subset(samples, [2, 3])} />
+         <TestColumn labels={['B', 'C']} {alpha} bind:p={p[2]} samples={[samples[1], samples[2]]} />
       </div>
    </div>
 

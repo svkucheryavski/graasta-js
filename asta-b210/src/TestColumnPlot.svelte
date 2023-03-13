@@ -1,12 +1,11 @@
 <script>
-   import {rep, mean} from 'mdatools/stat';
-   import {Axes, YAxis, TextLegend, ScatterSeries} from "svelte-plots-basic";
+   import { vector } from 'mdatools/arrays';
+   import { mean } from 'mdatools/stat';
+   import { Axes, YAxis, TextLegend, Points } from 'svelte-plots-basic/2d';
+   import { BoxAndWhiskers } from 'mdatools-plots/stat';
 
    // shared components
-   import {formatLabels} from "../../shared/graasta";
-
-   // shared components - plots
-   import BoxAndWhiskers from "../../shared/plots/BoxAndWhiskers.svelte";
+   import {formatLabels} from '../../shared/graasta';
 
    export let popMeans;
    export let popSigma;
@@ -23,7 +22,7 @@
 
    $: {
       // reset statistics if sample size, population proportion or a test tail has been changed
-      if (oldPopSigma !== popSigma || oldAlpha !== alpha) {
+      if (oldPopSigma !== popSigma || oldAlpha !== alpha) {
          oldPopSigma = popSigma;
          oldAlpha = alpha;
          nSamples = 0;
@@ -41,13 +40,13 @@
    $: popRanges = popQuartiles.map(v => [v[0] - 1.5 * (v[2] - v[0]), v[2] + 1.5 * (v[2] - v[0])]);
 
    $: legendElements = formatLabels([
-      {name: "H0", value: "µA = µB = µC"},
-      {name: "H0 rejections", value: `${nSamplesBelow005}/${nSamples} (${(100 * nSamplesBelow005/nSamples).toFixed(1)})`},
-      {name: "alpha for each test", value: alpha.toFixed(3)}
+      {name: 'H0', value: 'µA = µB = µC'},
+      {name: 'H0 rejections', value: `${nSamplesBelow005}/${nSamples} (${(100 * nSamplesBelow005/nSamples).toFixed(1)})`},
+      {name: 'alpha for each test', value: alpha.toFixed(3)}
    ]);
 </script>
 
-<Axes limX={[-0.5, 2.5]} limY={[50, 180]}>
+<Axes limX={[-0.5, 2.5]} limY={[50, 180]} margins={[0.1, 1, 0.5, 0.05]}>
    <!-- statistics -->
    <TextLegend textSize={1.05} left={-0.5} top={170} dx="1.5em" dy="1.4em" elements={legendElements} />
 
@@ -59,24 +58,25 @@
          borderColor={boxColor}
          range={popRanges[i]}
          quartiles={popQuartiles[i]}
+         outliers={[]}
          boxPosition={i}
          boxSize={0.5}
          horizontal={false}
       />
 
-      <ScatterSeries
+      <Points
          borderWidth={2}
          faceColor="transparent"
          borderColor={color}
          markerSize={1.25}
-         xValues={rep(i, samples[i].length)}
+         xValues={vector([i]).rep(samples[i].length)}
          yValues={samples[i]}
       />
 
-      <ScatterSeries
+      <Points
          borderWidth={2}
          faceColor="transparent"
-         borderColor={"green"}
+         borderColor="green"
          marker={8}
          markerSize={1.25}
          xValues={[i]}
@@ -84,6 +84,7 @@
       />
 
    {/each}
+
    <YAxis slot="yaxis" />
 </Axes>
 

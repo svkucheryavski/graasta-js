@@ -7,11 +7,12 @@
    export let horizontal = false;
    export let decNum = undefined;
 
-   $: decNum === undefined ? variables.map(v => getDecimalsNum(v.values)) : decNum;
-   const getDecimalsNum = (x) => {
+   function getDecimalsNum(x) {
       const dec = Math.log10(min(diff(x).map(v => Math.abs(v))));
       return Math.abs(dec < 0 ? Math.floor(dec) : Math.ceil(dec));
    }
+
+   $: decNum === undefined ? variables.map(v => getDecimalsNum(v.values)) : decNum;
 </script>
 
 <table class="datatable">
@@ -29,10 +30,10 @@
       <td class="datatable__label">{@html label}</td>
       {/each}
    </tr>
-   {#each variables[0].values as value, j}
+   {#each Array(variables[0].values.length) as _, j}
    <tr class="datatable__row">
-      {#each variables as {label, values}, i}
-      <DataTableValues values={[values[j]]} decNum={decNum[i]} />
+      {#each variables as {_, values}, i}
+      <DataTableValues values={[isvector(values) ? values.v[j] : values[j]]} decNum={decNum[i]} />
       {/each}
    </tr>
    {/each}

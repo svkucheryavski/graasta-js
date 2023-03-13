@@ -1,8 +1,9 @@
 <script>
-   import {rep, mean} from 'mdatools/stat';
+   import { mean } from 'mdatools/stat';
+   import { c, vector } from 'mdatools/arrays';
 
    // shared components - table
-   import DataTable from "../../shared/tables/DataTable.svelte";
+   import DataTable from '../../shared/tables/DataTable.svelte';
 
    export let labels;
    export let samples;
@@ -10,12 +11,13 @@
    export let decNum = 1;
 
    $: data = showMean ?
-      samples.map((v, i) =>  ({"label": labels[i], "values": v.concat(mean(v))})) :
-      samples.map((v, i) =>  ({"label": labels[i], "values": v}));
+      samples.map((v, i) =>  ({'label': labels[i], 'values': c(v, vector([mean(v)]))})) :
+      samples.map((v, i) =>  ({'label': labels[i], 'values': v}));
+
 </script>
 
 <div class="test-table">
-<DataTable variables={data} decNum={rep(decNum, samples.length)} horizontal={false} />
+<DataTable variables={data} decNum={Array(samples.length).fill(decNum)} horizontal={false} />
 </div>
 
 <style>
