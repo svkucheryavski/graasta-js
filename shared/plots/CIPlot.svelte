@@ -2,6 +2,7 @@
    import { c, vector } from 'mdatools/arrays';
    import { max } from 'mdatools/stat';
    import { Axes, XAxis, Lines, Area, TextLegend, Segments } from 'svelte-plots-basic/2d';
+
    import { formatLabels } from '../../shared/graasta';
 
    export let x;

@@ -1,8 +1,8 @@
 <script>
-   import { mrange} from "mdatools/stat";
-   import { Axes, XAxis, TextLegend, Segments } from "svelte-plots-basic";
+   import { mrange } from 'mdatools/stat';
+   import { Axes, XAxis, TextLegend, Segments } from 'svelte-plots-basic/2d';
 
-   import { formatLabels } from "../graasta";
+   import { formatLabels } from '../graasta';
 
    export let limX = undefined;
    export let limY = [-1, 1.1];
@@ -11,22 +11,22 @@
    export let effectObserved;
    export let ci;
 
-   export let expectedEffectColor = "#a0a0a0";
-   export let ciColor = "#606060";
+   export let expectedEffectColor = '#a0a0a0';
+   export let ciColor = '#606060';
 
    export let se = null;
    export let showLegend = true;
-   export let xLabel = "";
+   export let xLabel = '';
 
    $: limXLocal = limX === undefined ? mrange([ci[0], ci[1], effectExpected], 0.1) : limX;
    $: legendElements = formatLabels([
-         { name: "observed effect", value: effectObserved.toFixed(2) },
-         { name: "standard error", value: se.toFixed(2) }
+         { name: 'observed effect', value: effectObserved.toFixed(2) },
+         { name: 'standard error', value: se.toFixed(2) }
    ]);
 </script>
 
 <!-- plot with population based CI and position of current sample proportion -->
-<Axes limX={limXLocal} {limY} {xLabel}>
+<Axes limX={limXLocal} {limY} {xLabel} margins={[0.5, 0.05, 0.025, 0.05]}>
 
    <!-- statistics -->
    {#if showLegend}
