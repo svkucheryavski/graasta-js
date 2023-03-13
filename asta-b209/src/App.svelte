@@ -1,21 +1,22 @@
 <script>
-   import {tTest2, rnorm} from 'mdatools/stat';
+   import { ttest2 } from 'mdatools/tests';
+   import { Vector } from 'mdatools/arrays';
 
    // shared components
-   import {default as StatApp} from "../../shared/StatApp.svelte";
+   import {default as StatApp} from '../../shared/StatApp.svelte';
 
    // shared components - controls
-   import AppControlArea from "../../shared/controls/AppControlArea.svelte";
-   import AppControlButton from "../../shared/controls/AppControlButton.svelte";
-   import AppControlSwitch from "../../shared/controls/AppControlSwitch.svelte";
-   import AppControlRange from "../../shared/controls/AppControlRange.svelte";
+   import AppControlArea from '../../shared/controls/AppControlArea.svelte';
+   import AppControlButton from '../../shared/controls/AppControlButton.svelte';
+   import AppControlSwitch from '../../shared/controls/AppControlSwitch.svelte';
+   import AppControlRange from '../../shared/controls/AppControlRange.svelte';
 
    // shared components - controls
-   import TTestPlot from "../../shared/plots/TTestPlot.svelte";
-   import CIPlotSimple from "../../shared/plots/CIPlotSimple.svelte";
+   import TTestPlot from '../../shared/plots/TTestPlot.svelte';
+   import CIPlotSimple from '../../shared/plots/CIPlotSimple.svelte';
 
    // local components
-   import PopulationPlot from "./PopulationPlot.svelte";
+   import PopulationPlot from './PopulationPlot.svelte';
 
    const globalMean = 100;
    let effectExpected = 0;
@@ -29,8 +30,8 @@
    let reset = false;
    let clicked;
 
-   const xLabelTest = "Expected values for m1 – m2";
-   const xLabelCI = "Expected values for µ1 – µ2";
+   const xLabelTest = 'Expected values for m1 – m2';
+   const xLabelCI = 'Expected values for µ1 – µ2';
    const limX = [-70, 70];
 
    // when sample size or population SD changed - reset statistics and take new sample
@@ -47,12 +48,12 @@
    }
 
    // make a test
-   $: testRes = tTest2(samples[0], samples[1], 0.05, "both");
+   $: testRes = ttest2(samples[0], samples[1], 0.05, "both");
 
    function takeNewSample() {
       samples = [
-         rnorm(sampSize, globalMean - effectExpected/2, noiseExpected),
-         rnorm(sampSize, globalMean + effectExpected/2, noiseExpected)
+         Vector.randn(sampSize, globalMean - effectExpected/2, noiseExpected),
+         Vector.randn(sampSize, globalMean + effectExpected/2, noiseExpected)
       ];
 
       clicked = Math.random();
@@ -106,7 +107,6 @@
          normally. The left plot shows the corresponding distributions using blue and red colors.
       </p>
       <p>
-
          By default µ1 = µ2 = 100 mg. Since µ1 – µ2 = 0, we can say that in
          this case <em>temperature does not have any effect on yield</em>.
          However, if we run the reactions just a few times (e.g. 3 for each temperature) you will always
