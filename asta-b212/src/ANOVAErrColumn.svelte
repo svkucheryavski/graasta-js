@@ -1,16 +1,17 @@
 <script>
-   import { sum } from 'mdatools/stat';
+   import { Vector } from 'mdatools/arrays';
+   import { sum, ssq } from 'mdatools/stat';
+   import { QQPlot } from 'mdatools-plots/stat';
 
-   import DataTable  from "../../shared/tables/DataTable.svelte";
-   import QQPlot from "../../shared/plots/QQPlot.svelte";
+   import DataTable  from '../../shared/tables/DataTable.svelte';
    import ANOVATable from "./ANOVATable.svelte";
 
    export let errSample;
    export let labels;
-   export let mainColor = "#a0a0a0";
+   export let mainColor = '#a0a0a0';
 
    $: DoF = errSample.length * (errSample[0].length - 1);
-   $: SSQ = sum(errSample.map(v => sum(v.map(x => x**2))));
+   $: SSQ = sum(errSample.map(v => ssq(v)));
    $: MS = SSQ / DoF;
 </script>
 
@@ -24,7 +25,7 @@
       {label: "SSQ", values: [SSQ]},
       {label: "MS", values: [MS]}
    ]} decNum={[1, 1, 1]} horizontal={true} />
-   <QQPlot xLabel="" yLabel="" borderColor={mainColor} sample={errSample} />
+   <QQPlot xLabel="" yLabel="" borderColor={mainColor} lineColor={mainColor} values={Vector.c(...errSample)} />
 </div>
 
 <style>

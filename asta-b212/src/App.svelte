@@ -1,23 +1,24 @@
 <script>
-   import {rnorm, mean, rep} from 'mdatools/stat';
+   import { Vector, vector } from 'mdatools/arrays';
+   import { mean } from 'mdatools/stat';
 
    // shared components
-   import {default as StatApp} from "../../shared/StatApp.svelte";
+   import {default as StatApp} from '../../shared/StatApp.svelte';
 
    // shared components - controls
-   import AppControlArea from "../../shared/controls/AppControlArea.svelte";
-   import AppControlButton from "../../shared/controls/AppControlButton.svelte";
-   import AppControlRange from "../../shared/controls/AppControlRange.svelte";
-   import ANOVABoxplot from "../../shared/plots/ANOVABoxplot.svelte";
+   import AppControlArea from '../../shared/controls/AppControlArea.svelte';
+   import AppControlButton from '../../shared/controls/AppControlButton.svelte';
+   import AppControlRange from '../../shared/controls/AppControlRange.svelte';
+   import ANOVABoxplot from '../../shared/plots/ANOVABoxplot.svelte';
 
    // local components
-   import ANOVATable from "./ANOVATable.svelte";
-   import ANOVASysColumn from "./ANOVASysColumn.svelte";
-   import ANOVAErrColumn from "./ANOVAErrColumn.svelte";
+   import ANOVATable from './ANOVATable.svelte';
+   import ANOVASysColumn from './ANOVASysColumn.svelte';
+   import ANOVAErrColumn from './ANOVAErrColumn.svelte';
 
    // constant parameters
    const sampSize = 5;
-   const labels = ["A", "B", "C"];
+   const labels = ['A', 'B', 'C'];
    const noiseExpected = 10;
 
    // needed to make first sample predefined
@@ -36,7 +37,7 @@
    let clicked;
 
    $: {
-      if (sample && (oldMuA !== muA || oldMuB !== muB || oldMuC !== muC)) {
+      if (sample && (oldMuA !== muA || oldMuB !== muB || oldMuC !== muC)) {
          reset = true;
          oldMuA = muA;
          oldMuB = muB;
@@ -54,16 +55,16 @@
 
       if (firstSample) {
          sample = [
-            [ 85,  90,  95, 100, 105],
-            [ 90,  95, 100, 105, 110],
-            [ 95, 100, 105, 110, 115],
+            vector([85,  90,  95, 100, 105]),
+            vector([90,  95, 100, 105, 110]),
+            vector([95, 100, 105, 110, 115]),
          ];
          firstSample = false;
       } else {
          sample = [
-            rnorm(sampSize, muA, noiseExpected),
-            rnorm(sampSize, muB, noiseExpected),
-            rnorm(sampSize, muC, noiseExpected),
+            Vector.randn(sampSize, muA, noiseExpected),
+            Vector.randn(sampSize, muB, noiseExpected),
+            Vector.randn(sampSize, muC, noiseExpected),
          ];
       }
 
@@ -72,8 +73,8 @@
 
    $: sampleMeans = sample.map(v => mean(v));
    $: grandMean = mean(sampleMeans);
-   $: sysSample = sampleMeans.map(v => rep(v, sampSize));
-   $: errSample = sample.map((v, i) => v.map(x => x - sampleMeans[i]));
+   $: sysSample = sampleMeans.map(v => Vector.fill(v, sampSize));
+   $: errSample = sample.map((v, i) => v.subtract(sampleMeans[i]));
 
    // take first sample
    takeNewSample();

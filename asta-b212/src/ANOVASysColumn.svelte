@@ -1,20 +1,20 @@
 <script>
-   import { mean, sum } from 'mdatools/stat';
+   import { mean, sum, ssq } from 'mdatools/stat';
 
-   import DataTable  from "../../shared/tables/DataTable.svelte";
-   import ANOVATable from "./ANOVATable.svelte";
-   import ANOVATestPlot from "../../shared/plots/ANOVATestPlot.svelte";
+   import DataTable  from '../../shared/tables/DataTable.svelte';
+   import ANOVATable from './ANOVATable.svelte';
+   import ANOVATestPlot from '../../shared/plots/ANOVATestPlot.svelte';
 
    export let sysSample;
    export let errSample;
    export let labels;
    export let reset;
    export let clicked;
-   export let mainColor = "#a0a0a0";
+   export let mainColor = '#a0a0a0';
 
-   $: grandMean = mean(sysSample.map(v => v[0]));
+   $: grandMean = mean(sysSample.map(v => v.v[0]));
    $: DoF = sysSample.length - 1;
-   $: SSQ = sum(sysSample.map(v => sum(v.map(x => (x - grandMean)**2))));
+   $: SSQ = sum(sysSample.map(v => ssq(v.subtract(grandMean))));
    $: MS = SSQ / DoF;
 </script>
 
@@ -24,9 +24,9 @@
       <span>=</span>
    </div>
    <DataTable variables={[
-      {label: "DoF", values: [DoF]},
-      {label: "SSQ", values: [SSQ]},
-      {label: "MS", values: [MS]}
+      {label: 'DoF', values: [DoF]},
+      {label: 'SSQ', values: [SSQ]},
+      {label: 'MS', values: [MS]}
    ]} decNum={[1, 1, 1]} horizontal={true} />
    <ANOVATestPlot {mainColor} {sysSample} {errSample} {reset} {clicked}/>
 </div>
