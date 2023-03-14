@@ -1,5 +1,5 @@
 <script>
-   import { vector } from 'mdatools/arrays';
+   import { Vector } from 'mdatools/arrays';
    import { mean } from 'mdatools/stat';
    import { Axes, YAxis, TextLegend, Points } from 'svelte-plots-basic/2d';
    import { BoxAndWhiskers } from 'mdatools-plots/stat';
@@ -69,7 +69,7 @@
          faceColor="transparent"
          borderColor={color}
          markerSize={1.25}
-         xValues={vector([i]).rep(samples[i].length)}
+         xValues={Vector.fill(i, samples[i].length)}
          yValues={samples[i]}
       />
 

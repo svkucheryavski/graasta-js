@@ -1,6 +1,6 @@
 <script>
    import { max, range, count, split, quantile, min } from 'mdatools/stat';
-   import { c, vector, Vector, Index } from 'mdatools/arrays';
+   import { c, Vector, Index } from 'mdatools/arrays';
 
    // shared components
    import {default as StatApp} from '../../shared/StatApp.svelte';
@@ -96,7 +96,7 @@
       size = Math.round(size);
       return({
          x: population.generator(size),
-         y: vector([population.ps.position]).rep(size),
+         y: Vector.fill(population.ps.position, size),
          p: Vector.seq(1, size).apply(v => (v - 0.5) / size)
       });
    }

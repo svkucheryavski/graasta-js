@@ -21,9 +21,9 @@
    // plot parameters
    const yMidVec = Vector.zeros(sample.length);
    const yBottom = -1;
-   const yBottomVec = vector([yBottom]).rep(statNum);
+   const yBottomVec = Vector.fill(yBottom, statNum);
    const yTop = 3.3;
-   const yTopVec = vector([yTop]).rep(statNum);
+   const yTopVec = Vector.fill(yTop, statNum);
 
    // compute coordinates of plot elements and limits
    let outLeft, outRight, statValues, limX, Q1, Q2, Q3, m;

@@ -1,6 +1,6 @@
 <script>
    import { sum } from 'mdatools/stat';
-   import { vector, Vector, Index } from 'mdatools/arrays';
+   import { Vector, Index } from 'mdatools/arrays';
    import { Points } from 'svelte-plots-basic/2d';
 
    import { colors } from '../../shared/graasta.js';
@@ -16,7 +16,7 @@
    // sample size and coordinates for its elements
    $: n = sample.length;
    $: x = Vector.seq(1, n);
-   $: y = vector([yPos]).rep(n);
+   $: y = Vector.fill(yPos, n);
 
    // number and coordinates of tails
    $: nT = sum(sample);

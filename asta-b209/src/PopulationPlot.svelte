@@ -19,7 +19,7 @@
 
    $: sampSize = samples[0].length;
 
-   // parameters of sampel and population 1
+   // parameters of sample and population 1
    $: mu1 = globalMean - effectExpected / 2;
    $: x1 = Vector.seq(mu1 - 3.5 * noiseExpected, mu1 + 3.5 * noiseExpected, noiseExpected/100);
    $: f1 = dnorm(x1, mu1, noiseExpected);
@@ -46,7 +46,7 @@
    <Points xValues={[1.49]} yValues={[mu1]} faceColor={sampColors[0]} borderColor="transparent" />
 
     <!-- sample points for population 1 -->
-   <Points xValues={vector([-0]).rep(sampSize)} yValues={samples[0]} borderColor={sampColors[0]} borderWidth={2} markerSize={1.3} faceColor="transparent" />
+   <Points xValues={Vector.fill(-0, sampSize)} yValues={samples[0]} borderColor={sampColors[0]} borderWidth={2} markerSize={1.3} faceColor="transparent" />
 
     <!-- PDF  for population 2 -->
    <Lines xValues={y2} yValues={x2} lineColor={mainColors[1]} />
@@ -57,7 +57,7 @@
    <Points xValues={[1.51]} yValues={[mu2]} faceColor={sampColors[1]} borderColor="transparent" />
 
     <!-- sample points for population 2 -->
-   <Points xValues={vector([3]).rep(sampSize)} yValues={samples[1]} borderColor={sampColors[1]} borderWidth={2} markerSize={1.3} faceColor="transparent" />
+   <Points xValues={Vector.fill(3, sampSize)} yValues={samples[1]} borderColor={sampColors[1]} borderWidth={2} markerSize={1.3} faceColor="transparent" />
 
     <!-- line fo observed effect -->
    <Segments xStart={[0]} xEnd={[3]} yStart={[m1]} yEnd={[m2]} lineWidth={1.5} lineColor={effectLineColor} />

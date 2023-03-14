@@ -1,6 +1,6 @@
 <script>
    import { mean } from 'mdatools/stat';
-   import { c, vector, Index } from 'mdatools/arrays';
+   import { Index } from 'mdatools/arrays';
    import { Axes, XAxis, YAxis, Box, Segments, Area, TextLabels, Lines } from 'svelte-plots-basic/2d';
 
    export let x;
@@ -23,8 +23,8 @@
    $: yi = y.subset(Index.seq(intInd[0] + 1, intInd[1] + 1));
 
    // add additional coordinates to make area plot
-   $: xia = c(xi, vector([xs[1]]));
-   $: yia = c(yi, vector([0]));
+   $: xia = Vector.c(xi, xs[1]);
+   $: yia = Vector.c(yi, [0]);
 </script>
 
 <!-- control elements -->
