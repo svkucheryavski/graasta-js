@@ -1,28 +1,30 @@
 <script>
-   import {rnorm, subset, cov, seq, mean, shuffle, max, min} from 'mdatools/stat';
-   import {TextLegend} from 'svelte-plots-basic';
+   import { cov, mean } from 'mdatools/stat';
+   import { index, Index, Vector } from 'mdatools/arrays';
+   import {TextLegend} from 'svelte-plots-basic/2d';
 
    // shared components
-   import {default as StatApp} from "../../shared/StatApp.svelte";
+   import {default as StatApp} from '../../shared/StatApp.svelte';
 
    // shared components - controls
-   import AppControlArea from "../../shared/controls/AppControlArea.svelte";
-   import AppControlButton from "../../shared/controls/AppControlButton.svelte";
-   import AppControlRange from "../../shared/controls/AppControlRange.svelte";
-   import CovariancePlot from "../../shared/plots/CovariancePlot.svelte";
+   import AppControlArea from '../../shared/controls/AppControlArea.svelte';
+   import AppControlButton from '../../shared/controls/AppControlButton.svelte';
+   import AppControlRange from '../../shared/controls/AppControlRange.svelte';
+   import CovariancePlot from '../../shared/plots/CovariancePlot.svelte';
 
    // local components
-   import AppTable from "./AppTable.svelte";
+   import AppTable from './AppTable.svelte';
 
    // constant parameters
    const sampSize = 10;
    const popSize = 500;
    const meanX = 100;
    const sdX = 10;
+   const popInd = Index.seq(1, popSize);
 
-   // constant
-   const popZ = rnorm(popSize);
-   const popX = rnorm(popSize, meanX, sdX);
+   // random values which do not change inside the app
+   const popZ = Vector.randn(popSize);
+   const popX = Vector.randn(popSize, meanX, sdX);
 
    // variable parameters
    let popNoise = 10;
@@ -30,29 +32,76 @@
    let sample = [];
    let selectedPoint;
 
-   $: top = max(popY) - 4
-   $: left = min(popX)
-
-   function takeNewSample(popSize, sampSize) {
-      sample = subset(shuffle(seq(1, popSize)), seq(1, sampSize));
+   /**
+    * Takes a new sample as random indices of population points.
+    *
+    * @param {number} sampSize - size of the sample.
+    *
+    */
+   function takeNewSample(sampSize) {
+      sample = popInd.shuffle().slice(1, sampSize);
       selectedPoint = -1;
    }
 
+   /**
+    * Returns SVG chunk with information about co-variance values.
+    *
+    * @param {Vector} x - vector with x-values.
+    * @param {Vector} y - vector with y-values.
+    * @param name - name of the covariance.
+    *
+    * @returns {string} - SVG chunk with name and computed co-variance value.
+    */
    function covText(x, y, name) {
-      return "<tspan style='fill:#a0a0a0'>" + name + ":</tspan> cov(x, y) = <tspan style='font-weight:bold'>" + cov(x, y).toFixed(1) + "</tspan>";
+      return `<tspan style='fill:#a0a0a0'>${name}:</tspan> cov(x, y) = <tspan style='font-weight:bold'>${cov(x, y).toFixed(1)}</tspan>`;
    }
 
-   $: popY = popX.map((x, i) => (x - meanX) * popSlope + meanX + popNoise * popZ[i]);
-   $: takeNewSample(popSize, sampSize);
+   /**
+    * Find indices of points which contribute negatively, positively and neutrally to the covariance.
+    *
+    * @param {Vector} x - vector with x-values.
+    * @param {number} mx - mean of the x-values.
+    * @param {Vector} y - vector with y-values.
+    * @param {number} my - mean of the y-values.
+    *
+    * @returns {Array} array with three index vectors (for positive, negative and neutral contributors).
+    */
+   function getIndices(x, mx, y, my) {
+      const n = x.length;
+      const indPos = Index.ones(n);
+      const indNeg = Index.ones(n);
+      const indNeu = Index.ones(n);
 
-   $: sampX = subset(popX, sample);
-   $: sampY = subset(popY, sample);
+      let nips = 0, ning = 0, nint = 0;
+      for (let i = 0; i < n; i++) {
+         const p = (x.v[i] - mx) * (y.v[i] - my);
+         if (p > 0) {
+            indPos.v[nips] = i + 1;
+            nips = nips + 1;
+         } else if (p < 0) {
+            indNeg.v[ning] = i + 1;
+            ning = ning + 1;
+         } else {
+            indNeu.v[nint] = i + 1;
+            nint = nint + 1;
+         }
+      }
+
+      return [
+         nips > 0 ? indPos.slice(1, nips) : index([]),
+         ning > 0 ? indNeg.slice(1, ning) : index([]),
+         nint > 0 ? indNeu.slice(1, nint) : index([])
+      ];
+   }
+
+   $: popY = popX.apply((x, i) => (x - meanX) * popSlope + meanX).add(popZ.mult(popNoise));
+   $: takeNewSample(sampSize);
+
+   $: sampX = popX.subset(sample);
+   $: sampY = popY.subset(sample);
    $: sampMeanX = mean(sampX);
    $: sampMeanY = mean(sampY);
-
-   $: indPos = sampX.map((x, i) => ((sampX[i] - sampMeanX) * (sampY[i] - sampMeanY)) > 0 ? i + 1: undefined).filter(x => x);
-   $: indNeg = sampX.map((x, i) => ((sampX[i] - sampMeanX) * (sampY[i] - sampMeanY)) < 0 ? i + 1: undefined).filter(x => x);
-   $: indNeu = sampX.map((x, i) => ((sampX[i] - sampMeanX) * (sampY[i] - sampMeanY)) === 0 ? i + 1: undefined).filter(x => x);
+   $: [indPos, indNeg, indNeu] = getIndices(sampX, sampMeanX, sampY, sampMeanY);
 </script>
 
 <StatApp>
@@ -60,15 +109,16 @@
 
       <div class="app-plot-area">
          <!-- scatter plot -->
-         <CovariancePlot bind:selectedPoint={selectedPoint} {popX} {sampX} {popY} {sampY} {indNeg} {indPos} {indNeu}>
+         <CovariancePlot bind:selectedPoint={selectedPoint} limX={[60, 140]} limY={[20, 180]} {popX}
+            {sampX} {popY} {sampY} {indNeg} {indPos} {indNeu}>
 
             <!-- labels for covariance -->
-            <TextLegend left={left} top={top} dy="1.5em" elements={[covText(popX, popY, "population"), covText(sampX, sampY, "sample")]} pos={2} textSize={0.9} faceColor="#606060"/>
+            <TextLegend left={65} top={165} dy="1.5em" elements={[covText(popX, popY, "population"), covText(sampX, sampY, "sample")]} textSize={0.9} faceColor="#606060"/>
 
          </CovariancePlot>
       </div>
       <div class="app-table-area">
-         <AppTable {selectedPoint} {sampX} {sampY} {indNeg} {indPos} {indNeu} {sampMeanX} {sampMeanY} />
+         <AppTable {selectedPoint} {sampX} {sampY} {indNeg} {indPos} {sampMeanX} {sampMeanY} />
       </div>
       <div class="app-controls-area">
          <!-- Control elements -->
@@ -82,7 +132,7 @@
                bind:value={popNoise} min={0} max={30} step={1} decNum={0}
             />
             <AppControlButton
-               on:click={() => takeNewSample(popSize, sampSize)}
+               on:click={() => takeNewSample(sampSize)}
                id="newSample" label="Sample" text="Take new"></AppControlButton>
          </AppControlArea>
       </div>

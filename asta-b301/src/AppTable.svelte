@@ -1,12 +1,12 @@
 <script>
-   import {sum} from 'mdatools/stat';
-   import DataTable from "../../shared/tables/DataTable.svelte"
+   import { Vector } from 'mdatools/arrays';
+   import { sum } from 'mdatools/stat';
+   import DataTable from '../../shared/tables/DataTable.svelte';
 
    export let sampX;
    export let sampY;
    export let indNeg;
    export let indPos;
-   export let indNeu;
    export let sampMeanX;
    export let sampMeanY
    export let selectedPoint;
@@ -15,28 +15,38 @@
    let t;
 
    // compute distances between x and y values and corresponding mean
-   $: diffX = sampX.map(x => x - sampMeanX)
-   $: diffY = sampY.map(y => y - sampMeanY)
+   $: diffX = sampX.subtract(sampMeanX);
+   $: diffY = sampY.subtract(sampMeanY);
 
    // compute product of the distances
-   $: gang = diffX.map((x, i) => diffX[i] * diffY[i])
+   $: gang = diffX.mult(diffY);
 
    $: {
       // add style for selected point
       if (t) {
-         const rows = Array.from(t.querySelectorAll("tr"));
-         rows.filter((x, i) => i == selectedPoint).map(v => v.classList.add("selected"));
-         rows.filter((x, i) => i != selectedPoint).map(v => v.classList.remove("selected"));
+         const rows = Array.from(t.querySelectorAll('tr'));
+         for (let i = 0; i < rows.length - 1; i++) {
+            i === selectedPoint ? rows[i].classList.add('selected') : rows[i].classList.remove('selected');
+         }
       }
    }
 
    $: {
       // add classes to the table rows depending on the contribution (negative/positive)
       if (t) {
-         const rows = Array.from(t.querySelectorAll("tr"));
-         rows.filter((x, i) => indNeg.includes(i)).map(v => {v.classList.remove("positive", "neutral"); v.classList.add("negative")});
-         rows.filter((x, i) => indPos.includes(i)).map(v => {v.classList.remove("negative", "neutral"); v.classList.add("positive")});
-         rows.filter((x, i) => indNeu.includes(i)).map(v => {v.classList.remove("positive", "negative"); v.classList.add("neutral")});
+         const rows = Array.from(t.querySelectorAll('tr'));
+         for (let i = 0; i < rows.length - 1; i++) {
+            if (indNeg.v.includes(i)) {
+               rows[i].classList.remove('positive', 'neutral');
+               rows[i].classList.add('negative');
+            } else if (indPos.v.includes(i)) {
+               rows[i].classList.remove('negative', 'neutral');
+               rows[i].classList.add('positive');
+            } else {
+               rows[i].classList.remove('negative', 'positive');
+               rows[i].classList.add('neutral');
+            }
+         }
       }
    }
 
@@ -45,11 +55,11 @@
 <div class="table-container" bind:this={t}>
 <DataTable
    variables={[
-      {label: "x", values: sampX.concat([0])},
-      {label: "y", values: sampY.concat([0])},
-      {label: "(x – m)", values: diffX.concat([0])},
-      {label: "(y – m)", values: diffY.concat([0])},
-      {label: "prod", values: gang.concat([sum(gang)])}
+      {label: "x", values: Vector.c(sampX, 0)},
+      {label: "y", values: Vector.c(sampY, 0)},
+      {label: "(x – m)", values: Vector.c(diffX, 0)},
+      {label: "(y – m)", values: Vector.c(diffY, 0)},
+      {label: "prod", values: Vector.c(gang, sum(gang))}
 
    ]}
    decNum={[1, 1, 1, 1, 1]}
