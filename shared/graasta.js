@@ -24,3 +24,4 @@ export function formatLabels(labels) {
 
    return labelsStr;
 }
+
