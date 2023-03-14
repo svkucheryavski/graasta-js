@@ -1,26 +1,27 @@
 <script>
-   import {rep, mean, rnorm} from 'mdatools/stat';
+   import { Vector, vector } from 'mdatools/arrays';
+   import { mean } from 'mdatools/stat';
 
    // shared components
-   import {default as StatApp} from "../../shared/StatApp.svelte";
+   import {default as StatApp} from '../../shared/StatApp.svelte';
 
    // shared components - controls
-   import AppControlArea from "../../shared/controls/AppControlArea.svelte";
-   import AppControlButton from "../../shared/controls/AppControlButton.svelte";
-   import AppControlRange from "../../shared/controls/AppControlRange.svelte";
+   import AppControlArea from '../../shared/controls/AppControlArea.svelte';
+   import AppControlButton from '../../shared/controls/AppControlButton.svelte';
+   import AppControlRange from '../../shared/controls/AppControlRange.svelte';
 
    // shared components - plots
-   import ANOVATestPlot from "../../shared/plots/ANOVATestPlot.svelte";
+   import ANOVATestPlot from '../../shared/plots/ANOVATestPlot.svelte';
 
    // local components
-   import ANOVATable from "./ANOVATable.svelte";
-   import ANOVAColumn from "./ANOVAColumn.svelte";
+   import ANOVATable from './ANOVATable.svelte';
+   import ANOVAColumn from './ANOVAColumn.svelte';
 
    // constant parameters
    const globalMean = 100;
    const sampSize = 5;
    const nGroups = 3;
-   const labels = ["A", "B", "C"];
+   const labels = ['A', 'B', 'C'];
 
    // degrees of freedom
    const DoFTotal = sampSize * nGroups - 1;
@@ -45,7 +46,7 @@
    let clicked;
 
    $: {
-      if (sample && (oldMuA !== muA || oldMuB !== muB || oldMuC !== muC || oldNoiseExpected !== noiseExpected)) {
+      if (sample && (oldMuA !== muA || oldMuB !== muB || oldMuC !== muC || oldNoiseExpected !== noiseExpected)) {
          reset = true;
          oldMuA = muA;
          oldMuB = muB;
@@ -64,26 +65,26 @@
 
       if (firstSample) {
          sample = [
-            [ 85,  90,  95, 100, 105],
-            [ 90,  95, 100, 105, 110],
-            [ 95, 100, 105, 110, 115],
+            vector([ 85,  90,  95, 100, 105]),
+            vector([ 90,  95, 100, 105, 110]),
+            vector([ 95, 100, 105, 110, 115]),
          ];
          firstSample = false;
       } else {
          sample = [
-            rnorm(sampSize, globalMean + muA, noiseExpected),
-            rnorm(sampSize, globalMean + muB, noiseExpected),
-            rnorm(sampSize, globalMean + muC, noiseExpected),
+            Vector.randn(sampSize, globalMean + muA, noiseExpected),
+            Vector.randn(sampSize, globalMean + muB, noiseExpected),
+            Vector.randn(sampSize, globalMean + muC, noiseExpected),
          ];
       }
 
       const sampleMeans = sample.map(v => mean(v));
       grandMean = mean(sampleMeans);
-      unbiasedSample = sample.map(v => v.map(x => x - grandMean));
+      unbiasedSample = sample.map(v => v.subtract(grandMean));
 
       const unbiasedSampleMeans = unbiasedSample.map(v => mean(v));
-      sysSample = unbiasedSampleMeans.map(v => rep(v, sampSize));
-      errSample = unbiasedSample.map((v, i) => v.map(x => x - unbiasedSampleMeans[i]));
+      sysSample = unbiasedSampleMeans.map(v => Vector.fill(v, sampSize));
+      errSample = unbiasedSample.map((v, i) => v.subtract(unbiasedSampleMeans[i]));
 
       clicked = Math.random();
    }
@@ -165,8 +166,7 @@
       <p>
          Then app computes a global mean for all original values and subtract it from the values thus creating a
          table with unbiased values, which are shown in the gray column. Table in the top of the column contains
-         the unbiased values and their means. Under the table there are statistics: degrees of freedom (DoF), sum of squared values (SSQ)
-         and variance or mean squares (MS = SSQ/DoF). Plot below shows boxplots for populations and
+         the unbiased values and their means. Under the table there are statistics: degrees of freedom (DoF), sum of squared values (SSQ) and variance or mean squares (MS = SSQ/DoF). Plot below shows boxplots for populations and
          points for the values.
       </p>
       <p>

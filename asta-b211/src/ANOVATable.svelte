@@ -1,7 +1,8 @@
 <script>
-   import {rep, mean} from "mdatools/stat";
+   import { Vector } from 'mdatools/arrays';
+   import { mean } from 'mdatools/stat';
 
-   import DataTable from "../../shared/tables/DataTable.svelte";
+   import DataTable from '../../shared/tables/DataTable.svelte';
 
    export let labels;
    export let values;
@@ -9,12 +10,12 @@
    export let decNum = 1;
 
    $: data = showMean ?
-      values.map((v, i) =>  ({"label": labels[i], "values": v.concat(mean(v))})) :
-      values.map((v, i) =>  ({"label": labels[i], "values": v}));
+      values.map((v, i) =>  ({'label': labels[i], 'values': Vector.c(v, mean(v))})) :
+      values.map((v, i) =>  ({'label': labels[i], 'values': v}));
 </script>
 
 <div class="anova-table">
-<DataTable variables={data} decNum={rep(decNum, values.length)} horizontal={false} />
+<DataTable variables={data} decNum={Array(values.length).fill(decNum)} horizontal={false} />
 </div>
 
 <style>

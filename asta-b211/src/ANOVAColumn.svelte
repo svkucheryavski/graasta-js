@@ -1,10 +1,10 @@
 <script>
    import { sum } from 'mdatools/stat';
 
-   import DataTable  from "../../shared/tables/DataTable.svelte";
-   import ANOVAPlot from "../../shared/plots/ANOVABoxplot.svelte";
+   import DataTable  from '../../shared/tables/DataTable.svelte';
+   import ANOVAPlot from '../../shared/plots/ANOVABoxplot.svelte';
 
-   import ANOVATable from "./ANOVATable.svelte";
+   import ANOVATable from './ANOVATable.svelte';
 
    export let effectExpected;
    export let noiseExpected;
@@ -18,7 +18,7 @@
    // we bind MS value to this variable for parent block
    export let value = 0;
 
-   $: SSQ = sum(samples.map(v => sum(v.map(x => x**2))));
+   $: SSQ = sum(samples.map(v => sum(v.apply(x => x**2))));
    $: MS = SSQ / DoF;
    $: value = MS;
 </script>
@@ -29,9 +29,9 @@
       <span>{sign}</span>
    </div>
    <DataTable variables={[
-      {label: "DoF", values: [DoF]},
-      {label: "SSQ", values: [SSQ]},
-      {label: "MS", values: [MS]}
+      {label: 'DoF', values: [DoF]},
+      {label: 'SSQ', values: [SSQ]},
+      {label: 'MS', values: [MS]}
    ]} decNum={[1, 1, 1]} horizontal={true} />
    <ANOVAPlot color={colors[0]} boxColor={colors[1]} popMeans={effectExpected} popSigma={noiseExpected} samples={samples}  />
 </div>
