@@ -34,8 +34,6 @@
 
    // compute p-value and x/y coordinates for corresponding area under PDF
    $: pValue = 1 - pf(crit, DoFSys, DoFErr);
-   $: console.log(sysSample.map(v => sum(v.apply(x => (x - grandMean)**2))))
-   $: console.log(MSErr)
 </script>
 
 <TestPlot limX={[-0.2, 10]} {x} {f} {pValue} {reset} {clicked} {H0LegendStr} {mainColor} crit={[crit]} alpha={0.05} tail="right">
