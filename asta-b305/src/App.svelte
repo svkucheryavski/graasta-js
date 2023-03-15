@@ -1,13 +1,13 @@
 <script>
-   import {rnorm, subset, seq, shuffle} from 'mdatools/stat';
-   import {polyfit} from 'mdatools/models';
+   import { Index, Vector } from 'mdatools/arrays';
+   import { polyfit } from 'mdatools/models';
 
    // shared components
-   import {default as StatApp} from "../../shared/StatApp.svelte";
+   import {default as StatApp} from '../../shared/StatApp.svelte';
 
    // shared components - controls
-   import AppControlArea from "../../shared/controls/AppControlArea.svelte";
-   import AppControlButton from "../../shared/controls/AppControlButton.svelte";
+   import AppControlArea from '../../shared/controls/AppControlArea.svelte';
+   import AppControlButton from '../../shared/controls/AppControlButton.svelte';
    import AppControlSwitch from '../../shared/controls/AppControlSwitch.svelte';
 
    // local components
@@ -18,48 +18,49 @@
    const popSize = 500;
    const meanX = 0;
    const sdX = 1;
+   const popInd = Index.seq(1, popSize);
 
    // constant
-   const popZ = rnorm(popSize);
-   const popX = rnorm(popSize, meanX, sdX);
+   const popZ = Vector.randn(popSize);
+   const popX = Vector.randn(popSize, meanX, sdX);
 
    // variable parameters
    let popNoise = 10;
    let sampSize = 10;
-   let pType = "line"
+   let pType = 'line'
    let sample = [];
    let reset = false;
 
-   function takeNewSample(popSize, sampSize) {
-      sample = subset(shuffle(seq(1, popSize)), seq(1, sampSize));
+   function takeNewSample(sampSize) {
+      sample = popInd.shuffle().slice(1, sampSize);
    }
 
    // variables to trigger reset event
    let oldSampSize = sampSize;
    let oldPType = pType;
-   $: if (sample && (oldSampSize !== sampSize || oldPType !== pType)) {
+   $: if (sample && (oldSampSize !== sampSize || oldPType !== pType)) {
          reset = true;
          oldSampSize = sampSize;
          oldPType = pType;
-         takeNewSample(popSize, sampSize);
+         takeNewSample(sampSize);
       } else {
          reset = false;
       }
 
    // set polynomial degree
-   $: pDegree = {"line": 1, "quadratic": 2, "cubic": 3}[pType];
+   $: pDegree = {'line': 1, 'quadratic': 2, 'cubic': 3}[pType];
 
    // compute population coordinates and model
-   $: popY = popX.map((x, i) => -40 + 65 * x + popNoise * popZ[i]);
+   $: popY = popX.apply((x, i) => -40 + 65 * x).add(popZ.mult(popNoise));
    $: popModel = polyfit(popX, popY, pDegree);
 
    // compute sample coordinates and model
-   $: sampX = subset(popX, sample);
-   $: sampY = subset(popY, sample);
+   $: sampX = popX.subset(sample);
+   $: sampY = popY.subset(sample);
    $: sampModel = polyfit(sampX, sampY, pDegree);
 
    // take the first sample
-   takeNewSample(popSize, sampSize);
+   takeNewSample(sampSize);
 </script>
 
 <StatApp>
@@ -84,7 +85,7 @@
                bind:value={sampSize} options={[5, 10, 30, 100]}
             />
             <AppControlButton
-               on:click={() => takeNewSample(popSize, sampSize)}
+               on:click={() => takeNewSample(sampSize)}
                id="newSample" label="Sample" text="Take new"></AppControlButton>
          </AppControlArea>
       </div>
