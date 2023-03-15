@@ -1,9 +1,9 @@
 <script>
-   import {sum} from 'mdatools/stat';
-   import {vsubtract, vmult} from 'mdatools/matrix';
-   import DataTable from "../../shared/tables/DataTable.svelte"
+   import { Vector } from 'mdatools/arrays';
+   import { sum } from 'mdatools/stat';
+   import DataTable from '../../shared/tables/DataTable.svelte'
 
-   export let segments;
+   export let splits;
    export let indSeg;
    export let x;
    export let y;
@@ -12,30 +12,32 @@
 
    let t;
 
-   $: e = vsubtract(y, ycv);
-   $: e2 = vmult(e, e);
+   $: e = y.subtract(ycv);
+   $: e2 = e.mult(e);
 
-   $: t ? t.querySelectorAll("table > tr").forEach(e => {
-         e.classList.remove("selected")
-         const c = e.querySelector(".datatable__value");
+   $: t ? t.querySelectorAll('table > tr').forEach(e => {
+         e.classList.remove('selected')
+         const c = e.querySelector('.datatable__value');
          if  (c && c.innerHTML === (indSeg + 1).toString()) {
-            e.classList.add("selected")
+            e.classList.add('selected')
          }
-      }) : "";
+      }) : '';
+
+   $: console.log(Vector.c(e2, sum(e2)))
 </script>
 
 <div class="table-container" bind:this={t}>
 <DataTable
    variables={[
-      {label: "#", values: segments.num.concat([NaN])},
-      {label: "x", values: x.concat([NaN])},
-      {label: "y", values: y.concat([NaN])},
-      {label: "y<sub>cv</sub>", values: ycv.concat([NaN])},
-      {label: "e", values: e.concat([NaN])},
-      {label: "e<sup>2</sup>", values: e2.concat(sum(e2))}
+      {label: "#", values: [...Array.from(splits.v), NaN]},
+      {label: "x", values: Vector.c(x, NaN)},
+      {label: "y", values: Vector.c(y, NaN)},
+      {label: "y<sub>cv</sub>", values: Vector.c(ycv, NaN)},
+      {label: "e", values: Vector.c(e, NaN)},
+      {label: "e<sup>2</sup>", values: Vector.c(e2, sum(e2))}
 
    ]}
-   decNum={[0, 2, 1, 1, 1, 2]}
+   decNum={[0, 2, 1, 1, 2, 2]}
    horizontal={false}
 />
 </div>

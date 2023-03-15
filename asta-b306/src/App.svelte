@@ -1,29 +1,29 @@
 <script>
-   import {rnorm, subset, mean, sum, rep, sort, seq, shuffle} from 'mdatools/stat';
-   import {polyfit, polypredict} from 'mdatools/models';
-   import {tomatrix, vreplace, vsubtract, vapply, transpose} from 'mdatools/matrix';
+   import { Index, Vector } from 'mdatools/arrays';
+   import { max, mean, ssq } from 'mdatools/stat';
+   import { polyfit, polypredict } from 'mdatools/models';
 
    // shared components
-   import {default as StatApp} from "../../shared/StatApp.svelte";
+   import {default as StatApp} from '../../shared/StatApp.svelte';
 
    // shared components - controls
-   import AppControlArea from "../../shared/controls/AppControlArea.svelte";
-   import AppControlButton from "../../shared/controls/AppControlButton.svelte";
+   import AppControlArea from '../../shared/controls/AppControlArea.svelte';
+   import AppControlButton from '../../shared/controls/AppControlButton.svelte';
    import AppControlSwitch from '../../shared/controls/AppControlSwitch.svelte';
 
    // local components
-   import AppTable from "./AppTable.svelte";
-   import AppPlot from "./AppPlot.svelte";
+   import AppTable from './AppTable.svelte';
+   import AppPlot from './AppPlot.svelte';
 
    // delay for CV runs in ms
    const CVDELAY = 1000;
 
    // initial values for managable parameters
-   let cvType = "random";
-   let pName = "line";
+   let cvType = 'random';
+   let pName = 'line';
 
    // constant parameters
-   const pDegrees = {"line": 1, "quadratic": 2, "cubic": 3};
+   const pDegrees = {'line': 1, 'quadratic': 2, 'cubic': 3};
    const nSegments = 4;
    const sampSize = 12;
    const meanX = 0;
@@ -31,83 +31,80 @@
    const noise = 0.5;
 
    // create a sample
-   const sampZ = rnorm(sampSize);
-   const sampX = sort(rnorm(sampSize, meanX, sdX));
-   const sampY = sampX.map((x, i) => -2 + 2.5 * x + noise * sampZ[i]);
+   const sampZ = Vector.randn(sampSize);
+   const sampX = Vector.randn(sampSize, meanX, sdX).sort();
+   const sampY = sampX.apply((x, i) => -2 + 2.5 * x).add(sampZ.mult(noise));
 
    // timer for delay
    const timer = ms => new Promise(res => setTimeout(res, ms))
 
    // runtime parameters
-   let segments = {}
    let indSeg = -1;
-   let yCV = rep(NaN, sampSize);
+   let yCV = Vector.fill(NaN, sampSize);
    let statCV = undefined;
    let localModel = undefined;
 
    // function for compoting R2 and se for a model
    function getStat(y, yp, p) {
-      const SSE = sum(vapply(vsubtract(y, yp), v => v ** 2));
-      const SSY = sum(vapply(vsubtract(y, mean(y)), v => v ** 2));
+      const SSE = ssq(y.subtract(yp));
+      const SSY = ssq(y.subtract(mean(y)));
       const DoF = y.length - (pDegree + 1);
       return {R2: 1 - SSE/SSY, se: Math.sqrt(SSE/DoF)}
    }
 
+   function cv2obs(cv, k) {
+      const ind = Index.seq(1, cv.length);
+      return [
+         new Index(ind.v.filter(v => cv.v[v - 1] != k)),
+         new Index(ind.v.filter(v => cv.v[v - 1] == k))
+      ];
+   }
+
    // function for creating indices of CV segments
-   function getCVSegments(type, nSegments) {
+   function getCVSplits(type, nSegments) {
 
       // reset all previous CV results
-      yCV = rep(NaN, sampSize);
+      yCV = Vector.fill(NaN, sampSize);
       localModel = undefined;
       statCV = undefined;
       indSeg = -1;
 
-      // create vector with row indices
-      let indAll = seq(1, sampSize);
-      if (type === "random") {
-         indAll = shuffle(indAll);
+      if (type == "full") {
+         return Index.seq(1, sampSize);
       }
 
-      // create vector of indices for the local validation sets
-      let segSize = 1;
-      let segVal = transpose(seq(1, sampSize));
-      if (type !== "full") {
-         segSize = sampSize / nSegments;
-         segVal = transpose(tomatrix(indAll, nSegments, segSize));
+      const nrep = Math.ceil(sampSize/nSegments);
+      const ind = Index.seq(1, nSegments).rep(nrep).slice(1, sampSize);
+      if (type == "venetian") {
+         return ind;
       }
 
-      // create vector of indices for the local calibration sets
-      const segCal = segVal.map(v => indAll.filter(x => !v.includes(x)));
-
-      // create vector of segment number for each data row
-      let segNum = rep(0, sampSize)
-      for (let i = 0; i < segVal.length; i++) {
-         segNum = vreplace(segNum, rep(i + 1, segSize), segVal[i])
-      }
-
-      return {cal: segCal, val: segVal, num: segNum}
+      return ind.shuffle();
    }
 
+   $: console.log(indSeg)
    // function for running cross-validation iterations with delay
    async function run() {
 
       // reset all CV results
-      yCV = rep(NaN, sampSize)
+      yCV = Vector.fill(NaN, sampSize);
       statCV = undefined;
       indSeg = -1;
 
       // the cross-validation loop
-      for (let i = 0; i < segments.val.length; i++) {
+      for (let i = 1; i <= max(splits); i++) {
+         const [calInd, valInd] = cv2obs(splits, i);
          indSeg = i
-         localModel = polyfit(subset(sampX, segments.cal[indSeg]), subset(sampY, segments.cal[indSeg]), pDegree);
-         yCV = vreplace(yCV, polypredict(localModel, subset(sampX, segments.val[indSeg])), segments.val[indSeg]);
-
+         localModel = polyfit(sampX.subset(calInd), sampY.subset(calInd), pDegree);
+         yCV = yCV.replace(polypredict(localModel, sampX.subset(valInd)), valInd);
          await timer(CVDELAY);
       }
 
       // set indSeg to -1 to remove last segment from plot and compute overall performance
       indSeg = -1;
+      console.log(sampY, yCV)
       statCV = getStat(sampY, yCV);
+      console.log(statCV)
    }
 
    $: pDegree = pDegrees[pName];
@@ -116,7 +113,8 @@
    $: globalModel = polyfit(sampX, sampY, pDegree);
 
    // make new CV segments
-   $: segments = getCVSegments(cvType, nSegments);
+   $: splits = getCVSplits(cvType, nSegments);
+   $: console.log(splits)
 </script>
 
 <StatApp>
@@ -124,11 +122,11 @@
 
       <div class="app-plot-area">
          <!-- scatter plot -->
-         <AppPlot {segments} {indSeg} {statCV} {localModel} {globalModel} />
+         <AppPlot {splits} {indSeg} {statCV} {localModel} {globalModel} />
       </div>
       <div class="app-table-area">
          <!-- table -->
-         <AppTable {segments} {indSeg} x={sampX} y={sampY} ycv={yCV} />
+         <AppTable {splits} {indSeg} x={sampX} y={sampY} ycv={yCV} />
       </div>
       <div class="app-controls-area">
          <!-- Control elements -->
@@ -180,7 +178,7 @@
       "plot controls";
 
    grid-template-rows: 1fr auto;
-   grid-template-columns: minmax(65%, 80%) minmax(350px, 500px);
+   grid-template-columns: minmax(60%, 80%) minmax(300px, 500px);
 }
 
 .app-plot-area {
