@@ -1,30 +1,34 @@
 <script>
-   import {rnorm, subset, seq, mean, shuffle} from 'mdatools/stat';
+   import { Index, Vector } from 'mdatools/arrays';
+   import { mean } from 'mdatools/stat';
+
+   import { getIndices } from '../../shared/graasta.js';
 
    // shared components
-   import {default as StatApp} from "../../shared/StatApp.svelte";
+   import {default as StatApp} from '../../shared/StatApp.svelte';
 
    // shared components - controls
-   import AppControlArea from "../../shared/controls/AppControlArea.svelte";
-   import AppControlButton from "../../shared/controls/AppControlButton.svelte";
-   import AppControlRange from "../../shared/controls/AppControlRange.svelte";
-   import AppControlSelect from "../../shared/controls/AppControlSelect.svelte";
-   import AppControlSwitch from "../../shared/controls/AppControlSwitch.svelte";
+   import AppControlArea from '../../shared/controls/AppControlArea.svelte';
+   import AppControlButton from '../../shared/controls/AppControlButton.svelte';
+   import AppControlRange from '../../shared/controls/AppControlRange.svelte';
+   import AppControlSelect from '../../shared/controls/AppControlSelect.svelte';
+   import AppControlSwitch from '../../shared/controls/AppControlSwitch.svelte';
 
    // shared components - plots
-   import CovariancePlot from "../../shared/plots/CovariancePlot.svelte";
+   import CovariancePlot from '../../shared/plots/CovariancePlot.svelte';
 
    // local components
-   import AppStat from "./AppStat.svelte";
+   import AppStat from './AppStat.svelte';
 
    // constant parameters
    const popSize = 500;
    const meanX = 100;
    const sdX = 10;
+   const popInd = Index.seq(1, popSize);
 
-   // constant
-   const popZ = rnorm(popSize);
-   const popX = rnorm(popSize, meanX, sdX);
+   // random values which do not change inside the app
+   const popZ = Vector.randn(popSize);
+   const popX = Vector.randn(popSize, meanX, sdX);
 
    // variable parameters
    let sampSize = 10;
@@ -41,7 +45,7 @@
    let oldSampSize = sampSize;
 
    $: {
-      if (sample && (oldSampSize !== sampSize || oldNoise !== popNoise || oldSlope !== popSlope)) {
+      if (sample && (oldSampSize !== sampSize || oldNoise !== popNoise || oldSlope !== popSlope)) {
          reset = true;
          oldSampSize = sampSize;
          oldNoise = popNoise;
@@ -53,20 +57,17 @@
    }
 
    function takeNewSample() {
-      sample = subset(shuffle(seq(1, popSize)), seq(1, sampSize));
+      sample = popInd.shuffle().slice(1, sampSize);
       clicked = Math.random();
    }
 
-   $: popY = popX.map((x, i) => (x - meanX) * popSlope + meanX + popNoise * popZ[i]);
+   $: popY = popX.apply((x, i) => (x - meanX) * popSlope + meanX).add(popZ.mult(popNoise));
 
-   $: sampX = subset(popX, sample);
-   $: sampY = subset(popY, sample);
+   $: sampX = popX.subset(sample);
+   $: sampY = popY.subset(sample);
    $: sampMeanX = mean(sampX);
    $: sampMeanY = mean(sampY);
-
-   $: indPos = sampX.map((x, i) => ((sampX[i] - sampMeanX) * (sampY[i] - sampMeanY)) > 0 ? i + 1: undefined).filter(x => x);
-   $: indNeg = sampX.map((x, i) => ((sampX[i] - sampMeanX) * (sampY[i] - sampMeanY)) < 0 ? i + 1: undefined).filter(x => x);
-   $: indNeu = sampX.map((x, i) => ((sampX[i] - sampMeanX) * (sampY[i] - sampMeanY)) === 0 ? i + 1: undefined).filter(x => x);
+   $: [indPos, indNeg, indNeu] = getIndices(sampX, sampMeanX, sampY, sampMeanY);
 
    // take first sample
    takeNewSample();
@@ -111,8 +112,7 @@
    <div slot="help">
       <h2>Correlation and population based confidence interval</h2>
       <p>
-         This app helps you to understand the Pearson's correlation coefficient, <em>r(x,y)</em>, which is computed as covariance for
-         standardized <em>x</em> and <em>y</em> values. Alternatively you can compute covariance for the original values
+         This app helps you to understand the Pearson's correlation coefficient, <em>r(x,y)</em>, which is computed as covariance for standardized <em>x</em> and <em>y</em> values. Alternatively you can compute covariance for the original values
          and then standardize the covariance by dividing it to the standard deviation of  <em>x</em> and <em>y</em>.
          If there is no noise at all, and <em>y</em> is linearly dependent on <em>x</em>, the correlation does not depend on
          slope of the line. However, when noise is present, the slope has an influence which you can see by playing with the
@@ -122,7 +122,7 @@
          The uncertainty for correlation coefficient of a sample depends both on the correlation of population and
          the sample size. The sample correlation coefficient does not follow any theoretical distribution, therefore
          for computing the uncertainty and corresponding confidence interval, a <a href="https://en.wikipedia.org/wiki/Fisher_transformation">transformed statistic</a>, <em>z'</em>, is used. This
-         statistic follows normal distribution if n > 10. The app shows how the distribution of <em>z'</em> looks like
+         statistic follows normal distribution if n &gt; 10. The app shows how the distribution of <em>z'</em> looks like
          for different levels of noise and how it can be transformed back to distribution of <em>r</em> values.
       </p>
 

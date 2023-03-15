@@ -1,7 +1,10 @@
 <script>
-   import {cov, sd, seq, dnorm} from 'mdatools/stat';
-   import DataTable from "../../shared/tables/DataTable.svelte"
-   import CIPlot from "../../shared/plots/CIPlot.svelte";
+   import { vector, Vector } from 'mdatools/arrays';
+   import { dnorm } from 'mdatools/distributions';
+   import { cov, sd } from 'mdatools/stat';
+
+   import DataTable from '../../shared/tables/DataTable.svelte';
+   import CIPlot from '../../shared/plots/CIPlot.svelte';
 
    export let sampX;
    export let sampY;
@@ -9,14 +12,14 @@
    export let popY;
    export let clicked;
    export let reset;
-   export let plotType = "r";
+   export let plotType = 'r';
 
    function z2r(z) {
-      return z.map(v => (Math.exp(2 * v) - 1) / (Math.exp(2 * v) + 1));
+      return z.apply(v => (Math.exp(2 * v) - 1) / (Math.exp(2 * v) + 1));
    }
 
    function r2z(r) {
-      return r.map(v => 0.5 * Math.log( (1 + v) / (1 - v)));
+      return r.apply(v => 0.5 * Math.log( (1 + v) / (1 - v)));
    }
 
    // sample statistics
@@ -24,7 +27,7 @@
    $: sampSdX = sd(sampX);
    $: sampSdY = sd(sampY);
    $: sampCor = sampCov / (sampSdX * sampSdY);
-   $: sampZ = r2z([sampCor])[0];
+   $: sampZ = r2z(vector([sampCor])).v[0];
 
    // population parameters
    $: popCov = cov(popX, popY);
@@ -33,21 +36,21 @@
    $: popCor = popCov / (popSdX * popSdY);
 
    // z' distribution
-   $: zmu = r2z([popCor])[0];
+   $: zmu = r2z(vector([popCor])).v[0];
    $: zse = 1 / Math.sqrt(sampX.length - 3)
-   $: zx = seq(zmu - 3.5 * zse, zmu + 3.5 * zse, 200)
+   $: zx = Vector.seq(zmu - 3.5 * zse, zmu + 3.5 * zse, zse / 100)
    $: zf = dnorm(zx, zmu, zse);
+
    $: zci = [zmu - 1.96 * zse, zmu + 1.96 * zse];
-   $: cizx = seq(zci[0], zci[1], 100);
+   $: cizx = Vector.seq(zci[0], zci[1], 1/100);
    $: cizf = dnorm(cizx, zmu, zse);
 
    // r distribution
    $: rx = z2r(zx);
    $: rf = zf;
-   $: rci = z2r(zci);
+   $: rci = z2r(vector(zci)).v;
    $: cirx = z2r(cizx);
    $: cirf = cizf;
-
 </script>
 
 <div class="table-container">
