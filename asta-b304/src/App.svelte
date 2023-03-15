@@ -32,7 +32,7 @@
    let selectedPoint;
    let errorType = 'full';
 
-   function takeNewSample(popSize, sampSize) {
+   function takeNewSample(sampSize) {
       sample = popInd.shuffle().slice(1, sampSize);
       selectedPoint = -1;
    }
@@ -46,7 +46,7 @@
    $: sampY = popY.subset(sample);
    $: sampModel = lmfit(sampX, sampY);
 
-   $: takeNewSample(popSize, sampSize);
+   $: takeNewSample(sampSize);
 </script>
 
 <StatApp>
@@ -71,7 +71,7 @@
                bind:value={popNoise} min={0} max={5} step={0.1} decNum={0}
             />
             <AppControlButton
-               on:click={() => takeNewSample(popSize, sampSize)}
+               on:click={() => takeNewSample(sampSize)}
                id="newSample" label="Sample" text="Take new"></AppControlButton>
          </AppControlArea>
       </div>
