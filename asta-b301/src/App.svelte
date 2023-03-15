@@ -1,7 +1,9 @@
 <script>
    import { cov, mean } from 'mdatools/stat';
-   import { index, Index, Vector } from 'mdatools/arrays';
+   import { Index, Vector } from 'mdatools/arrays';
    import {TextLegend} from 'svelte-plots-basic/2d';
+
+   import { getIndices } from '../../shared/graasta.js';
 
    // shared components
    import {default as StatApp} from '../../shared/StatApp.svelte';
@@ -56,43 +58,7 @@
       return `<tspan style='fill:#a0a0a0'>${name}:</tspan> cov(x, y) = <tspan style='font-weight:bold'>${cov(x, y).toFixed(1)}</tspan>`;
    }
 
-   /**
-    * Find indices of points which contribute negatively, positively and neutrally to the covariance.
-    *
-    * @param {Vector} x - vector with x-values.
-    * @param {number} mx - mean of the x-values.
-    * @param {Vector} y - vector with y-values.
-    * @param {number} my - mean of the y-values.
-    *
-    * @returns {Array} array with three index vectors (for positive, negative and neutral contributors).
-    */
-   function getIndices(x, mx, y, my) {
-      const n = x.length;
-      const indPos = Index.ones(n);
-      const indNeg = Index.ones(n);
-      const indNeu = Index.ones(n);
 
-      let nips = 0, ning = 0, nint = 0;
-      for (let i = 0; i < n; i++) {
-         const p = (x.v[i] - mx) * (y.v[i] - my);
-         if (p > 0) {
-            indPos.v[nips] = i + 1;
-            nips = nips + 1;
-         } else if (p < 0) {
-            indNeg.v[ning] = i + 1;
-            ning = ning + 1;
-         } else {
-            indNeu.v[nint] = i + 1;
-            nint = nint + 1;
-         }
-      }
-
-      return [
-         nips > 0 ? indPos.slice(1, nips) : index([]),
-         ning > 0 ? indNeg.slice(1, ning) : index([]),
-         nint > 0 ? indNeu.slice(1, nint) : index([])
-      ];
-   }
 
    $: popY = popX.apply((x, i) => (x - meanX) * popSlope + meanX).add(popZ.mult(popNoise));
    $: takeNewSample(sampSize);
