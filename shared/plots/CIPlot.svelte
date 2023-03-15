@@ -56,7 +56,7 @@
 
 <!-- plot with population based CI and position of current sample proportion -->
 {#if errmsg === ''  }
-   <Axes {limX} limY={[-0.01, max(f) * 1.50]} {xLabel} margins={[0.5, 0.05, 0.5, 0.05]}>
+   <Axes {limX} limY={[-0.01, max(f) * 1.55]} {xLabel} margins={[0.5, 0.05, 0.5, 0.05]}>
       <!-- legend -->
       <TextLegend textSize={1.15} left={limX[0]} top={max(f) * 1.40} dx="1.25em" elements = {labelsStr} />
 
