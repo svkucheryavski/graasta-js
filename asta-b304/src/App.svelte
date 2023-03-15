@@ -1,48 +1,49 @@
 <script>
-   import {rnorm, subset, cov, seq, shuffle} from 'mdatools/stat';
-   import {lmfit} from 'mdatools/models';
+   import { Index, Vector } from 'mdatools/arrays';
+   import { lmfit } from 'mdatools/models';
 
    // shared components
-   import {default as StatApp} from "../../shared/StatApp.svelte";
+   import {default as StatApp} from '../../shared/StatApp.svelte';
 
    // shared components - controls
-   import AppControlArea from "../../shared/controls/AppControlArea.svelte";
-   import AppControlButton from "../../shared/controls/AppControlButton.svelte";
-   import AppControlRange from "../../shared/controls/AppControlRange.svelte";
+   import AppControlArea from '../../shared/controls/AppControlArea.svelte';
+   import AppControlButton from '../../shared/controls/AppControlButton.svelte';
+   import AppControlRange from '../../shared/controls/AppControlRange.svelte';
    import AppControlSwitch from '../../shared/controls/AppControlSwitch.svelte';
 
    // local components
-   import AppTable from "./AppTable.svelte";
-   import AppPlot from "./AppPlot.svelte";
+   import AppTable from './AppTable.svelte';
+   import AppPlot from './AppPlot.svelte';
 
    // constant parameters
    const sampSize = 10;
    const popSize = 500;
    const meanX = 1.65;
    const sdX = 0.1;
+   const popInd = Index.seq(1, popSize);
 
    // constant
-   const popZ = rnorm(popSize);
-   const popX = rnorm(popSize, meanX, sdX);
+   const popZ = Vector.randn(popSize);
+   const popX = Vector.randn(popSize, meanX, sdX);
 
    // variable parameters
    let popNoise = 2;
    let sample = [];
    let selectedPoint;
-   let errorType = "full";
+   let errorType = 'full';
 
    function takeNewSample(popSize, sampSize) {
-      sample = subset(shuffle(seq(1, popSize)), seq(1, sampSize));
+      sample = popInd.shuffle().slice(1, sampSize);
       selectedPoint = -1;
    }
 
    // population coordinates and model
-   $: popY = popX.map((x, i) => -40 + 65 * x + popNoise * popZ[i]);
+   $: popY = popX.apply((x, i) => -40 + 65 * x).add(popZ.mult(popNoise));
    $: popModel = lmfit(popX, popY);
 
    // sample coordinates and model
-   $: sampX = subset(popX, sample);
-   $: sampY = subset(popY, sample);
+   $: sampX = popX.subset(sample);
+   $: sampY = popY.subset(sample);
    $: sampModel = lmfit(sampX, sampY);
 
    $: takeNewSample(popSize, sampSize);
@@ -79,11 +80,11 @@
    <div slot="help">
       <h2>Simple linear regression</h2>
       <p>
-         The app shows how to use simple linear regression for investigation of relationship beteween two variables (in this case heght and weight of adult female persons). The plot shows data points both for population (N = 500) and current sample (n = 10). Both sets
-         of points are fitted by a simple linear regression model, you can see both models in form of lines and the corresponding equations, as well as their characteristics (standard error of  prediction and coefficient of determination, R2). The table on the right part of the app shows rference y-values, values, predicted by the model, error of prediction and its square. Sum of squared errors is what is used to compute both standard error and R2.
+         The app shows how to use simple linear regression for investigation of relationship between two variables (in this case height and weight of adult female persons). The plot shows data points both for population (N = 500) and current sample (n = 10). Both sets
+         of points are fitted by a simple linear regression model, you can see both models in form of lines and the corresponding equations, as well as their characteristics (standard error of  prediction and coefficient of determination, R2). The table on the right part of the app shows reference y-values, values, predicted by the model, error of prediction and its square. Sum of squared errors is what is used to compute both standard error and R2.
       </p>
       <p>
-         The shaded area on the plot shows uncertainties. By default you see uncertainty from both fitting and sampling error. You can use the swicher to see uncertaity from one of the source. You can also change the amount of noise (the more noise, the less percent of y-variance can be predicted by the model) and see how it changes the uncertainties. Plus you can select any sample point on the plot and see the predicted value and the uncertainty interval for this point.
+         The shaded area on the plot shows uncertainties. By default you see uncertainty from both fitting and sampling error. You can use the switcher to see uncertainty from one of the source. You can also change the amount of noise (the more noise, the less percent of y-variance can be predicted by the model) and see how it changes the uncertainties. Plus you can select any sample point on the plot and see the predicted value and the uncertainty interval for this point.
       </p>
    </div>
 </StatApp>

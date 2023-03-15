@@ -1,7 +1,7 @@
 <script>
-   import {sum} from 'mdatools/stat';
-   import {vsubtract, vmult} from 'mdatools/matrix';
-   import DataTable from "../../shared/tables/DataTable.svelte"
+   import { Vector } from 'mdatools/arrays';
+   import { sum } from 'mdatools/stat';
+   import DataTable from '../../shared/tables/DataTable.svelte';
 
    export let sampModel;
    export let selectedPoint;
@@ -9,8 +9,8 @@
    // link to data table container
    let t;
 
-   $: sampE = vsubtract(sampModel.data.y, sampModel.fitted);
-   $: sampE2 = vmult(sampE, sampE);
+   $: sampE = sampModel.data.y.subtract(sampModel.fitted);
+   $: sampE2 = sampE.mult(sampE);
 
    $: {
       // add style for selected point
@@ -26,14 +26,14 @@
 <div class="table-container" bind:this={t}>
 <DataTable
    variables={[
-      {label: "x", values: sampModel.data.X[0].concat([0])},
-      {label: "y", values: sampModel.data.y.concat([0])},
-      {label: "y<sub>p</sub>", values: sampModel.fitted.concat([0])},
-      {label: "e", values: sampE.concat([0])},
-      {label: "e<sup>2</sup>", values: sampE2.concat(sum(sampE2))}
+      {label: "x", values: Vector.c(sampModel.data.X.getcolumn(1), 0)},
+      {label: "y", values: Vector.c(sampModel.data.y, 0)},
+      {label: "y<sub>p</sub>", values: Vector.c(sampModel.fitted, 0)},
+      {label: "e", values: Vector.c(sampE, 0)},
+      {label: "e<sup>2</sup>", values: Vector.c(sampE2, sum(sampE2))}
 
    ]}
-   decNum={[1, 1, 1, 1, 2]}
+   decNum={[2, 1, 1, 2, 2]}
    horizontal={false}
 />
 </div>
