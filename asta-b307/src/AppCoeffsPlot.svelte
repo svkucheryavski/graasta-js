@@ -1,8 +1,10 @@
 <script>
-   import {sum, seq, mrange, mean, qt} from 'mdatools/stat';
-   import {vsubtract, vmult, msubtract, transpose, vadd, mmult} from 'mdatools/matrix';
-   import {Axes, YAxis, ScatterSeries, Segments, BarSeries} from 'svelte-plots-basic';
-   import { colors } from "../../shared/graasta";
+   import { Vector, Index, cbind, ismatrix } from 'mdatools/arrays';
+   import { ssq, mrange, mean } from 'mdatools/stat';
+   import { qt } from 'mdatools/distributions';
+
+   import { Axes, YAxis, Points, Segments, Bars } from 'svelte-plots-basic/2d';
+   import { colors } from '../../shared/graasta.js';
 
    export let popModel;
    export let globalModel;
@@ -11,36 +13,35 @@
    export let ready = true;
 
    // colors
-   const popColor = "#c0c0c0";
-   const globalColor = colors.plots.SAMPLES[0] + "60";
+   const popColor = '#c0c0c0';
+   const globalColor = colors.plots.SAMPLES[0] + '60';
    const sampColor = colors.plots.SAMPLES[0];
 
    // t-value for confidence interval
-   $: tCrit = qt(0.975, (globalModel.data.X[0].length - 1));
+   $: tCrit = qt(0.975, (globalModel.data.X.nrows - 1));
 
    // coefficients and errors
    let sampY = [];
    let sampE = [];
+   let sampErrMargin = [];
 
    // function which computes JK standard error for regression coefficients
    function getJKVar() {
-      const n = sampY.length;
+      const n = sampY.ncols;
+
       if (n < 2) return [];
-
-      const B = transpose(sampY);
-      const m = B.map(v => mean(v));
-      const E = msubtract(B, m);
-      sampY = [];
-
-      return mmult(E, E).map(x => Math.sqrt(sum(x) * (n - 1) / n));
+      const B = sampY.t();
+      const m = B.apply(mean, 2);
+      const E = B.subtract(m);
+      return E.apply(ssq, 2).mult((n - 1) / n).apply(Math.sqrt);
    }
 
    // coefficients for populaiton model
-   $: popX = seq(1, popModel.coeffs.estimate.length).map(x => x - 0.25);
+   $: popX = Vector.seq(1, popModel.coeffs.estimate.length).subtract(0.25);
    $: popY = popModel.coeffs.estimate;
 
    // coefficients for global model
-   $: globalX = seq(1, globalModel.coeffs.estimate.length).map(x => x + 0.25);
+   $: globalX = Vector.seq(1, globalModel.coeffs.estimate.length).add(0.25);
    $: globalY = globalModel.coeffs.estimate;
 
    // resetting the values
@@ -51,32 +52,40 @@
 
    // coefficients and errors for local model
    $: sampX = globalX;
-   $: sampY = localModel ? [...sampY, localModel.coeffs.estimate] : [];
+   $: sampY = localModel ?
+      (sampY.length  === 0 ?
+         cbind(localModel.coeffs.estimate) :
+         cbind(sampY, localModel.coeffs.estimate)
+      ): [];
 
    // if ready - compute error bars
    $: if (ready) {
-      sampE =  getJKVar();
+      sampE = getJKVar();
+      sampErrMargin = sampE.mult(tCrit);
+      sampY = [];
    }
+
+
 </script>
 
-<Axes limX={[0, 6]} limY={mrange(popY, 0.35)} yLabel="Coefficient">
+<Axes limX={[0, 6]} limY={mrange(popY, 0.35)} margins={[0.25, 0.65, 0.25, 0.25]} yLabel="Coefficient">
 
-   <BarSeries barWidth={0.5} xValues={popX} borderColor="white" faceColor={popColor} yValues={popY} />
-   <BarSeries barWidth={0.5} xValues={globalX} borderColor="white" faceColor={globalColor} yValues={globalY} />
+   <Bars barWidth={0.5} xValues={popX} borderColor="white" faceColor={popColor} yValues={popY} />
+   <Bars barWidth={0.5} xValues={globalX} borderColor="white" faceColor={globalColor} yValues={globalY} />
 
-   {#if !ready }
-      {#each sampY as sy, i}
-         <ScatterSeries xValues={sampX} yValues={sy} borderWidth={2} borderColor={sampColor + (!ready || i == sampY.length ? "60" : "F0")}/>
+   {#if !ready && ismatrix(sampY)}
+      {#each Index.seq(1, sampY.ncols) as _, i}
+         <Points xValues={sampX} yValues={sampY.getcolumn(i + 1)} borderWidth={2} borderColor={sampColor + (!ready || i == sampY.length ? "60" : "F0")}/>
       {/each}
    {/if}
 
    {#if ready && sampE.length > 0 }
       <Segments
-         xStart={globalX}  yStart={vsubtract(globalY, vmult(tCrit, sampE))}
-         xEnd={globalX}    yEnd={vadd(globalY, vmult(tCrit, sampE))}
+         xStart={globalX} yStart={globalY.subtract(sampErrMargin)}
+         xEnd={globalX} yEnd={globalY.add(sampErrMargin)}
          lineColor={sampColor}
       />
-      <ScatterSeries xValues={globalX} yValues={globalY} borderColor={sampColor} faceColor={sampColor} />
+      <Points xValues={globalX} yValues={globalY} borderColor={sampColor} faceColor={sampColor} />
    {/if}
 
    <YAxis slot="yaxis" />

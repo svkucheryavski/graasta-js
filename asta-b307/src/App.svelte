@@ -1,27 +1,27 @@
 <script>
-   import {rnorm, subset,  rep, sort, seq, shuffle} from 'mdatools/stat';
-   import {polyfit, polypredict} from 'mdatools/models';
+   import { Index, Vector } from 'mdatools/arrays';
+   import { polyfit, polypredict } from 'mdatools/models';
 
    // shared components
-   import {default as StatApp} from "../../shared/StatApp.svelte";
+   import {default as StatApp} from '../../shared/StatApp.svelte';
 
    // shared components - controls
-   import AppControlArea from "../../shared/controls/AppControlArea.svelte";
-   import AppControlButton from "../../shared/controls/AppControlButton.svelte";
+   import AppControlArea from '../../shared/controls/AppControlArea.svelte';
+   import AppControlButton from '../../shared/controls/AppControlButton.svelte';
    import AppControlSwitch from '../../shared/controls/AppControlSwitch.svelte';
 
    // local components
-   import AppCoeffsPlot from "./AppCoeffsPlot.svelte";
-   import AppPlot from "./AppPlot.svelte";
+   import AppCoeffsPlot from './AppCoeffsPlot.svelte';
+   import AppPlot from './AppPlot.svelte';
 
    // delay for CV runs in ms
-   const CVDELAY = 1000;
+   const CVDELAY = 500;
 
    // initial values for managable parameters
-   let pName = "line";
+   let pName = 'line';
 
    // constant parameters
-   const pDegrees = {"line": 1, "quadratic": 2, "cubic": 3};
+   const pDegrees = {'line': 1, 'quadratic': 2, 'cubic': 3};
    const sampSize = 12;
    const popSize = 500;
    const meanX = 0;
@@ -29,9 +29,10 @@
    const noise = 0.5;
 
    // create a population
-   const popZ = rnorm(popSize);
-   const popX = sort(rnorm(popSize, meanX, sdX));
-   const popY = popX.map((x, i) => -2 + 2.5 * x + noise * popZ[i]);
+   const popZ = Vector.randn(popSize);
+   const popX = Vector.randn(popSize, meanX, sdX).sort();
+   const popY = popX.apply((x, i) => -2 + 2.5 * x).add(popZ.mult(noise));
+   const popInd = Index.seq(1, popSize);
 
    // timer for delay
    const timer = ms => new Promise(res => setTimeout(res, ms))
@@ -41,7 +42,7 @@
    let ready = false;
 
    let indSeg = -1;
-   let yCV = rep(NaN, sampSize);
+   let yCV = Vector.fill(NaN, sampSize);
    let localModel = undefined;
 
    // sample parameters
@@ -52,9 +53,9 @@
    // function to take a new sample
    function takeNewSample() {
       resetAll();
-      sampInd = subset(shuffle(seq(1, popSize)), seq(1, sampSize));
-      sampX = subset(popX, sampInd);
-      sampY = subset(popY, sampInd);
+      sampInd = popInd.shuffle().slice(1, sampSize);
+      sampX = popX.subset(sampInd);
+      sampY = popY.subset(sampInd);
    }
 
    // function to reset previous CV results
@@ -62,7 +63,7 @@
       reset = true;
       ready = false;
       localModel = undefined;
-      yCV = rep(NaN, sampSize)
+      yCV = Vector.fill(NaN, sampSize)
       indSeg = -1;
    }
 
@@ -73,12 +74,12 @@
       resetAll();
 
       // the cross-validation loop
-      const ind = seq(1, sampSize);
+      const ind = Index.seq(1, sampSize);
       reset = false;
       for (indSeg = 0; indSeg < sampSize; indSeg++) {
-         const calInd = ind.filter(v => v != indSeg + 1)
-         localModel = polyfit(subset(sampX, calInd), subset(sampY, calInd), pDegree);
-         yCV[indSeg] = polypredict(localModel, subset(sampX, indSeg + 1));
+         const calInd = ind.filter(v => v !== indSeg + 1)
+         localModel = polyfit(sampX.subset(calInd), sampY.subset(calInd), pDegree);
+         yCV.v[indSeg] = polypredict(localModel, sampX.subset(indSeg + 1));
 
          await timer(CVDELAY);
       }
@@ -171,7 +172,7 @@
       "plot controls";
 
    grid-template-rows: 1fr auto;
-   grid-template-columns: 65% minmax(350px, 35%);
+   grid-template-columns: minmax(60%, 80%) minmax(300px, 500px);
 }
 
 .app-plot-area {
