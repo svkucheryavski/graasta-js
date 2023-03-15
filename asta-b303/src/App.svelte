@@ -1,30 +1,34 @@
 <script>
-   import {rnorm, subset, seq, mean, shuffle} from 'mdatools/stat';
+   import { Index, Vector } from 'mdatools/arrays';
+   import { mean } from 'mdatools/stat';
+
+   import { getIndices } from '../../shared/graasta.js';
 
    // shared components
-   import {default as StatApp} from "../../shared/StatApp.svelte";
+   import {default as StatApp} from '../../shared/StatApp.svelte';
 
    // shared components - controls
-   import AppControlArea from "../../shared/controls/AppControlArea.svelte";
-   import AppControlButton from "../../shared/controls/AppControlButton.svelte";
-   import AppControlRange from "../../shared/controls/AppControlRange.svelte";
-   import AppControlSelect from "../../shared/controls/AppControlSelect.svelte";
-   import AppControlSwitch from "../../shared/controls/AppControlSwitch.svelte";
+   import AppControlArea from '../../shared/controls/AppControlArea.svelte';
+   import AppControlButton from '../../shared/controls/AppControlButton.svelte';
+   import AppControlRange from '../../shared/controls/AppControlRange.svelte';
+   import AppControlSelect from '../../shared/controls/AppControlSelect.svelte';
+   import AppControlSwitch from '../../shared/controls/AppControlSwitch.svelte';
 
    // shared components - plots
-   import CovariancePlot from "../../shared/plots/CovariancePlot.svelte";
+   import CovariancePlot from '../../shared/plots/CovariancePlot.svelte';
 
    // local components
-   import AppStat from "./AppStat.svelte";
+   import AppStat from './AppStat.svelte';
 
    // constant parameters
    const popSize = 500;
    const meanX = 100;
    const sdX = 10;
+   const popInd = Index.seq(1, popSize);
 
-   // constant
-   const popZ = rnorm(popSize);
-   const popX = rnorm(popSize, meanX, sdX);
+   // random values which do not change inside the app
+   const popZ = Vector.randn(popSize);
+   const popX = Vector.randn(popSize, meanX, sdX);
 
    // variable parameters
    let sampSize = 10;
@@ -41,7 +45,7 @@
    let oldSampSize = sampSize;
 
    $: {
-      if (sample && (oldSampSize !== sampSize || oldNoise !== popNoise || oldSlope !== popSlope)) {
+      if (sample && (oldSampSize !== sampSize || oldNoise !== popNoise || oldSlope !== popSlope)) {
          reset = true;
          oldSampSize = sampSize;
          oldNoise = popNoise;
@@ -53,20 +57,17 @@
    }
 
    function takeNewSample() {
-      sample = subset(shuffle(seq(1, popSize)), seq(1, sampSize));
+      sample = popInd.shuffle().slice(1, sampSize);
       clicked = Math.random();
    }
 
-   $: popY = popX.map((x, i) => (x - meanX) * popSlope + meanX + popNoise * popZ[i]);
+   $: popY = popX.apply((x, i) => (x - meanX) * popSlope + meanX).add(popZ.mult(popNoise));
 
-   $: sampX = subset(popX, sample);
-   $: sampY = subset(popY, sample);
+   $: sampX = popX.subset(sample);
+   $: sampY = popY.subset(sample);
    $: sampMeanX = mean(sampX);
    $: sampMeanY = mean(sampY);
-
-   $: indPos = sampX.map((x, i) => ((sampX[i] - sampMeanX) * (sampY[i] - sampMeanY)) > 0 ? i + 1: undefined).filter(x => x);
-   $: indNeg = sampX.map((x, i) => ((sampX[i] - sampMeanX) * (sampY[i] - sampMeanY)) < 0 ? i + 1: undefined).filter(x => x);
-   $: indNeu = sampX.map((x, i) => ((sampX[i] - sampMeanX) * (sampY[i] - sampMeanY)) === 0 ? i + 1: undefined).filter(x => x);
+   $: [indPos, indNeg, indNeu] = getIndices(sampX, sampMeanX, sampY, sampMeanY);
 
    // take first sample
    takeNewSample();
@@ -114,7 +115,7 @@
          This app is almost identical to the previous one (asta-b302) with one important difference:
          confidence interval in this app is computed based on statistics of a current sample. So,
          you can see how confidence interval vary from one sample to another and how often
-         the correlation coefficient of population (or it's trasformed value, z') will be
+         the correlation coefficient of population (or it's transformed value, z') will be
          inside the interval.
       </p>
       <p>
