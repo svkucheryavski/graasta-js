@@ -53,11 +53,10 @@
    }
 
    function cv2obs(cv, k) {
-      const ind = Index.seq(1, cv.length);
       return [
-         new Index(ind.v.filter(v => cv.v[v - 1] != k)),
-         new Index(ind.v.filter(v => cv.v[v - 1] == k))
-      ];
+         cv.which(v => v !== k),
+         cv.which(v => v === k),
+      ]
    }
 
    // function for creating indices of CV segments
@@ -82,7 +81,6 @@
       return ind.shuffle();
    }
 
-   $: console.log(indSeg)
    // function for running cross-validation iterations with delay
    async function run() {
 
@@ -102,9 +100,7 @@
 
       // set indSeg to -1 to remove last segment from plot and compute overall performance
       indSeg = -1;
-      console.log(sampY, yCV)
       statCV = getStat(sampY, yCV);
-      console.log(statCV)
    }
 
    $: pDegree = pDegrees[pName];
@@ -114,7 +110,6 @@
 
    // make new CV segments
    $: splits = getCVSplits(cvType, nSegments);
-   $: console.log(splits)
 </script>
 
 <StatApp>
