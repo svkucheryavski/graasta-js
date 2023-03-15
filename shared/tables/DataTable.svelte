@@ -1,5 +1,5 @@
 <script>
-   import { isvector } from 'mdatools/arrays';
+   import { isindex, isvector } from 'mdatools/arrays';
    import { min, diff } from 'mdatools/stat';
    import DataTableValues from './DataTableValues.svelte';
 
@@ -21,7 +21,7 @@
    {#each variables as {label, values}, i}
    <tr class="datatable__row">
       <td class="datatable__label">{@html label}</td>
-      <DataTableValues values={isvector(values) ? values.v : values} decNum={decNum[i]} />
+      <DataTableValues values={isvector(values) || isindex(values) ? values.v : values} decNum={decNum[i]} />
    </tr>
    {/each}
 {:else}
@@ -33,7 +33,7 @@
    {#each Array(variables[0].values.length) as _, j}
    <tr class="datatable__row">
       {#each variables as {_, values}, i}
-      <DataTableValues values={[isvector(values) ? values.v[j] : values[j]]} decNum={decNum[i]} />
+      <DataTableValues values={[isvector(values) || isindex(values) ? values.v[j] : values[j]]} decNum={decNum[i]} />
       {/each}
    </tr>
    {/each}

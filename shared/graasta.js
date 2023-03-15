@@ -65,3 +65,17 @@ export function getIndices(x, mx, y, my) {
       nint > 0 ? indNeu.slice(1, nint) : index([])
    ];
 }
+
+   // function to show model info
+   export function getModelString(m, name, color) {
+      let str = '<tspan>y = </tspan>';
+      for (let i = 0; i < m.coeffs.estimate.length; i++) {
+         const b = m.coeffs.estimate.v[i];
+         str +=
+            (i > 0 ? b < 0 ? '<tspan> – </tspan>' : '<tspan> ＋ </tspan>' : '') +
+            `<tspan fill="${color}" font-weight=bold>${Math.abs(b).toFixed(2)}</tspan>` +
+            (i > 0 ? '<tspan font-weight=bold>x</tspan>' : '') +
+            (i > 1 ? '<tspan font-size="70%" baseline-shift = "super">' + i + '</tspan>' : '')
+      }
+      return [`<tspan font-weight=bold>${name}</tspan>`, str];
+   }

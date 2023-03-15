@@ -5,7 +5,7 @@
 
    import { Axes, XAxis, YAxis, Points, Lines, TextLegend} from 'svelte-plots-basic/2d';
 
-   import { colors } from '../../shared/graasta';
+   import { colors, getModelString } from '../../shared/graasta.js';
 
    export let popModel;
    export let sampModel;
@@ -18,29 +18,12 @@
 
    let sampLineY = [];
 
-
-   // function to show model info
-   function getStatString(m, name, color) {
-      let str = '<tspan>y = </tspan>';
-      for (let i = 0; i < m.coeffs.estimate.length; i++) {
-         const b = m.coeffs.estimate.v[i];
-         str +=
-            (i > 0 ? b < 0 ? '<tspan> – </tspan>' : '<tspan> ＋ </tspan>' : '') +
-            `<tspan fill="${color}" font-weight=bold>${Math.abs(b).toFixed(2)}</tspan>` +
-            (i > 0 ? '<tspan font-weight=bold>x</tspan>' : '') +
-            (i > 1 ? '<tspan font-size="70%" baseline-shift = "super">' + i + '</tspan>' : '')
-      }
-      return [`<tspan font-weight=bold>${name}</tspan>`, str];
-   }
-
-   // statistics for population - only for using in this component therefore compute here not in main App
-
    // population and sample regression lines
    $: popX = popModel.data.X.getcolumn(1);
    $: popY = popModel.data.y;
    $: lineX = Vector.seq(min(popX), max(popX), 1/100);
    $: popLineY = polypredict(popModel, lineX);
-   $: popText = getStatString(popModel, 'Population', '#a0a0a0');
+   $: popText = getModelString(popModel, 'Population', '#a0a0a0');
 
    // points and statistics for sample
    $: sampX = sampModel.data.X.getcolumn(1);
