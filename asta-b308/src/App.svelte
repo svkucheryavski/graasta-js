@@ -4,6 +4,10 @@
    // shared components
    import {default as StatApp} from '../../shared/StatApp.svelte';
 
+   // shared components - plots
+   import AppPlot from '../../shared/plots/3DPlotAxes.svelte';
+   import ModelPlot from '../../shared/plots/MLRModelPlot.svelte';
+
    // shared components - controls
    import AppControlArea from '../../shared/controls/AppControlArea.svelte';
    import AppControlRange from '../../shared/controls/AppControlRange.svelte';
@@ -11,8 +15,6 @@
    import {colors} from '../../shared/graasta';
 
    // local components
-   import AppPlot from './AppPlot.svelte';
-   import ModelPlot from './ModelPlot.svelte';
    import PointPlot from './PointPlot.svelte';
    import PointLineEquation from './PointLineEquation.svelte';
 
