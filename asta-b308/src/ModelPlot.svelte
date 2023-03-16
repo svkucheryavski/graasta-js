@@ -1,8 +1,6 @@
 <script>
-   import {rep, seq} from 'mdatools/stat';
-   import { mdot, vmult } from 'mdatools/matrix';
-
-   import Segments from '../../shared/plots3d/Segments.svelte';
+   import { Vector, cbind } from 'mdatools/arrays';
+   import { Segments } from 'svelte-plots-basic/3d';
 
    export let coeffs;
    export let X1Range;
@@ -11,45 +9,45 @@
    export let color;
 
    const n = 20;
-   const x0 = rep(1, n);
+   const x0 = Vector.ones(n);
 
    let X1Start, X1End = [];
    let X2Start, X2End = [];
 
    // generated points at fixed X2Range values
    $: {
-      const x1 = seq(X1Range[0], X1Range[1], n);
-      const x21 = rep(X2Range[0], n);
-      const x22 = rep(X2Range[1], n);
+      const x1 = Vector.seq(X1Range[0], X1Range[1], (X1Range[1] - X1Range[0]) / (n - 1));
+      const x21 = Vector.fill(X2Range[0], n);
+      const x22 = Vector.fill(X2Range[1], n);
 
       X2Start = [
          x1,
          x21,
-         mdot([x0, x1, x21, vmult(x1, x21)], coeffs)[0]
+         cbind(x0, x1, x21, x1.mult(x21)).dot(coeffs).getcolumn(1)
       ];
 
       X2End = [
          x1,
          x22,
-         mdot([x0, x1, x22, vmult(x1, x22)], coeffs)[0]
+         cbind(x0, x1, x22, x1.mult(x22)).dot(coeffs).getcolumn(1)
       ];
    }
 
    $: {
-      const x11 = rep(X1Range[0], n);
-      const x12 = rep(X1Range[1], n);
-      const x2 = seq(X2Range[0], X2Range[1], n);
+      const x11 = Vector.fill(X1Range[0], n);
+      const x12 = Vector.fill(X1Range[1], n);
+      const x2 = Vector.seq(X2Range[0], X2Range[1], (X2Range[1] - X2Range[0]) / (n - 1));
 
       X1Start = [
          x11,
          x2,
-         mdot([x0, x11, x2, vmult(x11, x2)], coeffs)[0]
+         cbind(x0, x11, x2, x11.mult(x2)).dot(coeffs).getcolumn(1)
       ];
 
       X1End = [
          x12,
          x2,
-         mdot([x0, x12, x2, vmult(x12, x2)], coeffs)[0]
+         cbind(x0, x12, x2, x12.mult(x2)).dot(coeffs).getcolumn(1)
       ];
    }
 </script>

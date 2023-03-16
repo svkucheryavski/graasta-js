@@ -1,23 +1,25 @@
 <script>
+   import { vector } from 'mdatools/arrays';
+
    // shared components
-   import {default as StatApp} from "../../shared/StatApp.svelte";
+   import {default as StatApp} from '../../shared/StatApp.svelte';
 
    // shared components - controls
-   import AppControlArea from "../../shared/controls/AppControlArea.svelte";
-   import AppControlRange from "../../shared/controls/AppControlRange.svelte";
+   import AppControlArea from '../../shared/controls/AppControlArea.svelte';
+   import AppControlRange from '../../shared/controls/AppControlRange.svelte';
    import AppControlSelect from '../../shared/controls/AppControlSelect.svelte';
    import {colors} from '../../shared/graasta';
 
    // local components
-   import AppPlot from "./AppPlot.svelte";
-   import ModelPlot from "./ModelPlot.svelte";
-   import PointPlot from "./PointPlot.svelte";
+   import AppPlot from './AppPlot.svelte';
+   import ModelPlot from './ModelPlot.svelte';
+   import PointPlot from './PointPlot.svelte';
    import PointLineEquation from './PointLineEquation.svelte';
 
    // constant parameters
    const X1Range = [0, 4];
    const X2Range = [0, 4];
-   const modelColor = "#a0a0ef70";
+   const modelColor = '#a0a0ef70';
    const pointColor = colors.plots.SAMPLES[0];
 
    // axes limits (a bit wider the X range)
@@ -37,10 +39,10 @@
    let pX2 = 2.0;
 
    // model lines mode
-   let showLines = "Both";
+   let showLines = 'Both';
 
    // combine coefficients to a vector
-   $: coeffs = [b0, b1, b2, b12];
+   $: coeffs = vector([b0, b1, b2, b12]);
 </script>
 
 <StatApp>
@@ -52,8 +54,8 @@
       <div class="app-plot-area">
          <!-- 3D plot -->
          <AppPlot {limX} {limY} {limZ}>
-            <PointPlot color={pointColor} {coeffs} {pX1} {pX2} {X1Range} {X2Range} {showLines} />
             <ModelPlot color={modelColor} {coeffs} {X1Range} {X2Range} {showLines} />
+            <PointPlot color={pointColor} {coeffs} {pX1} {pX2} {X1Range} {X2Range} {showLines} />
          </AppPlot>
       </div>
 
@@ -99,7 +101,7 @@
       "eq controls"
       "plot controls";
    grid-template-rows: min-content 1fr;
-   grid-template-columns: 65% minmax(350px, 35%);
+   grid-template-columns: minmax(60%, 80%) minmax(300px, 500px);
 }
 
 .app-eq-area {

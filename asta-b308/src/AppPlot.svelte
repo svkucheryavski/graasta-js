@@ -1,9 +1,6 @@
 <script>
    // shared components - 3d plot elements
-   import Axes from '../../shared/plots3d/Axes.svelte';
-   import XAxis from '../../shared/plots3d/XAxis.svelte';
-   import YAxis from '../../shared/plots3d/YAxis.svelte';
-   import ZAxis from '../../shared/plots3d/ZAxis.svelte';
+   import {Axes, XAxis, YAxis, ZAxis } from 'svelte-plots-basic/3d';
 
    export let limX;
    export let limY;
@@ -12,7 +9,7 @@
    // initial orientation
    let phi = -25.264 / 180 * Math.PI
    let theta = 215 / 180 * Math.PI;
-   let zoom = 0.5;
+   let zoom = 0.55;
 
    // drugging settings
    let isDragging = false;
@@ -57,12 +54,12 @@
 
    /* rotate and move plot by keyboard */
    document.onkeydown = function (event) {
-      if (event.key == "ArrowLeft") phi = phi - 0.05;
-      if (event.key == "ArrowRight") phi = phi + 0.05;
-      if (event.key == "ArrowUp") theta = theta - 0.01;
-      if (event.key == "ArrowDown") theta = theta + 0.01;
-      if (event.key == "+") zoom = zoom * 1.1;
-      if (event.key == "-") zoom = zoom * 0.9;
+      if (event.key == 'ArrowRight') phi = phi + 0.05;
+      if (event.key == 'ArrowLeft') phi = phi - 0.05;
+      if (event.key == 'ArrowUp') theta = theta - 0.01;
+      if (event.key == 'ArrowDown') theta = theta + 0.01;
+      if (event.key == '+') zoom = zoom * 1.1;
+      if (event.key == '-') zoom = zoom * 0.9;
    }
 </script>
 
@@ -75,6 +72,7 @@
       on:pointerup={stopRotation}
 >
    <Axes {limX} {limY} {limZ} {zoom} {phi} {theta}>
+   <slot></slot>
       <XAxis showGrid={true} title="X1" slot="xaxis" />
       <YAxis showGrid={true} title="Y" slot="yaxis" />
       <ZAxis showGrid={true} title="X2" slot="zaxis" />

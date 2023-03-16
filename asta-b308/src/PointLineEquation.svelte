@@ -1,13 +1,14 @@
 <script>
-   import { mdot } from 'mdatools/matrix';
+   import { vector } from 'mdatools/arrays';
+
 
    export let pX1;
    export let pX2;
    export let coeffs;
-   export let showLines = "Both";
+   export let showLines = 'Both';
 
-   $: X = [[1], [pX1], [pX2], [pX1 * pX2]];
-   $: y = mdot(X, coeffs)[0][0]
+   $: x = vector([1, pX1, pX2, pX1 * pX2]);
+   $: y = x.dot(coeffs);
 </script>
 
 <div class="eq">
@@ -21,15 +22,15 @@
       <span></span><span></span>
    </div>
    <div class="eq_term eq_term__coeff" >
-      <span>{coeffs[0].toFixed(1)}</span><span>b0</span>
+      <span>{coeffs.v[0].toFixed(1)}</span><span>b0</span>
    </div>
 
    <!-- b1 -->
    <div class="eq_term eq_term__op">
-      <span>{@html coeffs[1] < 0 ? '&minus;' : '+'}</span><span>+</span>
+      <span>{@html coeffs.v[1] < 0 ? '&minus;' : '+'}</span><span>+</span>
    </div>
    <div class="eq_term eq_term__coeff">
-      <span>{Math.abs(coeffs[1]).toFixed(1)}</span><span>b<sub>1</sub></span>
+      <span>{Math.abs(coeffs.v[1]).toFixed(2)}</span><span>b<sub>1</sub></span>
    </div>
    <div class="eq_term eq_term__op">
       <span>&times;</span><span>&times;</span>
@@ -40,10 +41,10 @@
 
    <!-- b2 -->
    <div class="eq_term eq_term__op">
-      <span>{@html coeffs[2] < 0 ? '&minus;' : '+'}</span><span>+</span>
+      <span>{@html coeffs.v[2] < 0 ? '&minus;' : '+'}</span><span>+</span>
    </div>
    <div class="eq_term eq_term__coeff">
-      <span>{Math.abs(coeffs[2]).toFixed(1)}</span><span>b<sub>2</sub></span>
+      <span>{Math.abs(coeffs.v[2]).toFixed(2)}</span><span>b<sub>2</sub></span>
    </div>
    <div class="eq_term eq_term__op">
       <span>&times;</span><span>&times;</span>
@@ -54,10 +55,10 @@
 
    <!-- b12 -->
    <div class="eq_term eq_term__op">
-      <span>{@html coeffs[3] < 0 ? '&minus;' : '+'}</span><span>+</span>
+      <span>{@html coeffs.v[3] < 0 ? '&minus;' : '+'}</span><span>+</span>
    </div>
    <div class="eq_term eq_term__coeff">
-      <span>{Math.abs(coeffs[3]).toFixed(2)}</span><span>b<sub>12</sub></span>
+      <span>{Math.abs(coeffs.v[3]).toFixed(2)}</span><span>b<sub>12</sub></span>
    </div>
    <div class="eq_term eq_term__op">
       <span>&times;</span><span>&times;</span>
@@ -77,7 +78,7 @@
    .eq {
       display: flex;
       flex-direction: row;
-      font-size: 1.35em;
+      font-size: 1.2em;
       align-items: stretch;
       justify-content: center;
       margin: 0.5em;
