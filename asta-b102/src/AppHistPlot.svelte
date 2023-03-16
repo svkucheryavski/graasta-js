@@ -7,7 +7,7 @@
    export let population;
 </script>
 
-<Axes limX={population.hist.xLim} limY={population.hist.yLim} xLabel={population.title} margins={[1, 1, 0.5, 0.5]}>
+<Axes limX={population.hist.xLim} limY={population.hist.yLim} xLabel={population.title} margins={[0.75, 0.75, 0.25, 0.25]}>
 
    <Histogram bins={population.hist.bins} counts={population.hist.counts}
       faceColor={colors.plots.POPULATIONS_PALE[0]} borderColor="transparent" />

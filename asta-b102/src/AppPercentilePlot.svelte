@@ -6,7 +6,7 @@
    export let population;
 </script>
 
-<Axes limY={[-0.05, 1.05]} limX={population.hist.xLim} xLabel={population.title} yLabel="Percentiles" margins={[1, 1, 0.5, 0.5]}>
+<Axes limY={[-0.05, 1.05]} limX={population.hist.xLim} xLabel={population.title} yLabel="Percentiles" margins={[0.75, 0.75, 0.25, 0.25]}>
 
    <Lines xValues={population.ps.xValues} yValues={population.ps.yValues} lineColor={colors.plots.POPULATIONS[0]} />
 

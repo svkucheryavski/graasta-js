@@ -1,6 +1,6 @@
 <script>
    import { mean } from 'mdatools/stat';
-   import { Index } from 'mdatools/arrays';
+   import { Vector, Index } from 'mdatools/arrays';
    import { Axes, XAxis, YAxis, Box, Segments, Area, TextLabels, Lines } from 'svelte-plots-basic/2d';
 
    export let x;

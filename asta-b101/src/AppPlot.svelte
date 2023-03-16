@@ -40,8 +40,6 @@
       outRight = Q3 + (Q3 - Q1) * 1.5;
       limX = [min([min(sample), outLeft]) - 2, max([max(sample), outRight]) + 2];
       statValues = vector([mn, Q1, Q2, Q3, mx]);
-
-      console.log(limX)
    }
 
 </script>

@@ -1,5 +1,5 @@
 <script>
-   import { Index } from 'mdatools/arrays';
+   import { Vector, Index } from 'mdatools/arrays';
    import { Axes, XAxis, YAxis, Box, Segments, Points, TextLabels, Lines } from 'svelte-plots-basic/2d';
 
    export let x;

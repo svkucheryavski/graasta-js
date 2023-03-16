@@ -6,7 +6,7 @@
 
    $: n = sample.length;
    $: ranks = Vector.seq(1, n);
-   $: percentages = Vector.seq(1, n).apply(v => (v - 0.5) / n);
+   $: percentages = Vector.seq(0.5/n, (n - 0.5)/n, 1/n);
 
 </script>
 

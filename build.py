@@ -49,11 +49,38 @@ for block in app_blocks:
         subprocess.call("npm run build", shell=True)
         os.chdir(wd)
 
-        # copy the files
+        # copy the javascript file
         os.makedirs(os.path.join(SRC_DIR, app), exist_ok = True)
-#        copyfile(app + "/public/" + app + ".css", SRC_DIR + app + "/" + app + ".css")
         copyfile(app + "/dist/" + app + ".js", SRC_DIR + app + "/" + app + ".js")
-        copyfile(app + "/" + "index.html", SRC_DIR + app + "/index.html")
+
+        # create HTML file
+        f = open(SRC_DIR + app + "/index.html", "w")
+        f.write(f"""
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+	<meta charset='utf-8'>
+	<meta name='viewport' content='width=device-width,initial-scale=1'>
+	<title>graasta | {app}</title>
+
+	<script defer type='module' src='{app}.js'></script>
+
+   <style>
+      html, body {{
+         height: 100%;
+         width: 100%;
+         padding: 0;
+         margin: 0;
+      }}
+   </style>
+</head>
+
+<body>
+   <div id='graasta-app-container'></div>
+</body>
+</html>
+        """)
+        f.close()
 
         # make archive
         make_archive(SRC_DIR + app, 'zip', SRC_DIR + app)

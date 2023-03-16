@@ -78,7 +78,7 @@
       } else {
          a = a > x2 ? x2 : a;
          x1 = a;
-         intInd = [closestind(x, a), intInd[1]];
+         intInd = [closestind(x, a) - 1, intInd[1]];
          p1 = p.v[intInd[0]];
       }
    }
@@ -103,7 +103,7 @@
          x2 = b;
       }
 
-      intInd = [intInd[0], closestind(x, b)];
+      intInd = [intInd[0], closestind(x, b) - 1];
       p2 = p.v[intInd[1]];
    }
 
@@ -124,7 +124,7 @@
       } else {
          pa = pa > p2 ? p2 : pa;
          p1 = pa;
-         intInd = [closestind(p, pa), intInd[1]];
+         intInd = [closestind(p, pa) - 1, intInd[1]];
          x1 = x.v[intInd[0]];
       }
    }
@@ -148,7 +148,7 @@
          p2 = pb;
       }
 
-      intInd = [intInd[0], closestind(p, pb)];
+      intInd = [intInd[0], closestind(p, pb) - 1];
       x2 = x.v[intInd[1]];
    }
 

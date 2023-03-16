@@ -1,6 +1,7 @@
 <script>
    import { createEventDispatcher } from "svelte";
    import AppControl from "./AppControl.svelte";
+    import AppControlArea from "./AppControlArea.svelte";
 
    export let id;
    export let label;
