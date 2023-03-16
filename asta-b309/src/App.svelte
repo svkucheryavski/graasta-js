@@ -1,37 +1,39 @@
 <script>
+   import { max, min, sd } from 'mdatools/stat';
+   import { Vector, vector, cbind, crossprod, tcrossprod } from 'mdatools/arrays';
+
+   import { Points } from 'svelte-plots-basic/3d';
+
    // shared components
    import {default as StatApp} from "../../shared/StatApp.svelte";
+   import { colors } from '../../shared/graasta';
+
+   // shared components - plots
+   import AppPlot from '../../shared/plots/3DPlotAxes.svelte';
+   import ModelPlot from '../../shared/plots/MLRModelPlot.svelte';
 
    // shared components - controls
    import AppControlArea from "../../shared/controls/AppControlArea.svelte";
    import AppControlSelect from '../../shared/controls/AppControlSelect.svelte';
    import AppControlButton from '../../shared/controls/AppControlButton.svelte';
-   import {colors} from '../../shared/graasta';
 
    // local components
-   import AppPlot from "./AppPlot.svelte";
-   import ModelPlot from "./ModelPlot.svelte";
    import PointLineEquation from './PointLineEquation.svelte';
-   import ScatterSeries from '../../shared/plots3d/ScatterSeries.svelte';
-   import AppCoeffsPlot from "./AppCoeffsPlot.svelte";
+   import AppCoeffsPlot from './AppCoeffsPlot.svelte';
 
-   // methods from mdatools
-   import { rnorm, max, min, sd, runif, rep } from "mdatools/stat";
-   import { vadd, vmult, crossprod, transpose, mdot } from "mdatools/matrix";
-   import { inv } from "mdatools/decomp";
 
 
    // constant parameters
-   const popCoeffs = [10, 1, 1];
-   const modelColor = "#a0a0ef70";
+   const popCoeffs = vector([10, 1, 1]);
+   const modelColor = '#a0a0ef70';
    const pointColor = colors.plots.SAMPLES[0];
-   const corrOptions = {"no": 0.0, "low": 0.3, "med": 0.7, "high":0.95};
-   const sampSizeOptions = {"10": 10, "15": 15, "30": 30};
-   const yerrOptions = {"low": 0.1, "med": 0.25, "large": 0.5};
+   const corrOptions = {'no': 0.0, 'low': 0.3, 'med': 0.7, 'high':0.95};
+   const sampSizeOptions = {'10': 10, '15': 15, '30': 30};
+   const yerrOptions = {'low': 0.1, 'med': 0.25, 'large': 0.5};
 
-   let corrStr = "low";
-   let sampSizeStr = "30";
-   let yerrStr = "low";
+   let corrStr = 'low';
+   let sampSizeStr = '30';
+   let yerrStr = 'low';
 
    // axes limits (a bit wider the X range)
    const limX = [-3, 3];
@@ -41,7 +43,7 @@
 
    // function for taking a new sample
    function takeSample() {
-      x1 = runif(sampSize, -2, 2);
+      x1 = Vector.rand(sampSize, -2, 2);
    }
 
    // function fo rescaling x values
@@ -51,7 +53,7 @@
       const d1 = mx - mn;
       const d2 = r2 - r1;
 
-      return x.map(v => r1 + (v - mn) / d1 * d2);
+      return x.apply(v => r1 + (v - mn) / d1 * d2);
    }
 
    // reactive parameters depend on user input
@@ -59,20 +61,24 @@
    $: sampSize = sampSizeOptions[sampSizeStr];
    $: yErr = yerrOptions[yerrStr];
 
-   // generate x1 values as random numbers
-   $: x1 = runif(sampSize, -2, 2);
+   // create data values
+   let x1, x2, X, y, sampCoeffs;
+   $: {
+      // generate x1 values as random numbers
+      x1 = Vector.rand(sampSize, -2, 2);
 
-   // compute x2 values based on x1 and the correlation degree
-   $: x2 = rescale(vadd(vmult(x1, corr / sd(x1)), rnorm(sampSize, 2, 2 - 2 * Math.abs(corr))), -2, 2);
+      // compute x2 values based on x1 and the correlation degree
+      x2 = rescale(x1.mult(corr / sd(x1)).add(Vector.randn(sampSize, 2, 2 - 2 * Math.abs(corr))), -2, 2);
 
-   // combine x-variables together and add column of ones.
-   $: X = [rep(1, sampSize), x1, x2]
+      // combine x-variables together and add column of ones.
+      X = cbind(Vector.ones(sampSize), x1, x2);
 
-   // compute theoretical y-values and add some noise
-   $: y = vadd(mdot(X, popCoeffs)[0], rnorm(sampSize, 0, yErr));
+      // compute theoretical y-values and add some noise
+      y = X.dot(popCoeffs).add(Vector.randn(sampSize, 0, yErr)).getcolumn(1);
 
-   // fit the MLR model and get the estimated coefficients
-   $: sampCoeffs = mdot(mdot(inv(crossprod(X)), transpose(X)), y)[0]
+      // fit MLR model to the sample
+      sampCoeffs = tcrossprod(crossprod(X).inv(), X).dot(y).getcolumn(1);
+   }
 </script>
 
 <StatApp>
@@ -86,9 +92,9 @@
       <!-- 3D plot -->
       <div class="app-plot-area">
          <AppPlot {limX} {limY} {limZ}>
-            <ScatterSeries xValues={x1} zValues={x2} yValues={y} borderWidth={2} borderColor={pointColor} />
-            <ScatterSeries xValues={x1} zValues={x2} yValues={rep(0, sampSize)} borderWidth={2} borderColor={"#b0b0b0"}/>
-            <ModelPlot color={modelColor} coeffs={sampCoeffs} X1Range={[-3, 3]} X2Range={[-3, 3]} />
+            <Points xValues={x1} zValues={x2} yValues={y} borderWidth={2} borderColor={pointColor} />
+            <Points xValues={x1} zValues={x2} yValues={Vector.zeros(sampSize)} borderWidth={2} borderColor={"#b0b0b0"}/>
+            <ModelPlot color={modelColor} coeffs={Vector.c(sampCoeffs, 0)} X1Range={[-3, 3]} X2Range={[-3, 3]} />
          </AppPlot>
       </div>
 
@@ -130,7 +136,7 @@
       "plot coeffsplot"
       "plot controls";
    grid-template-rows: min-content 1fr 1fr;
-   grid-template-columns: 65% minmax(350px, 35%);
+   grid-template-columns: minmax(60%, 80%) minmax(300px, 500px);
 }
 
 .app-eq-area {
