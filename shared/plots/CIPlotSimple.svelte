@@ -30,7 +30,7 @@
 
    <!-- statistics -->
    {#if showLegend}
-   <TextLegend textSize={1.05} left={limXLocal[0]} top={0.85} dx="2em" dy="1.35em" elements={legendElements} />
+   <TextLegend textSize={1.15} left={limXLocal[0]} top={0.85} dx="2em" dy="1.35em" elements={legendElements} />
    {/if}
 
    {#if effectExpected !== null}

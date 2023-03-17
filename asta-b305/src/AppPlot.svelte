@@ -28,7 +28,7 @@
    // points and statistics for sample
    $: sampX = sampModel.data.X.getcolumn(1);
    $: sampY = sampModel.data.y;
-   $: sampText = getStatString(sampModel, 'Sample', sampColor);
+   $: sampText = getModelString(sampModel, 'Sample', sampColor);
    $: sampLineY = reset ? [polypredict(sampModel, lineX)] : [...sampLineY, polypredict(sampModel, lineX)] ;
 </script>
 

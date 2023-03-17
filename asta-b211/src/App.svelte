@@ -227,16 +227,10 @@
 }
 
 .app-original-data-area  > :global(.plot) {
-   min-height: 130px;
-   height: 100%;
    grid-area: plot;
 }
 
-.app-original-data-area  > :global(.plot) {
-   grid-area: plot;
-}
-
-.app-original-data-area  > :global(.app-control-area) {
+.app-original-data-area  > :global(.app-control-block) {
    margin-top: 1em;
    grid-area: controls;
 }

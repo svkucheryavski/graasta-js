@@ -139,10 +139,11 @@
    display: grid;
    grid-template-areas:
       "plot stat"
-      "plot controls";
+      "plot controls"
+      "plot .";
 
-   grid-template-rows: auto min-content;
-   grid-template-columns: 65% 35%;
+   grid-template-rows: max(250px, 60%) min-content auto;
+   grid-template-columns: auto min(400px, 35%);
 }
 
 .app-plot-area {
@@ -156,6 +157,7 @@
 }
 
 .app-controls-area {
+   padding-top: 1em;
    padding-left: 1em;
    grid-area: controls;
 }

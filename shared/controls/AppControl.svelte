@@ -26,8 +26,8 @@
    .app-control > label {
       height: 1.5em;
       line-height: 1.5em;
-      flex: 0 0 90px;
-      max-width: 90px;
+      flex: 0 0 16ch;
+      max-width: 16ch;
       user-select: none;
       -webkit-user-select: none;
       cursor: default
@@ -35,25 +35,14 @@
 
    .app-control > slot {
       width: 100%;
+      flex: 1 1 auto;
    }
 
    .shield {
       display: none;
    }
 
-   @media(min-width: 959px) {
-      .app-control > label {
-         flex: 0 0 120px;
-         max-width: 120px;
-      }
-   }
 
-   @media(min-width: 1279px) {
-      .app-control > label {
-         flex: 0 0 150px;
-         max-width: 150px;
-      }
-   }
 
    /* disabled styles */
    .app-control.disable > label{

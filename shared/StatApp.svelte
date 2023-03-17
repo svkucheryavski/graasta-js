@@ -37,15 +37,18 @@
    font-family: Helvetica, Areal, Verdana, sans-serif;
    display: block;
    position: relative;
-   font-size: max(14px, 1vw);
+   font-size: 1em;
 
-   width: auto;
    min-width: 800px;
    min-height: 450px;
-   height: auto;
-   width: auto;
-   aspect-ratio: 16/9;
+   max-height: 100%;
+   max-width: 100%;
 
+   aspect-ratio: 16/9;
+   width: auto;
+   height: auto;
+
+   object-fit: contain;
    box-sizing: border-box;
    padding: 0;
    margin: 0 auto;

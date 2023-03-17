@@ -99,10 +99,11 @@
    display: grid;
    grid-template-areas:
       "plot table"
-      "plot controls";
+      "plot controls"
+      "plot .";
 
-   grid-template-rows: 1fr auto;
-   grid-template-columns: 65% 35%;
+   grid-template-rows: min-content auto auto;
+   grid-template-columns: auto min(400px, 35%);
 }
 
 .app-plot-area {

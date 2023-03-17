@@ -3,7 +3,7 @@
    export let legend = "";
 </script>
 
-<fieldset class="app-control-area">
+<fieldset class="app-control-block">
    {#if legend !== ""}
    <legend>{legend}</legend>
    {/if}
@@ -12,6 +12,12 @@
 </fieldset>
 
 <style>
+   .app-control-block {
+      box-sizing: border-box;
+      width: 100%;
+      min-width: 200px;
+   }
+
    .app-control-error {
       padding: 0.5em 0.5em 0.25em 0.65em;
       font-size: 0.75em;
@@ -33,7 +39,7 @@
       display: block;
       margin: 0;
       padding: 0.25em 0em;
-      font-size: 1.1em;
+      font-size: 1.0em;
       font-weight: bold;
    }
 </style>

@@ -67,10 +67,23 @@ for block in app_blocks:
 
    <style>
       html, body {{
-         height: 100%;
-         width: 100%;
-         padding: 0;
-         margin: 0;
+        font-size: 12px;
+        height: 100%;
+        width: 100%;
+        padding: 0;
+        margin: 0;
+      }}
+
+      @media (min-width: 960px) and (min-height: 540px) {{
+        html, body {{
+            font-size: 14px;
+        }}
+      }}
+
+      @media (min-width: 1200px) and (min-height: 675px) {{
+        html, body {{
+            font-size: 16px;
+        }}
       }}
    </style>
 </head>

@@ -131,7 +131,7 @@
       "plot ."
       "qqtable .";
    grid-template-rows: min-content min-content auto min-content;
-   grid-template-columns: 65% 35%;
+   grid-template-columns: auto min(400px, 35%);
 }
 
 .app-qqplot-area {

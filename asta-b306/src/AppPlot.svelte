@@ -4,7 +4,7 @@
    import { polypredict } from 'mdatools/models';
    import { Axes, XAxis, YAxis, Points, Lines, TextLegend } from 'svelte-plots-basic/2d';
 
-   import { colors, getModelString } from '../../shared/graasta.js';
+   import { colors, getModelString, getStatString } from '../../shared/graasta.js';
 
    export let globalModel;
    export let localModel;
@@ -27,13 +27,6 @@
    let textLocal = [];
    let lineYLocal = []
 
-   // function for getting strings with prediction statistics
-   function getStatString(s) {
-      console.log(s)
-      return [
-      `s(e) =  <tspan font-weight=bold>${s.se.toFixed(2)}</tspan>`,
-      `R2 =  <tspan font-weight=bold>${s.R2.toFixed(3)}</tspan>`];
-   }
 
    // points and statistics for global model
    $: xGlobal = globalModel.data.X.getcolumn(1);

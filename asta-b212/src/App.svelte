@@ -152,7 +152,7 @@
       "controls"
       ".";
 
-   grid-template-rows: min-content max(130px, 30%) min-content auto;
+   grid-template-rows: min-content max(200px, 35%) min-content auto;
    grid-template-columns: 1fr min-content;
 }
 
@@ -176,13 +176,11 @@
 }
 
 .app-original-data-area  > :global(.plot) {
-   min-height: 130px;
-   height: 100%;
    grid-area: plot;
    padding-left: 1em;
 }
 
-.app-original-data-area  > :global(.app-control-area) {
+.app-original-data-area  > :global(.app-control-block) {
    margin-top: 1em;
    grid-area: controls;
 }

@@ -160,8 +160,8 @@
    position: relative;
 
    display: grid;
-   grid-template-columns: 3fr 2fr;
-   grid-template-rows: 3fr 1fr;
+   grid-template-columns: auto min(450px, 35%);
+   grid-template-rows: 3fr 2fr;
    grid-template-areas:
       "plot1 plot2"
       "plot1 controls";

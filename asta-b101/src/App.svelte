@@ -122,17 +122,17 @@
 <style>
 
 .app-layout {
+   min-width: 800px;
    width: 100%;
    height: 100%;
    position: relative;
-
    display: grid;
    grid-template-areas:
       "plot stattable"
       "plot controls"
       "plot ."
       "datatable .";
-   grid-template-columns: 65% 35%;
+   grid-template-columns: auto min(400px, 35%);
    grid-template-rows: min-content auto auto min-content;
 }
 

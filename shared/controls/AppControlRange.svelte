@@ -105,6 +105,7 @@
       margin: 0;
       padding: 0;
       width: auto;
+      min-width: 100px;
       border-radius: 2px;
 
       user-select: none;
