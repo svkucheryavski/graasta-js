@@ -22,8 +22,6 @@
             e.classList.add('selected')
          }
       }) : '';
-
-   $: console.log(Vector.c(e2, sum(e2)))
 </script>
 
 <div class="table-container" bind:this={t}>

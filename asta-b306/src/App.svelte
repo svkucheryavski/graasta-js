@@ -170,10 +170,10 @@
    display: grid;
    grid-template-areas:
       "plot table"
-      "plot controls";
-
-   grid-template-rows: 1fr auto;
-   grid-template-columns: minmax(60%, 80%) minmax(300px, 500px);
+      "plot controls"
+      "plot .";
+   grid-template-rows: min-content min-content auto;
+   grid-template-columns: auto min(400px, 35%);
 }
 
 .app-plot-area {
